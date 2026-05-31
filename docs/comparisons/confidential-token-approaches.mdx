@@ -1,0 +1,63 @@
+---
+title: "Ways to build a confidential token, compared"
+description: "Confidential tokens can be built three ways: DIY confidential contracts, permissioned token standards like ERC-3643, or managed confidential-asset infrastructure. The trade-offs of each approach."
+sidebarTitle: "Token approaches"
+---
+
+There are three broad ways to put a confidential or compliance-controlled token onchain: build confidential token contracts yourself, adopt a permissioned token standard (such as ERC-3643) that controls *who* can hold an asset, or use managed confidential-asset infrastructure that handles confidentiality, compliance, and operations behind an API. They solve different parts of the problem, and only the third gives you encrypted balances plus disclosure, audit, and operations without building a blockchain organization.
+
+## The three approaches
+
+### 1. DIY confidential token contracts
+
+Write and operate your own contracts that encrypt balances and amounts and verify activity with zero-knowledge proofs. This gives maximum control but requires deep expertise in cryptography, proving systems, circuits, key management, and onchain operations — and you own all of it forever, including audits, incident response, and upgrades.
+
+### 2. Permissioned / compliance token standards (e.g. ERC-3643)
+
+Standards like ERC-3643 ("T-REX") add **identity and permissioning** to tokens: only verified, allowlisted identities can hold or transfer the asset. This is valuable for regulated distribution — but note what it does and does not do. It controls *who participates*; it does **not** by itself encrypt balances or amounts. On a public chain, an ERC-3643 token's balances and transfers are still visible; the privacy is about gating participation, not hiding values.
+
+### 3. Managed confidential-asset infrastructure (Ryle)
+
+A platform that provides **encrypted balances and amounts, selective disclosure, audit logging, policy/KYC controls, and operations** behind a Console and APIs. You work with business-level primitives — assets, accounts, mints, redemptions, policies, events — while the platform manages proofs, circuits, signing, gas, and network coordination. It can also layer confidentiality onto an asset you already issue or a third-party asset.
+
+## Side-by-side comparison
+
+| Dimension | DIY contracts | Permissioned standard (ERC-3643) | Managed infrastructure (Ryle) |
+| --- | --- | --- | --- |
+| Encrypted balances & amounts | If you build it | No (participation control only) | Yes |
+| Selective disclosure | If you build it | Not inherent | Yes, scoped and logged |
+| Participation / KYC control | If you build it | Yes | Yes |
+| Audit log | If you build it | Partial (onchain events) | Immutable, attributed, exportable |
+| Operations (mint/redeem, reconciliation) | You build & run | You build & run | Provided via Console + API |
+| Cryptography burden | All yours | N/A | Managed by the platform |
+| Time to production | Long | Medium | Days, per the [technical brief](/partner-integration/technical-brief) |
+
+## How to choose
+
+- Need **confidentiality** (hidden balances/amounts) *and* compliance? That is the gap managed confidential-asset infrastructure fills.
+- Need only **gated participation** on otherwise-public tokens? A permissioned standard may be enough.
+- Have a **dedicated cryptography and protocol team** and a reason to own the stack? DIY is possible, at significant ongoing cost.
+
+Ryle is designed so that integrating confidential assets feels closer to integrating a payments processor than building a blockchain product.
+
+## Related
+
+- [What are confidential digital assets?](/what-are-confidential-digital-assets)
+- [How confidential assets work](/concepts/how-confidential-assets-work)
+- [Confidential assets vs traditional tokens](/concepts/confidential-vs-traditional-tokens)
+- [Technical brief](/partner-integration/technical-brief)
+- [Platform overview](/partner-integration/platform-overview)
+
+## FAQ
+
+<AccordionGroup>
+  <Accordion title="Does ERC-3643 make a token private?">
+    Not on its own. ERC-3643 controls which identities can hold or transfer an asset, but balances and transfer amounts remain visible on a public chain. Confidentiality requires encrypting those values, which is what confidential digital assets do.
+  </Accordion>
+  <Accordion title="Do I need to choose between privacy and compliance?">
+    No. Managed confidential-asset infrastructure provides both: encrypted balances and amounts plus participation control, selective disclosure, and an audit trail.
+  </Accordion>
+  <Accordion title="Can I add confidentiality to a token I already issue?">
+    Yes. Ryle supports a confidential layer on an asset you already issue, a brand-new confidential asset, or confidentiality on a third-party asset — all behind the same API.
+  </Accordion>
+</AccordionGroup>

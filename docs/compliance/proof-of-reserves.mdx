@@ -1,0 +1,57 @@
+---
+title: "Proof of reserves for confidential assets"
+description: "Proof of reserves lets an issuer prove that a confidential asset's supply is fully backed — to an auditor or regulator — without exposing individual holder balances. How reconciliation works in Ryle."
+sidebarTitle: "Proof of reserves"
+---
+
+Proof of reserves for a confidential asset is the ability to demonstrate that the asset's total supply is backed by the reserves held against it, without revealing who holds what. Because supply and reserves are aggregate facts while balances are individual, an issuer can prove backing to an auditor or regulator while every holder balance stays encrypted. In Ryle, this is handled through reconciliation between the confidential supply and the public-side reserves an asset is bound to.
+
+## The problem proof of reserves solves
+
+Issuers of stablecoins, tokenized funds, and other backed instruments must show that what they have issued is actually backed. On a transparent chain this is "solved" by exposing everything — which leaks holder data. With full anonymity it cannot be solved at all — there is no way to prove the aggregate. Confidential assets resolve the tension: the aggregate (supply, reserves) is provable; the individual (balances, counterparties) stays private.
+
+## How reconciliation works
+
+A confidential asset that spans a public/confidential boundary is minted against reserves and redeemed back against them:
+
+1. **Mint** creates units of the confidential asset against reserves.
+2. **Redeem** removes units from circulation, reconciled against reserves.
+3. **Reconciliation** continuously compares confidential supply to the reserves the asset is bound to, surfacing divergence as an alert.
+
+Reconciliation endpoints expose supply-vs-reserves status for assets that span the boundary, so the issuer always has a current, provable picture.
+
+## Disclosing reserves without exposing holders
+
+When an auditor or regulator needs to verify backing, the issuer issues a [selective disclosure](/concepts/selective-disclosure) scoped to reserve and supply figures — not to individual accounts. The recipient can verify the aggregate cryptographically; the disclosure itself is recorded in the audit log. Holder balances and transaction graphs are never part of that disclosure.
+
+## What stays private vs what is provable
+
+| Fact | Visibility |
+| --- | --- |
+| Total supply | Provable to authorized parties |
+| Reserves / backing | Provable to authorized parties |
+| Supply-vs-reserves reconciliation | Provable to authorized parties |
+| Individual holder balances | Private by default |
+| Counterparties and transaction graph | Private by default |
+
+## Related
+
+- [Compliance overview](/compliance/overview)
+- [Regulatory frameworks](/compliance/regulatory-frameworks)
+- [Selective disclosure](/concepts/selective-disclosure)
+- [Confidential stablecoins](/use-cases/stablecoins)
+- [How confidential assets work](/concepts/how-confidential-assets-work)
+
+## FAQ
+
+<AccordionGroup>
+  <Accordion title="Can I prove reserves without revealing holder balances?">
+    Yes. Supply and reserves are aggregate facts, so they can be reconciled and disclosed to an auditor or regulator while individual balances remain encrypted and private.
+  </Accordion>
+  <Accordion title="How is divergence between supply and reserves detected?">
+    Reconciliation continuously compares confidential supply against the reserves the asset is bound to and surfaces divergence as an alert before it becomes a problem.
+  </Accordion>
+  <Accordion title="Is a reserve disclosure logged?">
+    Yes. Like every selective disclosure, a reserve or supply disclosure is scoped, time-bounded, and recorded in the immutable audit log.
+  </Accordion>
+</AccordionGroup>

@@ -1,0 +1,50 @@
+---
+title: "Confidentiality and data protection (GDPR) onchain"
+description: "Public blockchains conflict with data-protection law by publishing personal financial data permanently. Confidential digital assets keep that data encrypted by default, aligning onchain settlement with GDPR-style principles."
+sidebarTitle: "Data protection"
+---
+
+Confidential digital assets align onchain activity with data-protection principles because they keep personal and financial data encrypted by default rather than publishing it to a permanent, world-readable ledger. Public chains sit in tension with regimes like the GDPR — they broadcast balances and transaction relationships indefinitely, with no data minimization and no practical way to restrict access. Confidential assets invert that default: data is private unless an explicit, scoped, logged policy grants access.
+
+## Why public chains strain data-protection law
+
+Data-protection frameworks generally expect **data minimization, purpose limitation, access control, and accountability**. A transparent ledger violates the spirit of all four: every balance and transfer is published to everyone, forever, for any purpose, with no access control. Even pseudonymous addresses are routinely re-linked to real entities through [transaction-graph analysis](/problems/public-blockchain-exposure), so "it's just an address" is not a sufficient safeguard.
+
+## How confidential assets align with the principles
+
+| Principle | Public chain | Confidential digital asset |
+| --- | --- | --- |
+| Data minimization | All data public | Balances and amounts encrypted; only what policy grants is visible |
+| Purpose limitation | Any observer, any purpose | Access scoped to a defined party and purpose via disclosure |
+| Access control | None | Role- and policy-based; disclosures are scoped and time-bounded |
+| Accountability | Not applicable | Every privileged action and disclosure is logged |
+
+## Access is a logged decision, not a default
+
+With Ryle, visibility into confidential activity is always the result of a deliberate policy decision: a role, an asset configuration, or a specific [selective disclosure](/concepts/selective-disclosure). There is no API or Console surface that returns end-user balances or transaction graphs ambiently. When access is granted, it is scoped, time-bounded, and recorded — which is the kind of demonstrable accountability data-protection regimes expect.
+
+## What confidentiality does not do
+
+Confidentiality is not a substitute for an issuer's own data-protection program. Ryle keeps onchain financial data private and access controlled, but obligations around lawful basis, data-subject rights, retention, and cross-border transfer of any off-chain personal data the issuer collects remain the issuer's responsibility. This page is educational, not legal advice.
+
+## Related
+
+- [Compliance overview](/compliance/overview)
+- [Regulatory frameworks](/compliance/regulatory-frameworks)
+- [Why public blockchains expose business activity](/problems/public-blockchain-exposure)
+- [Selective disclosure](/concepts/selective-disclosure)
+- [Confidential accounts](/concepts/confidential-accounts)
+
+## FAQ
+
+<AccordionGroup>
+  <Accordion title="Are public blockchains compatible with the GDPR?">
+    They are in tension with it: a public ledger publishes personal financial data permanently with no minimization or access control, and pseudonymous addresses are often re-linked to real entities. Confidential assets keep that data encrypted by default, which aligns far better with data-protection principles.
+  </Accordion>
+  <Accordion title="Who can access confidential activity?">
+    By default, no one but the holder. Any external visibility is the result of an explicit role, policy, or scoped selective disclosure — and every access is logged.
+  </Accordion>
+  <Accordion title="Does Ryle handle all of my data-protection obligations?">
+    No. Ryle keeps onchain data private and access controlled, but the issuer remains responsible for its own program around lawful basis, data-subject rights, retention, and any off-chain personal data it collects.
+  </Accordion>
+</AccordionGroup>

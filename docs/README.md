@@ -39,6 +39,10 @@ Legacy `.md` files remain for GitHub reading but are excluded from the Mintlify 
 3. Enable **monorepo** in Git Settings and set the documentation path to `/docs`.
 4. Push to your deploy branch — Mintlify builds automatically.
 
+## Public URL (`www.ryle.sh/docs`)
+
+Docs are served on the marketing domain under `/docs` via Vercel rewrites to Mintlify. See [DEPLOYMENT.md](./DEPLOYMENT.md) for `DOCS_PROXY_ORIGIN`, Mintlify **Host at `/docs`**, and verification steps.
+
 Wallet engineering docs stay in [sur-techs/exchange](https://github.com/sur-techs/exchange) under `docs/wallet/`.
 
 ## MCP in Cursor

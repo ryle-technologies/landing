@@ -1,0 +1,73 @@
+---
+title: "Confidential assets and regulatory frameworks (MiCA, Travel Rule, AML)"
+description: "How confidential digital assets fit MiCA, the FATF Travel Rule, AML/KYC, and sanctions screening — privacy by default with selective disclosure for supervisors. A framework-by-framework overview."
+sidebarTitle: "Regulatory frameworks"
+---
+
+Confidential digital assets fit major regulatory frameworks because they preserve the supervisory hooks regulators require — customer due diligence, reserve reporting, transaction information sharing, and recordkeeping — while keeping data private from the public. Privacy applies to competitors and outside observers; obligated disclosure to supervisors, auditors, and counterparties is preserved through [selective disclosure](/concepts/selective-disclosure) and an immutable audit log. This page maps confidential assets to the frameworks that most often come up.
+
+> This page is educational, not legal advice. Applicability depends on the asset, jurisdiction, and the issuer's own analysis with counsel.
+
+## MiCA (EU Markets in Crypto-Assets)
+
+MiCA regulates asset-referenced tokens (ARTs), e-money tokens (EMTs, including many stablecoins), and crypto-asset service providers in the EU. Its core demands are around **reserve backing and reporting, issuer governance, and transparency to authorities** — not public visibility of every holder.
+
+- **Reserve and supply reporting** is satisfied through [proof of reserves and reconciliation](/compliance/proof-of-reserves): an issuer proves backing and supply to a supervisor or auditor without publishing individual balances.
+- **Supervisory access** is satisfied through scoped selective disclosure rather than an open ledger.
+- **Holder privacy** is preserved by default, which is generally compatible with — and often expected under — data-protection law.
+
+A [confidential stablecoin](/use-cases/stablecoins) can therefore meet EMT-style reserve obligations while keeping payroll, vendor, and balance data private.
+
+## FATF Travel Rule
+
+The Travel Rule (FATF Recommendation 16) requires originator and beneficiary information to travel with transfers above a threshold between obligated institutions (VASPs). Confidentiality from the public does not remove this obligation — it changes *who* can see the information:
+
+- Required originator/beneficiary data is shared between the obligated institutions through their compliance process, not broadcast on a public ledger.
+- Confidentiality actually *reduces* the over-exposure that a transparent chain creates, where Travel Rule data plus a public graph would reveal far more than the rule intends.
+- Selective disclosure and the audit log give supervisors the ability to verify that information sharing occurred.
+
+## AML / KYC and sanctions screening
+
+Anti-money-laundering programs depend on knowing participants and monitoring activity — both of which are policy functions, not public-ledger functions:
+
+- **Customer due diligence (KYC)** is enforced through per-asset KYC requirements; KYC providers are configurable per asset, and participation is policy-gated through allowlists.
+- **Sanctions screening** is applied at the participation and policy layer (who may hold or transact).
+- **Suspicious activity monitoring and reporting** is supported by the immutable, attributed, exportable audit log and by scoped disclosure to investigators.
+
+Confidentiality is from the *public*; the issuer and its obligated partners retain the visibility AML programs require.
+
+## Recordkeeping and supervision
+
+Many regimes (BSA in the US, equivalents elsewhere) require durable, retrievable records of activity. Every privileged operation in Ryle is recorded in an immutable audit log, attributed to the actor, and exportable — which is stronger and more queryable than reconstructing activity from a public explorer.
+
+## How the frameworks line up
+
+| Framework | What it requires | How confidential assets satisfy it |
+| --- | --- | --- |
+| MiCA | Reserve backing, reporting, supervisory access | Proof of reserves + scoped disclosure; holder privacy preserved |
+| FATF Travel Rule | Originator/beneficiary info between institutions | Compliance-channel data sharing, not public broadcast |
+| AML / KYC | Customer due diligence, monitoring, SAR | Per-asset KYC, policy gating, audit log, scoped disclosure |
+| Sanctions | Screening of participants | Participation and policy controls |
+| Recordkeeping | Durable, retrievable records | Immutable, attributed, exportable audit log |
+
+## Related
+
+- [Compliance overview](/compliance/overview)
+- [Proof of reserves and reconciliation](/compliance/proof-of-reserves)
+- [Confidentiality and data protection](/compliance/data-protection)
+- [Selective disclosure](/concepts/selective-disclosure)
+- [Confidential stablecoins](/use-cases/stablecoins)
+
+## FAQ
+
+<AccordionGroup>
+  <Accordion title="Can a confidential stablecoin be MiCA compliant?">
+    MiCA's reserve and reporting obligations are about provable backing and supervisory access, not public visibility of holders. A confidential stablecoin proves reserves and supply through reconciliation and discloses to supervisors under policy, while keeping holder balances private. Final applicability is for the issuer and its counsel to determine.
+  </Accordion>
+  <Accordion title="How does the Travel Rule work if transactions are confidential?">
+    Originator and beneficiary information is shared between the obligated institutions through their compliance process — exactly as the rule intends — rather than being broadcast publicly. Confidentiality removes the over-exposure a transparent chain would add.
+  </Accordion>
+  <Accordion title="Does confidentiality prevent AML monitoring?">
+    No. KYC, sanctions screening, monitoring, and reporting are policy and audit functions. Participation is gated by KYC and policy, and the audit log plus selective disclosure give obligated parties the visibility AML programs require.
+  </Accordion>
+</AccordionGroup>

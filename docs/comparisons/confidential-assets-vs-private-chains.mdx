@@ -1,0 +1,46 @@
+---
+title: "Confidential digital assets vs private / permissioned chains"
+description: "Private and permissioned chains hide data by walling off the network, sacrificing public-chain liquidity and reach. Confidential digital assets keep public-chain settlement while encrypting activity. A comparison."
+sidebarTitle: "vs private chains"
+---
+
+Confidential digital assets and private (permissioned) blockchains both keep business activity off the public record, but they make opposite trade-offs. A private chain achieves privacy by **walling off the entire network** — only approved participants can see or join it — which sacrifices the liquidity, reach, interoperability, and neutrality of public networks. Confidential digital assets keep settlement on **public, EVM-compatible chains** and instead encrypt the sensitive values, so activity is private while the asset still lives on open infrastructure.
+
+## Two ways to get privacy
+
+- **Private chain:** move to a separate, permissioned network. Privacy comes from restricting *who is on the network*. You give up public liquidity and interoperability, and you take on the cost of running or trusting a closed network.
+- **Confidential asset:** stay on a public chain, but encrypt balances and amounts and prove validity with [zero-knowledge proofs](/concepts/how-confidential-assets-work). Privacy comes from *what is visible*, not from who is allowed in.
+
+## Side-by-side comparison
+
+| Dimension | Private / permissioned chain | Confidential digital asset |
+| --- | --- | --- |
+| Where it settles | Closed, permissioned network | Public EVM-compatible chains |
+| Source of privacy | Restricted network membership | Encrypted state + ZK proofs |
+| Liquidity & interoperability | Limited to the network | Public-chain reach |
+| Counterparty reach | Only network members | Anyone with a confidential account |
+| Operational burden | Run/trust a network and its validators | Managed by the platform |
+| Disclosure to regulators | Network-operator dependent | [Selective disclosure](/concepts/selective-disclosure) by policy |
+| Neutrality / censorship resistance | Lower | Public-chain properties |
+
+## When each makes sense
+
+Private chains can suit fully closed consortia that never need public-chain liquidity or external counterparties. But for most enterprise use — [treasury](/use-cases/treasury), [stablecoins](/use-cases/stablecoins), [B2B settlement](/use-cases/b2b-settlement), [tokenized assets](/use-cases/tokenization-platforms) — the goal is the reach and settlement guarantees of public chains *without* the exposure. Confidential digital assets deliver that combination; private chains force a choice between privacy and reach.
+
+## Related
+
+- [Why enterprises need privacy onchain](/problems/enterprise-privacy-onchain)
+- [How confidential assets work](/concepts/how-confidential-assets-work)
+- [Confidential assets vs privacy coins](/comparisons/confidential-assets-vs-privacy-coins)
+- [What are confidential digital assets?](/what-are-confidential-digital-assets)
+
+## FAQ
+
+<AccordionGroup>
+  <Accordion title="Why not just use a private or permissioned chain?">
+    Private chains sacrifice the reach, liquidity, and interoperability of public networks. Confidential digital assets keep public-chain settlement while making activity private and disclosable by policy.
+  </Accordion>
+  <Accordion title="Do confidential assets give up any privacy by staying on a public chain?">
+    Balances and amounts are encrypted and counterparties are not exposed, so the sensitive data is protected. What you keep is the public chain's liquidity, neutrality, and reach.
+  </Accordion>
+</AccordionGroup>

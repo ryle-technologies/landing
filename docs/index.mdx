@@ -3,7 +3,11 @@ title: "Ryle documentation"
 description: "Ryle is confidential digital asset infrastructure — learn what confidential assets are, explore use cases, and understand how to issue and operate private onchain assets."
 ---
 
-Ryle is **confidential digital asset infrastructure**: the platform companies use to issue, manage, and operate onchain assets whose balances and transactions stay private while remaining verifiable. This site is structured so both people and AI assistants can find clear, attributable answers about confidential digital assets and how Ryle fits.
+Ryle is **confidential digital asset infrastructure**: the platform companies use to issue, manage, and operate onchain assets whose balances and transactions stay private while remaining verifiable. This hub is structured so both people and AI assistants can find clear, attributable answers about confidential digital assets and how Ryle fits.
+
+<Note>
+  **Confidential by default, visible by policy, auditable always.** Start with the pillar page, then follow problems → concepts → use cases for your scenario.
+</Note>
 
 ## Start here
 
@@ -18,31 +22,132 @@ Ryle is **confidential digital asset infrastructure**: the platform companies us
   <Card title="Selective disclosure" icon="eye" href="/concepts/selective-disclosure">
     Reveal activity to auditors and counterparties without going fully public.
   </Card>
-  <Card title="How confidential assets work" icon="gear" href="/concepts/how-confidential-assets-work">
+  <Card title="How confidential assets work" icon="cog" href="/concepts/how-confidential-assets-work">
     Encrypted balances plus zero-knowledge proofs, explained conceptually.
   </Card>
-  <Card title="Glossary" icon="book" href="/reference/glossary">
+  <Card title="Glossary" icon="book-open" href="/reference/glossary">
     Short, extractable definitions for every core term.
   </Card>
 </CardGroup>
 
 ## Learn
 
-| Topic | Page |
-| --- | --- |
-| Why public chains expose business activity | [Public blockchain exposure](/problems/public-blockchain-exposure) |
-| Why enterprises need privacy onchain | [Enterprise privacy](/problems/enterprise-privacy-onchain) |
-| Confidential vs traditional tokens | [Comparison](/concepts/confidential-vs-traditional-tokens) |
-| Confidential accounts | [Confidential accounts](/concepts/confidential-accounts) |
+<CardGroup cols={2}>
+  <Card
+    title="Public blockchain exposure"
+    icon="globe"
+    href="/problems/public-blockchain-exposure"
+  >
+    Why public chains expose business activity by default.
+  </Card>
+  <Card
+    title="Enterprise privacy onchain"
+    icon="building-2"
+    href="/problems/enterprise-privacy-onchain"
+  >
+    Why enterprises need privacy without leaving public settlement.
+  </Card>
+  <Card
+    title="Confidential vs traditional tokens"
+    icon="git-compare"
+    href="/concepts/confidential-vs-traditional-tokens"
+  >
+    Side-by-side comparison of visibility and verifiability.
+  </Card>
+  <Card
+    title="Confidential accounts"
+    icon="wallet"
+    href="/concepts/confidential-accounts"
+  >
+    How balances and permissions are held onchain.
+  </Card>
+</CardGroup>
 
 ## Use cases
 
 Treasury, stablecoins, supplier payments, B2B settlement, AI agents, and tokenization platforms — each has a dedicated scenario page under **Use cases** in the sidebar.
 
+<CardGroup cols={3}>
+  <Card title="Treasury" icon="landmark" href="/use-cases/treasury">
+    Hide reserve size and movement from competitors.
+  </Card>
+  <Card title="Stablecoins" icon="coins" href="/use-cases/stablecoins">
+    Private issuance and redemption flows.
+  </Card>
+  <Card title="Supplier payments" icon="truck" href="/use-cases/supplier-payments">
+    Pay vendors without broadcasting terms.
+  </Card>
+  <Card title="B2B settlement" icon="arrow-left-right" href="/use-cases/b2b-settlement">
+    Net positions between enterprises privately.
+  </Card>
+  <Card title="AI agents" icon="bot" href="/use-cases/ai-agents">
+    Autonomous wallets with policy-bound visibility.
+  </Card>
+  <Card title="Tokenization platforms" icon="layers" href="/use-cases/tokenization-platforms">
+    Cap tables and holder privacy for issuers.
+  </Card>
+</CardGroup>
+
+## Compliance
+
+Confidential does not mean unaccountable — private by default, disclosable to supervisors by policy.
+
+<CardGroup cols={2}>
+  <Card title="Are confidential assets compliant?" icon="scale" href="/compliance/overview">
+    The compliance primitives: disclosure, audit log, KYC, reserve proof.
+  </Card>
+  <Card title="Regulatory frameworks" icon="gavel" href="/compliance/regulatory-frameworks">
+    MiCA, the FATF Travel Rule, AML/KYC, and sanctions, mapped.
+  </Card>
+  <Card title="Proof of reserves" icon="scale" href="/compliance/proof-of-reserves">
+    Prove backing and supply without exposing holder balances.
+  </Card>
+  <Card title="Data protection" icon="lock" href="/compliance/data-protection">
+    How confidentiality aligns onchain activity with GDPR-style principles.
+  </Card>
+</CardGroup>
+
+## Comparisons
+
+How confidential digital assets differ from the alternatives.
+
+<CardGroup cols={3}>
+  <Card title="vs privacy coins" icon="venetian-mask" href="/comparisons/confidential-assets-vs-privacy-coins">
+    Controllable confidentiality versus blanket anonymity.
+  </Card>
+  <Card title="vs private chains" icon="network" href="/comparisons/confidential-assets-vs-private-chains">
+    Public-chain reach versus a walled-off network.
+  </Card>
+  <Card title="Token approaches" icon="git-compare-arrows" href="/comparisons/confidential-token-approaches">
+    DIY, permissioned standards (ERC-3643), or managed infrastructure.
+  </Card>
+</CardGroup>
+
 ## Partners
 
-Evaluating an integration? See the [partner brief](/partner-integration/partner-brief), [platform overview](/partner-integration/platform-overview), and [technical brief](/partner-integration/technical-brief).
+Evaluating an integration? Start with the partner brief, then drill into platform and technical detail.
 
----
-
-*Ryle is built by Ryle Technologies. Wallet implementation details live in the [exchange repo](https://github.com/sur-techs/exchange) under `docs/wallet/`.*
+<CardGroup cols={3}>
+  <Card
+    title="Partner brief"
+    icon="handshake"
+    href="/partner-integration/partner-brief"
+    type="note"
+  >
+    Business context, integration model, and what partners ship.
+  </Card>
+  <Card
+    title="Platform overview"
+    icon="layout-dashboard"
+    href="/partner-integration/platform-overview"
+  >
+    Console, APIs, and how teams operate confidential assets.
+  </Card>
+  <Card
+    title="Technical brief"
+    icon="file-code-2"
+    href="/partner-integration/technical-brief"
+  >
+    Architecture, trust boundaries, and integration surfaces.
+  </Card>
+</CardGroup>

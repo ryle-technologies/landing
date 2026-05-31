@@ -41,6 +41,13 @@ const nextConfig: NextConfig = {
     return [
       { source: "/docs", destination: `${docsOrigin}/docs` },
       { source: "/docs/:path*", destination: `${docsOrigin}/docs/:path*` },
+      // GEO: AI engines look for these at the domain root. Mintlify generates
+      // them under the hosted subpath (/docs), so proxy the root paths to it.
+      { source: "/llms.txt", destination: `${docsOrigin}/docs/llms.txt` },
+      {
+        source: "/llms-full.txt",
+        destination: `${docsOrigin}/docs/llms-full.txt`,
+      },
     ];
   },
   async headers() {
