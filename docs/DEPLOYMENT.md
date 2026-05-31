@@ -1,6 +1,14 @@
 # Landing deployment (Vercel)
 
-## New project
+## Status
+
+| Item | State |
+|------|--------|
+| Repo | [`martinmateo1/landing`](https://github.com/martinmateo1/landing) → target **`ryle-technologies/landing`** |
+| Preview deploy | `https://ryle-landing.vercel.app` (personal Vercel scope) |
+| Production domain | **`www.ryle.sh`** — move from `sur-techs/exchange` project (Ryle team admin) |
+
+## New project (Ryle team — requires admin)
 
 1. Create GitHub org **ryle-technologies** at https://github.com/organizations/plan (if not done).
 2. Push this repo to `ryle-technologies/landing`.

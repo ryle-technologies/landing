@@ -29,9 +29,9 @@ Partner integration briefs (markdown only, no docs site yet):
 
 ## Deployment
 
-Vercel project in the **Ryle** team, production domain **`www.ryle.sh`**.
+Vercel project **`ryle-landing`** (personal scope preview: `https://ryle-landing.vercel.app`). Production domain target: **`www.ryle.sh`** on the **Ryle** team — see [`docs/DEPLOYMENT.md`](docs/DEPLOYMENT.md).
 
-See [`docs/DEPLOYMENT.md`](docs/DEPLOYMENT.md) for env vars and domain cutover from `sur-techs/exchange`.
+**GitHub:** create org `ryle-technologies` and transfer from [`martinmateo1/landing`](https://github.com/martinmateo1/landing).
 
 ## Scripts
 
