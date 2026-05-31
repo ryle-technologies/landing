@@ -19,9 +19,39 @@
 |----------|------------------|
 | `NEXT_PUBLIC_SITE_URL` | `https://www.ryle.sh` |
 | `NEXT_PUBLIC_ALPHA_TEST_URL` | Wallet Vercel URL (e.g. `https://exchange-xxx.vercel.app`) — no custom domain on wallet yet |
+| `DOCS_PROXY_ORIGIN` | `https://ryle.mintlify.dev` (Mintlify subdomain for `/docs` rewrites) |
 | `GOOGLE_SITE_VERIFICATION` | Move from `exchange` project when cutover completes |
 
 Preview deployments do not need `NEXT_PUBLIC_SITE_URL` — origin resolves from `VERCEL_URL`.
+
+## Docs at `www.ryle.sh/docs` (Mintlify subpath)
+
+The marketing site proxies `/docs` and `/docs/*` to Mintlify via `next.config.ts` rewrites. Set `DOCS_PROXY_ORIGIN` on the **landing** Vercel project (production and preview).
+
+### Mintlify (dashboard or Admin MCP)
+
+1. [Mintlify project](https://app.mintlify.com/ryle/ryle) → **Custom domain** → enable **Host at `/docs`**.
+2. Add `www.ryle.sh` (and optionally `ryle.sh` if apex DNS allows Mintlify hostname verification).
+3. Complete any Cloudflare custom-hostname TXT records shown in the dashboard until status is **active**.
+
+### Vercel
+
+Rewrites are already in `next.config.ts`:
+
+```ts
+{ source: "/docs", destination: `${docsOrigin}/docs` }
+{ source: "/docs/:path*", destination: `${docsOrigin}/docs/:path*` }
+```
+
+Marketing CSP headers are scoped to exclude `/docs` so proxied Mintlify assets load correctly.
+
+### Verify after Mintlify deploys content
+
+- `https://www.ryle.sh/docs` — docs home
+- `https://www.ryle.sh/docs/llms.txt` — LLM index (or root `/llms.txt` per Mintlify routing)
+- `https://www.ryle.sh/docs/sitemap.xml`
+
+Until Mintlify Git is connected to `ryle-technologies/landing` (`/docs` path), `/docs` may return Mintlify 404 even when the proxy is configured correctly.
 
 ## Domain cutover (www.ryle.sh)
 

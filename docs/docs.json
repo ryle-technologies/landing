@@ -1,12 +1,49 @@
 {
   "$schema": "https://mintlify.com/docs.json",
-  "name": "Ryle",
+  "name": "Ryle Documentation",
   "description": "Confidential digital asset infrastructure — learn what confidential digital assets are, explore use cases, and operate private onchain assets with Ryle.",
   "theme": "maple",
   "colors": {
     "primary": "#6b5d4a",
     "light": "#f5f2ee",
     "dark": "#141210"
+  },
+  "logo": {
+    "light": "/logo/light.svg",
+    "dark": "/logo/dark.svg",
+    "href": "https://www.ryle.sh"
+  },
+  "favicon": "/favicon.png",
+  "appearance": {
+    "default": "system"
+  },
+  "fonts": {
+    "heading": {
+      "family": "Inter",
+      "weight": 600
+    },
+    "body": {
+      "family": "Inter",
+      "weight": 400
+    }
+  },
+  "icons": {
+    "library": "lucide"
+  },
+  "background": {
+    "color": {
+      "light": "#f5f2ee",
+      "dark": "#141210"
+    }
+  },
+  "styling": {
+    "eyebrows": "breadcrumbs",
+    "codeblocks": {
+      "theme": {
+        "light": "github-light",
+        "dark": "one-dark-pro"
+      }
+    }
   },
   "seo": {
     "metatags": {
@@ -25,6 +62,7 @@
           "what-are-confidential-digital-assets",
           {
             "group": "Problems",
+            "icon": "triangle-alert",
             "pages": [
               "problems/public-blockchain-exposure",
               "problems/enterprise-privacy-onchain",
@@ -34,6 +72,7 @@
           },
           {
             "group": "Concepts",
+            "icon": "lightbulb",
             "pages": [
               "concepts/selective-disclosure",
               "concepts/how-confidential-assets-work",
@@ -56,6 +95,44 @@
         ]
       },
       {
+        "group": "Products",
+        "icon": "package",
+        "pages": [
+          "products/issuance",
+          "products/confidential-payments",
+          "products/accounts-and-wallets",
+          "products/compliance-and-disclosure"
+        ]
+      },
+      {
+        "group": "Build",
+        "icon": "blocks",
+        "pages": [
+          "build/console",
+          "build/apis",
+          "build/white-label-wallet"
+        ]
+      },
+      {
+        "group": "Compliance",
+        "icon": "scale",
+        "pages": [
+          "compliance/overview",
+          "compliance/regulatory-frameworks",
+          "compliance/proof-of-reserves",
+          "compliance/data-protection"
+        ]
+      },
+      {
+        "group": "Comparisons",
+        "icon": "git-compare-arrows",
+        "pages": [
+          "comparisons/confidential-assets-vs-privacy-coins",
+          "comparisons/confidential-assets-vs-private-chains",
+          "comparisons/confidential-token-approaches"
+        ]
+      },
+      {
         "group": "Reference",
         "icon": "list",
         "pages": ["reference/glossary", "reference/faq"]
@@ -75,11 +152,14 @@
     "links": [
       {
         "label": "Website",
-        "href": "https://www.ryle.sh"
+        "href": "https://www.ryle.sh",
+        "icon": "globe"
       }
-    ]
-  },
-  "footer": {
-    "socials": {}
+    ],
+    "primary": {
+      "type": "button",
+      "label": "Partner integration",
+      "href": "/partner-integration/partner-brief"
+    }
   }
 }

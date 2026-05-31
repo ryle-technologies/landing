@@ -1,0 +1,51 @@
+---
+title: "Confidential digital assets vs privacy coins"
+description: "Privacy coins aim for blanket anonymity; confidential digital assets are private by default but disclosable by policy. Why the difference matters for regulated businesses, compared side by side."
+sidebarTitle: "vs privacy coins"
+---
+
+Confidential digital assets and privacy coins both hide onchain activity, but they are built for opposite users. Privacy coins (such as Monero or Zcash) pursue **blanket anonymity** — the goal is that no one can ever link activity to a party. Confidential digital assets pursue **controllable confidentiality** — private by default, but disclosable to a regulator, auditor, or counterparty under explicit, logged policy. That single difference is why regulated businesses can use confidential assets and generally cannot use privacy coins.
+
+## The core difference
+
+A privacy coin's design goal is that disclosure is *impossible by default and often by intent*. A confidential digital asset's design goal is that disclosure is *unnecessary by default but always possible under policy*. Both keep data away from the public; only one keeps the issuer's ability to prove specific facts on demand.
+
+## Side-by-side comparison
+
+| Dimension | Privacy coin | Confidential digital asset |
+| --- | --- | --- |
+| Design goal | Blanket anonymity | Private by default, disclosable by policy |
+| Who controls disclosure | No one (or the holder only) | The issuer, under scoped, logged policy |
+| Auditor / regulator access | Not provided | [Selective disclosure](/concepts/selective-disclosure) on demand |
+| Proof of reserves / supply | Generally not possible | [Reconciled and provable](/compliance/proof-of-reserves) |
+| KYC / participation control | None | Policy- and KYC-gated participation |
+| Audit trail | None | Immutable, attributed audit log |
+| Issuer model | None (network asset) | Issued and operated by a company |
+| Fit for regulated business | Weak | Strong |
+
+## Why privacy coins do not fit regulated business
+
+A bank, stablecoin issuer, or tokenization platform cannot operate on an asset where it is structurally unable to answer a regulator's question, prove reserves, or demonstrate customer due diligence. Blanket anonymity removes exactly the levers a compliance program is built on. See [are confidential digital assets compliant?](/compliance/overview).
+
+## Why confidential assets do
+
+Confidential assets keep the same privacy benefit — competitors and the public cannot see balances, counterparties, or flows — while preserving disclosure, audit, reserve proof, and participation control. That is the combination [enterprises actually need](/problems/enterprise-privacy-onchain): not anonymity, but confidentiality they can govern.
+
+## Related
+
+- [What are confidential digital assets?](/what-are-confidential-digital-assets)
+- [Selective disclosure](/concepts/selective-disclosure)
+- [Compliance overview](/compliance/overview)
+- [Confidential assets vs private chains](/comparisons/confidential-assets-vs-private-chains)
+- [Confidential assets vs traditional tokens](/concepts/confidential-vs-traditional-tokens)
+
+## FAQ
+
+<AccordionGroup>
+  <Accordion title="Why can't a business just use a privacy coin?">
+    Blanket-anonymity privacy coins cannot prove specific activity to a regulator or auditor, prove reserves, or enforce KYC. Selective disclosure is built for compliance: private by default, provable when required.
+  </Accordion>
+  <Accordion title="Are confidential digital assets just a privacy coin with extra steps?">
+    No. The architecture inverts the trust model: disclosure is always possible under policy and every privileged action is logged, whereas privacy coins are designed so that disclosure is impossible by default.
+  </Accordion>
+</AccordionGroup>

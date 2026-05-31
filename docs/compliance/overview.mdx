@@ -1,0 +1,57 @@
+---
+title: "Are confidential digital assets compliant?"
+description: "Confidential digital assets are compliant when privacy is paired with selective disclosure: private by default, disclosable to regulators and auditors by policy, and auditable always. How Ryle supports compliance teams."
+sidebarTitle: "Compliance overview"
+---
+
+Confidential digital assets are compliant when confidentiality is paired with control: balances and transactions stay private by default, but specific activity can be disclosed to regulators, auditors, and counterparties under explicit, scoped, logged policy. This is the opposite of blanket anonymity. Ryle is built around the principle **confidential by default, visible by policy, auditable always**, so compliance teams keep the oversight they are obligated to provide without publishing sensitive financial activity to the public.
+
+## Why privacy and compliance are not opposites
+
+The common objection to onchain privacy is that it conflicts with regulation. It does for *anonymity* — systems where no one can ever see who did what fail audit, reporting, and supervision obligations. Confidential digital assets take a different shape: the data is encrypted from the public, but the issuer retains the ability to prove specific facts to specific parties on demand. Compliance is a function of **who can compel disclosure and how it is logged**, not of whether the ledger is world-readable.
+
+## The compliance primitives Ryle provides
+
+- **[Selective disclosure](/concepts/selective-disclosure)** — scoped, time-bounded, logged views into specific accounts, assets, or date ranges for an auditor, regulator, or counterparty.
+- **Immutable audit log** — every privileged action (mint, redeem, role change, policy update, disclosure) is recorded, attributed to an actor, and exportable on demand.
+- **Policy and KYC controls** — allowlists, role assignments, caps, and per-asset KYC requirements determine who can hold or transact an asset. KYC providers are configurable per asset.
+- **[Proof of reserves and reconciliation](/compliance/proof-of-reserves)** — supply can be reconciled against reserves and proven to an auditor without exposing individual holders.
+- **Role-based access** — operator roles (Owner, Admin, Operator, Compliance, Auditor, Viewer) scope what each team member can see and do; a compliance or audit role can review without acting.
+
+## How this maps to obligations
+
+| Obligation | How confidential assets satisfy it |
+| --- | --- |
+| Audit of balances, supply, reserves | Selective disclosure + reconciliation, without publishing holder data |
+| Regulatory inquiry into specific activity | Scoped, time-bounded disclosure of the relevant accounts or transactions |
+| Recordkeeping and supervision | Immutable, attributed, exportable audit log of every privileged action |
+| Customer due diligence (KYC/AML) | Per-asset KYC requirements and policy-gated participation |
+| Reserve / backing reporting | Proof of reserves against supply on demand |
+
+For framework-specific detail — MiCA, the FATF Travel Rule, AML/KYC, and data protection — see [regulatory frameworks](/compliance/regulatory-frameworks).
+
+## What Ryle does and does not do
+
+Ryle provides the platform primitives — confidentiality, selective disclosure, audit logging, policy, KYC integration, and reserve reconciliation — that a compliance program is built on. Ryle is not a law firm and does not provide legal advice; whether a given asset and configuration satisfies a specific obligation in a specific jurisdiction is determined by the issuer and its counsel. Ryle is also not a custodian: issuers connect a custody solution they operate, and Ryle binds the asset to it.
+
+## Related
+
+- [Selective disclosure](/concepts/selective-disclosure)
+- [Regulatory frameworks](/compliance/regulatory-frameworks)
+- [Proof of reserves and reconciliation](/compliance/proof-of-reserves)
+- [Confidentiality and data protection](/compliance/data-protection)
+- [Why enterprises need privacy onchain](/problems/enterprise-privacy-onchain)
+
+## FAQ
+
+<AccordionGroup>
+  <Accordion title="Does onchain privacy conflict with compliance?">
+    No. Confidential digital assets are private by default but disclosable by policy: issuers can reveal specific activity to regulators and auditors on demand, and every disclosure is logged. Compliance depends on controllable disclosure, not public visibility.
+  </Accordion>
+  <Accordion title="Can a regulator or auditor get the data they need?">
+    Yes. Selective disclosure grants a scoped, time-bounded, logged view into the specific accounts, assets, or transactions in question, without exposing unrelated activity or making the data public.
+  </Accordion>
+  <Accordion title="Does Ryle provide legal or compliance advice?">
+    No. Ryle provides the platform primitives — confidentiality, selective disclosure, audit logging, policy, KYC integration, reserve reconciliation — that a compliance program uses. Whether a configuration meets a specific obligation is determined by the issuer and its counsel.
+  </Accordion>
+</AccordionGroup>

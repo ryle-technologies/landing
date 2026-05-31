@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { GeistMono } from "geist/font/mono";
 import { GeistSans } from "geist/font/sans";
 import { buildRootMetadata } from "@/lib/metadata";
+import { buildStructuredData } from "@/lib/structuredData";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -30,7 +31,15 @@ export default function RootLayout({
       lang="en-US"
       className={`${GeistSans.variable} ${GeistMono.variable}`}
     >
-      <body>{children}</body>
+      <body>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(buildStructuredData()),
+          }}
+        />
+        {children}
+      </body>
     </html>
   );
 }

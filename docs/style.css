@@ -1,0 +1,175 @@
+/* Ryle docs — aligned with marketing site (warm neutrals, editorial headings) */
+/* Landing hero uses --page-backdrop / --marketing-surface: #f5f2ee */
+
+:root {
+  --ryle-docs-surface: #f5f2ee;
+  --ryle-docs-surface-rgb: 245 242 238;
+  --ryle-docs-surface-dark: #141210;
+  --ryle-docs-accordion-light: #ffffff;
+  --ryle-docs-accordion-light-border: #e8e4df;
+  --ryle-docs-accordion-dark: #1a1816;
+  --ryle-docs-accordion-dark-border: rgba(255, 255, 255, 0.08);
+}
+
+html:not(.dark) {
+  --background-light: var(--ryle-docs-surface-rgb);
+}
+
+html:not(.dark),
+html:not(.dark) body {
+  background-color: var(--ryle-docs-surface) !important;
+}
+
+html:not(.dark) #background-color,
+html:not(.dark) #sidebar,
+html:not(.dark) #content-container {
+  background-color: var(--ryle-docs-surface) !important;
+}
+
+html.dark #background-color,
+html.dark #sidebar,
+html.dark #content-container {
+  background-color: var(--ryle-docs-surface-dark) !important;
+}
+
+/* FAQ accordions */
+html:not(.dark) accordion-group,
+html:not(.dark) details.accordion {
+  background-color: var(--ryle-docs-accordion-light) !important;
+  border: 1px solid var(--ryle-docs-accordion-light-border) !important;
+}
+
+html:not(.dark) accordion-group details.accordion {
+  background-color: var(--ryle-docs-accordion-light) !important;
+}
+
+html:not(.dark) accordion-group details.accordion > summary:hover,
+html:not(.dark) details.accordion > summary:hover {
+  background-color: var(--ryle-docs-surface) !important;
+}
+
+html.dark accordion-group,
+html.dark details.accordion {
+  background-color: var(--ryle-docs-accordion-dark) !important;
+  border: 1px solid var(--ryle-docs-accordion-dark-border) !important;
+}
+
+html.dark accordion-group details.accordion {
+  background-color: var(--ryle-docs-accordion-dark) !important;
+}
+
+html.dark accordion-group details.accordion > summary:hover,
+html.dark details.accordion > summary:hover {
+  background-color: #22201c !important;
+}
+
+/* Page pager (prev / next) */
+html:not(.dark) #pagination {
+  background-color: var(--ryle-docs-accordion-light) !important;
+  border: 1px solid var(--ryle-docs-accordion-light-border) !important;
+}
+
+html:not(.dark) #pagination .bg-background-light {
+  background-color: var(--ryle-docs-accordion-light) !important;
+}
+
+html:not(.dark) #pagination .bg-gray-100 {
+  background-color: var(--ryle-docs-accordion-light-border) !important;
+}
+
+@media (min-width: 1024px) {
+  :root {
+    --ryle-docs-sidebar-width: 22rem;
+  }
+
+  #sidebar {
+    width: var(--ryle-docs-sidebar-width) !important;
+  }
+
+  #sidebar > ul {
+    width: calc(var(--ryle-docs-sidebar-width) - 1px) !important;
+  }
+
+  #content-container {
+    margin-left: var(--ryle-docs-sidebar-width) !important;
+  }
+}
+
+#content-area {
+  max-width: 46rem;
+}
+
+/* Page h1 only — New York italic (system serif on Apple; fallbacks elsewhere) */
+#page-title,
+#content h1 {
+  font-family: "New York", "New York Small", ui-serif, Georgia, "Times New Roman", serif !important;
+  font-style: italic !important;
+  font-weight: 400 !important;
+  font-size: clamp(2.125rem, 3.5vw, 2.75rem) !important;
+  letter-spacing: -0.03em;
+  line-height: 1.08;
+  margin-bottom: 1rem !important;
+}
+
+/* Frontmatter lede sits directly under the h1 — keep total gap at 1rem */
+#header > div.prose {
+  margin-top: 0 !important;
+}
+
+#content h2 {
+  margin-top: 2.25rem;
+}
+
+#content h3 {
+  letter-spacing: -0.01em;
+}
+
+#content p,
+#content li {
+  line-height: 1.65;
+}
+
+#content table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9375rem;
+  margin: 1.25rem 0 1.75rem;
+}
+
+#content table th {
+  text-align: left;
+  font-weight: 500;
+  padding: 0.625rem 0.875rem;
+  border-bottom: 1px solid color-mix(in srgb, currentColor 12%, transparent);
+}
+
+#content table td {
+  padding: 0.625rem 0.875rem;
+  border-bottom: 1px solid color-mix(in srgb, currentColor 8%, transparent);
+  vertical-align: top;
+}
+
+#content table tr:last-child td {
+  border-bottom: none;
+}
+
+#sidebar-content .nav-logo {
+  max-width: none !important;
+  height: 1.75rem !important;
+}
+
+#navbar {
+  backdrop-filter: blur(12px);
+}
+
+#topbar-cta-button a {
+  border-radius: 9999px;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+}
+
+#footer,
+footer.advanced-footer,
+a[href*="utm_campaign=poweredBy"] {
+  display: none !important;
+}
