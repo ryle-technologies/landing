@@ -31,7 +31,7 @@ Partner integration briefs (markdown only, no docs site yet):
 
 Vercel project **`ryle-landing`** (personal scope preview: `https://ryle-landing.vercel.app`). Production domain target: **`www.ryle.sh`** on the **Ryle** team — see [`docs/DEPLOYMENT.md`](docs/DEPLOYMENT.md).
 
-**GitHub:** create org `ryle-technologies` and transfer from [`martinmateo1/landing`](https://github.com/martinmateo1/landing).
+**GitHub:** [`ryle-technologies/landing`](https://github.com/ryle-technologies/landing)
 
 ## Scripts
 
