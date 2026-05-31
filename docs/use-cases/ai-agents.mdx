@@ -1,0 +1,43 @@
+---
+title: "Confidential AI agents"
+description: "Confidential AI agents can hold and move value onchain without broadcasting every transaction. Ryle gives autonomous agents confidential balances, policy limits, and gas-sponsored payments."
+---
+
+Confidential AI agents are autonomous agents that can hold and transact value onchain without exposing every payment, balance, and counterparty to the public. As agents begin to transact economically, their activity on a transparent chain would leak strategy and invite surveillance. Ryle gives agents confidential balances, policy-bound permissions, and gas-sponsored transactions through the same confidential asset infrastructure used by enterprises.
+
+## The scenario
+
+An AI agent (or a fleet of them) pays for services, settles with other agents, or manages a budget onchain. The operator needs control and auditability, but does not want every agent action publicly visible.
+
+## Why public chains fail it
+
+On a public chain, an agent's entire transaction history — what it buys, from whom, how often, and its remaining balance — is exposed in real time. That reveals the operator's strategy and creates an attack surface for front-running and targeting.
+
+## How confidentiality and selective disclosure solve it
+
+[Confidential digital assets](/what-are-confidential-digital-assets) keep agent balances and payments encrypted while remaining verifiable. Policy controls cap what an agent can do, and [selective disclosure](/concepts/selective-disclosure) lets the operator or an auditor review specific activity without publishing the agent's full history.
+
+## What Ryle enables
+
+- Give agents [confidential accounts](/concepts/confidential-accounts) with encrypted balances.
+- Enforce per-account and per-operation limits through policy.
+- Sponsor gas via Ryle's relayer, so agents never hold a native gas token.
+- Keep an immutable audit trail of every agent action.
+
+## Related
+
+- [Confidential accounts explained](/concepts/confidential-accounts)
+- [Selective disclosure](/concepts/selective-disclosure)
+- [How confidential assets work](/concepts/how-confidential-assets-work)
+- [What are confidential digital assets?](/what-are-confidential-digital-assets)
+
+## FAQ
+
+<AccordionGroup>
+  <Accordion title="How is an AI agent's spending controlled?">
+    Through policy: per-asset, per-operation, and per-account limits govern what an agent can do, and every action is recorded in the audit log.
+  </Accordion>
+  <Accordion title="Do agents need to hold gas tokens?">
+    No. Ryle's relayer sponsors and submits transactions, so agents transact without holding the chain's native gas asset.
+  </Accordion>
+</AccordionGroup>

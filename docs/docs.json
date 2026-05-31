@@ -1,0 +1,85 @@
+{
+  "$schema": "https://mintlify.com/docs.json",
+  "name": "Ryle",
+  "description": "Confidential digital asset infrastructure — learn what confidential digital assets are, explore use cases, and operate private onchain assets with Ryle.",
+  "theme": "maple",
+  "colors": {
+    "primary": "#6b5d4a",
+    "light": "#f5f2ee",
+    "dark": "#141210"
+  },
+  "seo": {
+    "metatags": {
+      "og:site_name": "Ryle Documentation",
+      "og:type": "website",
+      "twitter:card": "summary_large_image"
+    }
+  },
+  "navigation": {
+    "groups": [
+      {
+        "group": "Learn",
+        "icon": "book-open",
+        "pages": [
+          "index",
+          "what-are-confidential-digital-assets",
+          {
+            "group": "Problems",
+            "pages": [
+              "problems/public-blockchain-exposure",
+              "problems/enterprise-privacy-onchain",
+              "problems/stablecoin-privacy",
+              "problems/tokenized-asset-privacy"
+            ]
+          },
+          {
+            "group": "Concepts",
+            "pages": [
+              "concepts/selective-disclosure",
+              "concepts/how-confidential-assets-work",
+              "concepts/confidential-vs-traditional-tokens",
+              "concepts/confidential-accounts"
+            ]
+          }
+        ]
+      },
+      {
+        "group": "Use cases",
+        "icon": "briefcase",
+        "pages": [
+          "use-cases/treasury",
+          "use-cases/stablecoins",
+          "use-cases/supplier-payments",
+          "use-cases/b2b-settlement",
+          "use-cases/ai-agents",
+          "use-cases/tokenization-platforms"
+        ]
+      },
+      {
+        "group": "Reference",
+        "icon": "list",
+        "pages": ["reference/glossary", "reference/faq"]
+      },
+      {
+        "group": "Partner integration",
+        "icon": "handshake",
+        "pages": [
+          "partner-integration/partner-brief",
+          "partner-integration/platform-overview",
+          "partner-integration/technical-brief"
+        ]
+      }
+    ]
+  },
+  "navbar": {
+    "links": [
+      {
+        "label": "Website",
+        "href": "https://www.ryle.sh"
+      }
+    ]
+  },
+  "footer": {
+    "socials": {}
+  }
+}

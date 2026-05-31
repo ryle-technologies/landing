@@ -1,11 +1,65 @@
-# Partner integration docs
+# Partner documentation (Mintlify)
 
-Markdown briefs for Ryle platform partners. No published docs site yet — read in GitHub or your editor.
+Published partner integration docs for Ryle, built with [Mintlify](https://mintlify.com).
 
-| Doc | Audience |
-|-----|----------|
-| [partner-integration-brief.md](./partner-integration-brief.md) | Executive / first meeting |
-| [partner-integration-overview.md](./partner-integration-overview.md) | Product, ops, technical business |
-| [partner-integration-technical-brief.md](./partner-integration-technical-brief.md) | Engineering / integration scoping |
+## Local preview
 
-The wallet engineering docs stay in [sur-techs/exchange](https://github.com/sur-techs/exchange) under `docs/wallet/`.
+From the repo root:
+
+```bash
+pnpm docs:dev
+```
+
+Open [http://localhost:3333](http://localhost:3333). The Mintlify dev server uses port 3333 so it does not conflict with the Next.js app on 3000.
+
+Optional: run `pnpm exec mint login` once to enable search and the assistant in local preview.
+
+## Validate before deploy
+
+```bash
+pnpm docs:validate
+pnpm docs:links
+```
+
+## Pages
+
+| MDX page | Source markdown (archived) |
+| --- | --- |
+| [index.mdx](./index.mdx) | — |
+| [partner-integration/partner-brief.mdx](./partner-integration/partner-brief.mdx) | [partner-integration-brief.md](./partner-integration-brief.md) |
+| [partner-integration/platform-overview.mdx](./partner-integration/platform-overview.mdx) | [partner-integration-overview.md](./partner-integration-overview.md) |
+| [partner-integration/technical-brief.mdx](./partner-integration/technical-brief.mdx) | [partner-integration-technical-brief.md](./partner-integration-technical-brief.md) |
+
+Legacy `.md` files remain for GitHub reading but are excluded from the Mintlify build via [`.mintignore`](./.mintignore).
+
+## Mintlify dashboard (deploy)
+
+1. Create a project at [mintlify.com/start](https://mintlify.com/start).
+2. Connect this repo: **GitHub** → `ryle-technologies/landing`.
+3. Enable **monorepo** in Git Settings and set the documentation path to `/docs`.
+4. Push to your deploy branch — Mintlify builds automatically.
+
+Wallet engineering docs stay in [sur-techs/exchange](https://github.com/sur-techs/exchange) under `docs/wallet/`.
+
+## MCP in Cursor
+
+Two Mintlify MCP servers work together:
+
+| Server | URL | Purpose |
+| --- | --- | --- |
+| **Docs MCP** (read-only) | `https://mintlify.com/docs/mcp` | Search Mintlify platform docs while authoring (`user-mintlify` in Cursor) |
+| **Admin MCP** (write) | `https://mcp.mintlify.com` | Edit pages, navigation, and `docs.json` via OAuth; changes land on a PR branch |
+
+Add the admin MCP in Cursor: **Cmd+Shift+P** → **Open MCP settings** → add:
+
+```json
+{
+  "mcpServers": {
+    "mintlify-admin": {
+      "url": "https://mcp.mintlify.com"
+    }
+  }
+}
+```
+
+Complete OAuth when prompted. Use natural-language prompts like “check out a branch and add a FAQ page under Partner integration.”

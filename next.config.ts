@@ -30,13 +30,28 @@ const nextConfig: NextConfig = {
       { source: "/landing/:path*", destination: "/", permanent: true },
     ];
   },
+  async rewrites() {
+    // Serve the Mintlify content hub under ryle.sh/docs by proxying to the
+    // Mintlify deployment. Override the origin with DOCS_PROXY_ORIGIN.
+    // Scoped to /docs only so the marketing app and existing redirects are
+    // untouched.
+    const docsOrigin = (
+      process.env.DOCS_PROXY_ORIGIN ?? "https://ryle.mintlify.dev"
+    ).replace(/\/+$/, "");
+    return [
+      { source: "/docs", destination: `${docsOrigin}/docs` },
+      { source: "/docs/:path*", destination: `${docsOrigin}/docs/:path*` },
+    ];
+  },
   async headers() {
     if (process.env.NODE_ENV !== "production") {
       return [];
     }
     return [
       {
-        source: "/:path*",
+        // Apply the marketing-site CSP to every path EXCEPT /docs, whose
+        // proxied Mintlify assets need their own (looser) headers to render.
+        source: "/((?!docs).*)",
         headers: [
           {
             key: "Content-Security-Policy",

@@ -1,0 +1,110 @@
+---
+title: "Technical brief"
+description: "An engineering-oriented overview for teams scoping a Ryle integration."
+sidebarTitle: "Technical brief"
+---
+
+> A short, engineering-oriented overview for teams scoping an integration. Companion to the [partner brief](/partner-integration/partner-brief).
+
+## 1. Where Ryle sits
+
+Ryle is a managed backend your systems integrate with over HTTPS. Your backend calls the Ryle API to operate on assets and participants; Ryle delivers asynchronous events back to your endpoints via webhooks. Operators use the Console for the same surface, manually.
+
+Architecturally, the platform settles on **EVM-compatible chains** and uses **zero-knowledge proofs** to deliver confidentiality. The underlying network, signing, proof generation and verification, supporting circuits, and confidential-asset mechanics are all managed on Ryle's side and never surface in your integration code — you work with assets, accounts, and operations, not with the cryptographic machinery underneath.
+
+Three integration shapes are supported behind the same API surface: a brand-new confidential asset, a confidential layer on an asset you already issue, or confidentiality offered on a third-party asset.
+
+## 2. Platform components
+
+| Surface | Hosted by | Partner integration cost |
+| --- | --- | --- |
+| **Console** (operator dashboard) | Ryle (multi-tenant web app) | Account provisioning only. |
+| **APIs** (REST + webhooks) | Ryle | Backend integration: HTTP client + webhook handler. |
+| **White-label Wallet** *(optional)* | Ryle (per-partner deploy under your custom domain) | Branding + identity configuration. No client code to ship. |
+
+All three surfaces share the same data model and audit log: everything an operator does in the Console maps to an API call and emits the same events as a programmatic invocation.
+
+## 3. Authentication and access control
+
+- **API keys** per organization, per environment (sandbox / live). Scoped (full / asset-scoped / read-only), fingerprinted, revocable, IP-restrictable. Bearer-token auth over TLS.
+- **Operator access** to the Console is team-managed: invite users, assign permissions, and control who can operate assets, manage compliance, export audit logs, or view read-only. The same permission model applies consistently across Console and API.
+- **End-user authentication** runs through a managed identity provider (Google OAuth out of the box; federation to your IdP on request) and is bridged into a per-user embedded EVM wallet — see §8.
+
+## 4. Core API resources
+
+REST-style surface organized around stable primitives:
+
+- `Asset` — a confidential asset and its configuration (policies, limits, fees, status).
+- `Account` — a participant identity (a policy record; not a balance).
+- `Mint` / `Redeem` — operations across the public/confidential boundary, with reconciliation against reserves.
+- `Policy` — allowlist, role assignments, caps, KYC requirements, pause flags.
+- `Event` — every privileged operation and lifecycle change, immutable and queryable.
+
+Operations are addressable, idempotent (client-supplied idempotency keys), cursor-paginated where applicable, and return stable resource IDs. JSON in, JSON out.
+
+## 5. Webhooks
+
+- Subscribe endpoints to event types (asset state, mint/redeem progression, policy updates, alerts, delivery failures).
+- HMAC-signed payloads with replay protection (per-endpoint signing secret + timestamp).
+- Exponential-backoff retries, per-delivery logs, manual replay from the Console.
+- Schemas auto-generated and versioned; an in-Console "Try it" runner exercises endpoints before any client code is written.
+
+## 6. Errors, consistency, and reconciliation
+
+- Stable, machine-readable error codes with human-readable messages and per-request IDs for support.
+- Eventual consistency: operations that touch the underlying network are asynchronous. The API returns an operation handle synchronously; the webhook reports the terminal outcome.
+- Reconciliation endpoints expose supply-vs-reserves status for assets that span a public/confidential boundary.
+
+## 7. Environments
+
+- **Sandbox** and **Live** are schema-identical and isolated: separate keys, webhooks, audit logs.
+- Promotion to Live is a guided checklist (KYB, team and signers, reserves, webhook endpoints).
+- The Console UI is re-themed in sandbox to make environment confusion impossible.
+
+## 8. Platform technology and third-party integrations
+
+A few architectural choices partners should understand at a high level.
+
+**Settlement on EVM-compatible chains.** All on-chain activity — confidential transfers, mints, redemptions, balance state — settles on EVM-compatible chains (e.g. **Ethereum**, **Polygon**, **Base**, **Arc**, **Plasma**, **Tempo**, among others). Chain target and RPC endpoint are configurable per deployment.
+
+**Confidentiality via zero-knowledge proofs.** Confidential operations are produced and verified using zero-knowledge proofs. Proof generation runs in managed workers; the supporting circuits, proving keys, and verification stay inside the platform.
+
+**Gas sponsorship via Ryle's relayer.** Ryle's flagship relayer sponsors and submits transactions on the user's behalf, so end users never need to hold the chain's native gas asset and partner backends never sign or broadcast transactions directly. Sponsorship eligibility is policy-driven (per asset, per operation, per-account limits), failures surface as standard error codes and webhook events, and relayer activity is captured in the same audit log as every other privileged action.
+
+**Third-party services Ryle integrates with.** The platform composes a small set of best-in-class providers, abstracted behind the Ryle API and Console so partners do not integrate with them directly:
+
+- **Embedded-wallet provider** (Privy by default; other providers pluggable on request). Each end user is provisioned a secure, per-user EVM wallet automatically on first login: no seed phrases, no recovery flows, and no key material for partner teams or end users to manage. The user's identity unlocks the wallet transparently.
+- **Managed identity providers** — Google OAuth out of the box, with OIDC/SAML federation to a partner's IdP on request.
+- **KYC providers** — configurable per asset; partners can bring their own or use a preconfigured default.
+- **Custody providers** — partners can connect custody solutions they already use (institutional custodians, MPC vendors, or other setups they operate). Ryle binds each asset to that custody connection for treasury, signing, and reserve operations. Ryle is not a custodian; keys stay with the partner's provider. A self-hosted custody product that partners can deploy into their own infrastructure is on the roadmap.
+- **RPC providers** — configurable; partners can pin a preferred provider in production.
+
+**What partner teams do not implement, regardless of integration path:**
+
+- Private keys, signing, or seed-phrase UX.
+- Contract addresses, ABIs, role plumbing, or RPC selection in code.
+- Proof generation, circuits, or verification.
+- Custody primitives or transaction lifecycle on chain.
+- Gas funding, relayer plumbing, or native-asset top-ups for end users.
+
+Provider choices (chain target, custody connection, KYC provider, IdP federation) are exposed as configuration in the Console and applied without redeployment.
+
+## 9. Observability and developer tooling
+
+- **API logs** — every call against your keys: timestamp, key fingerprint, method, path, status, latency, response excerpt.
+- **Webhook logs** — every delivery attempt: payload, response, retry history, replay button.
+- **Activity feed** — chronological log of every operator and system event, per-event detail pane, CSV/JSON export.
+- **Event schemas** — auto-generated reference for every webhook payload, versioned.
+- **End-user telemetry** — crash and error monitoring is provided by default on partner-facing surfaces; partner-side observability is your call.
+
+## 10. Security and data boundaries
+
+- **Confidentiality is enforced at the API boundary.** End-user balances and transaction graphs are never returned by any endpoint, to any caller. Aggregate health (supply, reserves, bucketed counts) is.
+- **Audit log** — every privileged action (operator or API) is recorded, attributed, immutable, and exportable.
+- **Selective disclosure** — when external visibility is required, the platform issues scoped, time-bounded disclosure views; access to disclosed data is itself logged.
+- **Mechanism abstraction** — confidentiality is managed entirely on Ryle's side. The platform handles zero-knowledge proof generation and verification, the supporting circuits, key material, signing, and network coordination. None of these primitives surface in your code; your integration interacts with the API contract.
+- **Defense in depth** — row-level access control on user-scoped data, scoped client keys, server-only privileged credentials, signed webhooks, and RBAC on every operator action.
+
+## What integration looks like in practice
+
+A typical first integration is small: provision a sandbox API key, configure one asset and a webhook endpoint, exercise mint / redeem / participant flows end-to-end, then promote. Most engineering teams reach a working sandbox integration in days, not weeks, because the surface is intentionally narrow and the protocol-specific complexity stays on Ryle's side of the boundary.

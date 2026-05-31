@@ -1,0 +1,43 @@
+---
+title: "Confidential stablecoins"
+description: "Confidential stablecoins keep holder balances and payments private while letting issuers prove reserves and supply to auditors and regulators. Ryle is the infrastructure to issue and operate them."
+---
+
+Confidential stablecoins are stablecoins whose holder balances and payment amounts are encrypted onchain, so payroll, vendor payments, and account balances stay private. Issuers can still prove reserves and supply to auditors and regulators through selective disclosure. Ryle provides the infrastructure to issue and operate a confidential stablecoin without building blockchain or cryptography expertise in-house.
+
+## The scenario
+
+A company or issuer wants a stablecoin for business payments — payroll, supplier settlement, B2B flows — but cannot expose every payment and balance to the public.
+
+## Why public chains fail it
+
+A stablecoin on a transparent chain leaks salaries, vendor terms, balances, and payment cadence to anyone watching. This is [the privacy problem of stablecoins](/problems/stablecoin-privacy), and it makes public-by-default stablecoins unusable for confidential business flows.
+
+## How confidentiality and selective disclosure solve it
+
+Encrypting balances and amounts keeps individual activity private while [zero-knowledge proofs](/concepts/how-confidential-assets-work) keep supply verifiable. [Selective disclosure](/concepts/selective-disclosure) lets the issuer prove reserves to auditors and report specific activity to regulators — satisfying compliance without publishing holder data.
+
+## What Ryle enables
+
+- Issue a new confidential stablecoin, or add confidentiality to one you already issue.
+- Mint and redeem against reserves with reconciliation.
+- Keep holder balances and payments private by default.
+- Prove reserves and supply through scoped, logged disclosures.
+
+## Related
+
+- [The privacy problem of stablecoins](/problems/stablecoin-privacy)
+- [Selective disclosure](/concepts/selective-disclosure)
+- [Confidential supplier payments](/use-cases/supplier-payments)
+- [What are confidential digital assets?](/what-are-confidential-digital-assets)
+
+## FAQ
+
+<AccordionGroup>
+  <Accordion title="Can a confidential stablecoin meet reserve-reporting requirements?">
+    Yes. Selective disclosure proves reserves and supply to auditors and regulators without exposing individual holder balances.
+  </Accordion>
+  <Accordion title="Can I make an existing stablecoin confidential?">
+    Yes. Ryle supports adding a confidential layer to an asset you already issue, as well as issuing a brand-new confidential stablecoin.
+  </Accordion>
+</AccordionGroup>

@@ -1,0 +1,43 @@
+---
+title: "Confidential B2B settlement"
+description: "Confidential B2B settlement runs a private payment network between business customers where individual flows stay confidential but reserves and aggregate health remain reconcilable. Ryle is the infrastructure."
+---
+
+Confidential B2B settlement is a private onchain payment network between business customers, where individual transactions stay confidential but reserves and aggregate health remain reconcilable and auditable. Businesses settle with each other quickly and programmatically without exposing who pays whom or how much. Ryle provides the confidential asset infrastructure to operate this kind of settlement network.
+
+## The scenario
+
+A platform or consortium wants to run settlement between business customers — using a stablecoin, its own asset, or a third-party asset — with the efficiency of onchain rails but without exposing individual flows.
+
+## Why public chains fail it
+
+Public settlement reveals every counterparty relationship and amount, letting participants and outsiders reconstruct the economics of the network. No business wants its settlement activity visible to competitors. See [why enterprises need privacy onchain](/problems/enterprise-privacy-onchain).
+
+## How confidentiality and selective disclosure solve it
+
+[Confidential digital assets](/what-are-confidential-digital-assets) encrypt individual settlements while [zero-knowledge proofs](/concepts/how-confidential-assets-work) keep aggregate supply and reserves verifiable. [Selective disclosure](/concepts/selective-disclosure) lets the operator or a participant prove a specific settlement to a counterparty, auditor, or regulator on demand.
+
+## What Ryle enables
+
+- Operate a confidential settlement network across business customers.
+- Keep individual flows private while reconciling aggregate reserves.
+- Prove specific settlements to counterparties or regulators when needed.
+- Integrate via APIs and webhooks next to existing ledger and payment systems.
+
+## Related
+
+- [Confidential treasury operations](/use-cases/treasury)
+- [Confidential supplier payments](/use-cases/supplier-payments)
+- [Selective disclosure](/concepts/selective-disclosure)
+- [What are confidential digital assets?](/what-are-confidential-digital-assets)
+
+## FAQ
+
+<AccordionGroup>
+  <Accordion title="Can the network operator reconcile reserves without seeing individual flows?">
+    Yes. Aggregate supply and reserve health are verifiable and reconcilable; individual transaction amounts and counterparties stay encrypted.
+  </Accordion>
+  <Accordion title="Which assets can settle on the network?">
+    A brand-new confidential asset, a confidential layer on an asset you already issue, or confidentiality on a third-party asset — all behind the same integration.
+  </Accordion>
+</AccordionGroup>

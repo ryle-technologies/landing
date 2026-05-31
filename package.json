@@ -8,7 +8,10 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint --max-warnings 0",
-    "test": "vitest run"
+    "test": "vitest run",
+    "docs:dev": "cd docs && mint dev --no-open --port 3333",
+    "docs:validate": "cd docs && mint validate",
+    "docs:links": "cd docs && mint broken-links"
   },
   "dependencies": {
     "geist": "^1.7.0",
@@ -26,6 +29,7 @@
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "16.1.6",
+    "mint": "^4.2.587",
     "tailwindcss": "^4",
     "typescript": "^5",
     "vitest": "^4.1.4"

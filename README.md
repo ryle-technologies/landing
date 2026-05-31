@@ -21,11 +21,14 @@ Open [http://localhost:3000](http://localhost:3000).
 
 ## Docs
 
-Partner integration briefs (markdown only, no docs site yet):
+Partner integration docs live in [`docs/`](docs/) as a [Mintlify](https://mintlify.com) site.
 
-- [`docs/partner-integration-brief.md`](docs/partner-integration-brief.md) — executive overview
-- [`docs/partner-integration-overview.md`](docs/partner-integration-overview.md) — product / ops
-- [`docs/partner-integration-technical-brief.md`](docs/partner-integration-technical-brief.md) — engineering
+```bash
+pnpm docs:dev    # http://localhost:3333
+pnpm docs:validate
+```
+
+See [`docs/README.md`](docs/README.md) for deploy (monorepo path `/docs`) and MCP setup.
 
 ## Deployment
 
@@ -41,3 +44,5 @@ Vercel project **`ryle-landing`** (personal scope preview: `https://ryle-landing
 | `pnpm build`  | Production build   |
 | `pnpm lint`   | ESLint             |
 | `pnpm test`   | Vitest unit tests  |
+| `pnpm docs:dev` | Mintlify docs preview (port 3333) |
+| `pnpm docs:validate` | Validate Mintlify build |

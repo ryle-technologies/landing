@@ -1,0 +1,52 @@
+---
+title: "Confidential digital assets FAQ"
+description: "Answers to common questions about confidential digital assets, selective disclosure, compliance, and how Ryle issues and operates private onchain assets."
+---
+
+Common questions about confidential digital assets and how Ryle provides the infrastructure to issue and operate them.
+
+## What are confidential digital assets?
+
+Confidential digital assets are onchain assets whose balances and transaction amounts are encrypted but remain cryptographically verifiable. They let companies use public-chain settlement without exposing treasury, counterparties, or transaction history. See [what are confidential digital assets](/what-are-confidential-digital-assets).
+
+## What is Ryle?
+
+Ryle is confidential digital asset infrastructure — a platform companies use to issue, manage, and operate confidential assets through a Console for operators and APIs for engineers, while Ryle abstracts the underlying confidential network.
+
+## What is selective disclosure?
+
+Selective disclosure is the ability to reveal specific confidential activity to a chosen party (auditor, regulator, or counterparty) through a scoped, time-bounded, logged view, without making it public. See [selective disclosure](/concepts/selective-disclosure).
+
+## Are confidential digital assets compliant?
+
+Yes. They are private by default but disclosable by policy: issuers can prove reserves and reveal specific activity to regulators and auditors on demand, while every disclosure is logged.
+
+## How are confidential assets different from privacy coins?
+
+Privacy coins aim for blanket anonymity. Confidential digital assets are built for regulated business: private by default, but controllable, auditable, and disclosable by policy.
+
+## How do confidential assets stay verifiable if balances are encrypted?
+
+Each transaction carries a zero-knowledge proof that the rules were followed — sufficient balance, conserved supply — so the network verifies validity without seeing the amounts. See [how confidential assets work](/concepts/how-confidential-assets-work).
+
+## What chains do confidential assets settle on?
+
+EVM-compatible chains such as Ethereum, Polygon, Base, Arc, Plasma, and Tempo. The chain target is a per-deployment configuration choice.
+
+## Does Ryle custody funds?
+
+No. Ryle is not a custodian. Partners connect a custody solution they already operate, and Ryle binds the asset to it.
+
+## Can I add confidentiality to an asset I already issue?
+
+Yes. Ryle supports a brand-new confidential asset, a confidential layer on an asset you already issue, or confidentiality on a third-party asset — all behind the same API.
+
+## Who can see an account's balance?
+
+By default, no one but the holder. Operators see aggregate health, not individual balances; external visibility requires an explicit, logged selective disclosure.
+
+## Related
+
+- [Glossary](/reference/glossary)
+- [What are confidential digital assets?](/what-are-confidential-digital-assets)
+- [Selective disclosure](/concepts/selective-disclosure)

@@ -1,0 +1,40 @@
+---
+title: "What is the privacy problem of stablecoins?"
+description: "Stablecoins on public chains expose payroll, vendor payments, and account balances to anyone. Confidential stablecoins keep individual activity private while proving reserves to auditors."
+---
+
+The privacy problem of stablecoins is that, on a public chain, every holder balance and every payment is visible to anyone — exposing payroll, vendor relationships, and account balances to competitors, counterparties, and the public. A stablecoin meant for business payments becomes a live feed of who pays whom and how much. Confidential stablecoins fix this by keeping individual activity private while still letting issuers prove reserves and supply.
+
+## Payroll and vendor exposure
+
+Pay an employee or a supplier in a transparent stablecoin and the amount, timing, and recipient are public forever. Salaries, vendor terms, and payment cadence — information businesses treat as confidential — become trivially observable.
+
+## Balance surveillance
+
+Anyone can watch a company's or individual's stablecoin balance rise and fall. For a business, that exposes cash position and runway; for an individual, it is a privacy and safety risk.
+
+## Regulatory tension
+
+Issuers face a real tension: they must satisfy regulators and auditors (reserves, supply, sanctions screening) while not exposing every customer's activity to the world. Full transparency over-shares; full anonymity fails compliance.
+
+## How confidential stablecoins solve it
+
+A [confidential stablecoin](/use-cases/stablecoins) encrypts balances and amounts while preserving verifiability, so payments stay private. [Selective disclosure](/concepts/selective-disclosure) lets the issuer prove reserves to an auditor or report specific activity to a regulator without publishing holder data — resolving the regulatory tension instead of trading one failure for another.
+
+## Related
+
+- [Confidential stablecoins](/use-cases/stablecoins)
+- [Selective disclosure](/concepts/selective-disclosure)
+- [Why enterprises need privacy onchain](/problems/enterprise-privacy-onchain)
+- [What are confidential digital assets?](/what-are-confidential-digital-assets)
+
+## FAQ
+
+<AccordionGroup>
+  <Accordion title="Can a confidential stablecoin still prove its reserves?">
+    Yes. Selective disclosure lets the issuer prove reserves and supply to auditors and regulators without revealing individual holder balances.
+  </Accordion>
+  <Accordion title="Who can see my confidential stablecoin balance?">
+    By default, only you. Operators see aggregate health, not individual balances; external parties see only what an explicit, logged disclosure grants.
+  </Accordion>
+</AccordionGroup>

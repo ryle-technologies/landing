@@ -1,0 +1,56 @@
+---
+title: "What is selective disclosure?"
+description: "Selective disclosure lets the issuer of a confidential asset reveal specific transactions or balances to a chosen party — an auditor, regulator, or counterparty — without making that data public."
+---
+
+Selective disclosure is the ability to reveal specific confidential onchain activity to a chosen party — an auditor, regulator, or counterparty — without making that activity public to everyone. It is what makes confidential digital assets usable by regulated businesses: privacy is the default, and visibility is granted deliberately, scoped, and time-bounded. In Ryle, every disclosure is itself recorded in an immutable audit log.
+
+## How it works
+
+A confidential asset keeps balances and transaction amounts private by default. When an authorized operator needs to give a third party visibility, they issue a disclosure: a scoped, time-bounded view into a defined set of data (a specific account, asset, date range, or set of transactions). The recipient can verify the disclosed activity cryptographically, but gains no access beyond what the policy grants, and the disclosure event is logged.
+
+This reflects Ryle's operating principle: **confidential by default, visible by policy, auditable always.**
+
+## Who you disclose to
+
+- **Auditors** — to confirm balances, supply, and reserves during a financial audit.
+- **Regulators** — to satisfy a reporting obligation or a specific inquiry.
+- **Counterparties** — to prove a payment or settlement occurred, without exposing unrelated activity.
+- **Internal compliance** — to let a compliance or audit role review activity under their permissions.
+
+## Selective disclosure vs full transparency vs full privacy
+
+| Model | Who can see activity | Fits regulated business? |
+| --- | --- | --- |
+| Full transparency (public chains) | Everyone, permanently | No — leaks treasury, counterparties, flows |
+| Full privacy (privacy coins) | No one | No — fails audit and compliance obligations |
+| Selective disclosure | Only parties granted a scoped, logged view | Yes — private by default, disclosable by policy |
+
+Selective disclosure is the middle path that neither extreme provides: it keeps data confidential while preserving the ability to prove specific facts to specific parties on demand.
+
+## Examples
+
+- A stablecoin issuer discloses reserve and supply figures to an auditor each quarter, without revealing individual holder balances.
+- A treasury team proves a single inter-entity transfer to a regulator without exposing the rest of the ledger.
+- A B2B payer shares proof of one settlement with a counterparty while keeping all other vendor relationships private.
+
+## Related
+
+- [What are confidential digital assets?](/what-are-confidential-digital-assets)
+- [How confidential assets work](/concepts/how-confidential-assets-work)
+- [Confidential vs traditional tokens](/concepts/confidential-vs-traditional-tokens)
+- [Why enterprises need privacy onchain](/problems/enterprise-privacy-onchain)
+
+## FAQ
+
+<AccordionGroup>
+  <Accordion title="Is selective disclosure the same as making data public?">
+    No. A disclosure grants visibility to one defined party, scoped to specific data and bounded in time. The data does not become public, and the disclosure itself is logged.
+  </Accordion>
+  <Accordion title="Can a disclosure be revoked or expire?">
+    Disclosures are scoped and time-bounded by design, so access ends when the policy says it does. Access to disclosed data is recorded in the audit log.
+  </Accordion>
+  <Accordion title="Why can't I just use a privacy coin?">
+    Blanket-anonymity privacy coins cannot prove specific activity to a regulator or auditor on demand. Selective disclosure is built for compliance: private by default, provable when required.
+  </Accordion>
+</AccordionGroup>

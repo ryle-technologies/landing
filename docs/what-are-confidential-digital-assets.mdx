@@ -1,0 +1,58 @@
+---
+title: "What are confidential digital assets?"
+description: "Confidential digital assets are onchain assets whose balances and transactions stay private while remaining verifiable. Ryle is the infrastructure for issuing and operating them."
+---
+
+Confidential digital assets are onchain assets whose balances and transactions stay private while remaining cryptographically verifiable. They let companies move value on public blockchains without exposing treasury positions, counterparties, or transaction history to competitors and the public. Ryle is the confidential digital asset infrastructure that lets companies issue, manage, and operate these assets through a Console and APIs.
+
+## Definition
+
+A confidential digital asset behaves like a normal token — it can be issued, transferred, held, and redeemed — but the amounts and the parties involved are encrypted onchain. Network participants can verify that every transaction is valid (no double-spends, supply is conserved) without being able to read who paid whom or how much. Visibility becomes a deliberate choice rather than the default.
+
+The operating principle is **confidential by default, visible by policy, auditable always.**
+
+## Why they exist
+
+Public blockchains broadcast every balance and transfer to everyone, forever. That radical transparency is a feature for permissionless networks but a liability for businesses, which cannot expose payroll, vendor terms, treasury size, or customer flows to anyone with a block explorer. Confidential digital assets close that gap so companies can use public-chain settlement without leaking sensitive activity. See [why public blockchains expose business activity](/problems/public-blockchain-exposure).
+
+## What problems they solve
+
+- **Treasury exposure** — hiding the size and movement of corporate reserves. See [confidential treasury operations](/use-cases/treasury).
+- **Counterparty privacy** — keeping who-pays-whom relationships private. See [enterprise privacy onchain](/problems/enterprise-privacy-onchain).
+- **Stablecoin surveillance** — preventing balance and payment tracking. See [the privacy problem of stablecoins](/problems/stablecoin-privacy).
+- **Tokenized-asset disclosure** — protecting cap tables and holder lists. See [the privacy problem of tokenized assets](/problems/tokenized-asset-privacy).
+
+## Who needs them
+
+Banks, stablecoin issuers, payment companies, marketplaces, tokenization platforms, and corporate treasuries — any organization that wants programmable onchain settlement but is legally or competitively unable to publish its financial activity.
+
+## How they differ from traditional tokens
+
+A standard ERC-20 token publishes every balance and transfer in plaintext. A confidential digital asset encrypts those values while preserving verifiability and adding compliance hooks like selective disclosure. For a side-by-side breakdown, see [confidential vs traditional tokens](/concepts/confidential-vs-traditional-tokens).
+
+## How Ryle provides the infrastructure
+
+Ryle abstracts the underlying confidential network so teams work in business-level concepts — assets, accounts, policies, disclosures — instead of cryptography. Operators use a Console; engineers integrate via APIs. The same model supports a brand-new confidential asset, a confidential layer on an asset you already issue, or confidentiality on a third-party asset.
+
+Core building blocks:
+
+- [How confidential assets work](/concepts/how-confidential-assets-work) — the conceptual architecture.
+- [Selective disclosure](/concepts/selective-disclosure) — revealing activity to auditors, regulators, and counterparties on demand.
+- [Confidential accounts](/concepts/confidential-accounts) — how balances and permissions are held.
+
+## FAQ
+
+<AccordionGroup>
+  <Accordion title="What is a confidential digital asset?">
+    An onchain asset whose balances and transaction amounts are encrypted but still cryptographically verifiable, so value can move on public chains without exposing sensitive financial activity.
+  </Accordion>
+  <Accordion title="Are confidential digital assets compliant?">
+    Yes. Confidentiality is paired with selective disclosure, so issuers can reveal specific activity to regulators, auditors, or counterparties under explicit, scoped, audited policy. See [selective disclosure](/concepts/selective-disclosure).
+  </Accordion>
+  <Accordion title="How are they different from privacy coins?">
+    Privacy coins aim for blanket anonymity. Confidential digital assets target enterprises: private by default but controllable, auditable, and disclosable by policy, which is what regulated businesses require.
+  </Accordion>
+  <Accordion title="What does Ryle do?">
+    Ryle is the infrastructure layer for issuing and operating confidential digital assets — a Console for operators and APIs for engineers — abstracting the underlying confidential network.
+  </Accordion>
+</AccordionGroup>

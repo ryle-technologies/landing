@@ -1,0 +1,64 @@
+---
+title: "Confidential digital assets glossary"
+description: "Short, extractable definitions of the core terms for confidential digital assets: confidential asset, selective disclosure, confidential account, zero-knowledge proof, mint, redeem, and more."
+---
+
+Definitions of the core terms used across confidential digital assets and the Ryle platform. Each entry is a single, self-contained definition.
+
+## Confidential digital asset
+
+An onchain asset whose balances and transaction amounts are encrypted but remain cryptographically verifiable, letting value move on public chains without exposing sensitive financial activity. See [what are confidential digital assets](/what-are-confidential-digital-assets).
+
+## Selective disclosure
+
+The ability to reveal specific confidential activity to a chosen party — auditor, regulator, or counterparty — through a scoped, time-bounded, and logged view, without making the data public. See [selective disclosure](/concepts/selective-disclosure).
+
+## Confidential account
+
+The identity that holds and transacts a confidential asset, with an encrypted balance and policy-based permissions. In Ryle, an account is a policy record per identity, not a public balance. See [confidential accounts](/concepts/confidential-accounts).
+
+## Zero-knowledge proof
+
+A cryptographic proof that a statement is true — such as a transaction being valid — without revealing the underlying data. Confidential assets use them to keep amounts private while proving correctness.
+
+## Confidential by default, visible by policy, auditable always
+
+Ryle's operating principle: activity is private unless an explicit policy or disclosure grants visibility, and every privileged action is recorded in an immutable audit log.
+
+## Mint
+
+The operation that creates units of a confidential asset, typically against reserves, across the public/confidential boundary.
+
+## Redeem
+
+The operation that removes units of a confidential asset from circulation, reconciled against reserves.
+
+## Policy
+
+The configuration governing an asset or account — allowlists, role assignments, caps, KYC requirements, and pause flags — that determines who can do what.
+
+## Audit log
+
+An immutable, attributed record of every privileged operation (mint, redeem, role change, policy update, disclosure), exportable on demand.
+
+## Reserves
+
+The backing held against a confidential asset's supply; reconciliation proves supply matches reserves without exposing individual balances.
+
+## Relayer
+
+Ryle's service that sponsors and submits transactions, so end users and agents never need to hold the chain's native gas asset.
+
+## White-label wallet
+
+An optional customer-facing wallet partners ship under their own brand, with per-user embedded EVM wallets provisioned automatically.
+
+## EVM-compatible chain
+
+A blockchain compatible with the Ethereum Virtual Machine (for example Ethereum, Polygon, Base, Arc, Plasma, Tempo) where confidential assets settle.
+
+## Related
+
+- [What are confidential digital assets?](/what-are-confidential-digital-assets)
+- [How confidential assets work](/concepts/how-confidential-assets-work)
+- [FAQ](/reference/faq)

@@ -1,0 +1,43 @@
+---
+title: "Confidential treasury operations"
+description: "Confidential treasury operations let companies move and hold funds onchain — across entities and accounts — without exposing reserve size or internal flows, while keeping a complete internal audit trail."
+---
+
+Confidential treasury operations let a company hold and move funds onchain without exposing the size of its reserves or its internal flows to competitors and the public. Treasury teams get programmable settlement and a complete internal audit trail, while balances and transfers stay encrypted. Ryle provides the infrastructure to run these operations through a Console and APIs.
+
+## The scenario
+
+A corporate treasury manages reserves and moves balances between subsidiaries, business units, and legal entities. It wants the efficiency of onchain settlement but cannot publish reserve sizes, inter-entity transfers, or timing.
+
+## Why public chains fail it
+
+On a public chain, reserve balances and every internal transfer are visible to anyone. Competitors can infer runway and cash position; adversaries can map the corporate structure from the flow of funds. See [public blockchain exposure](/problems/public-blockchain-exposure).
+
+## How confidentiality and selective disclosure solve it
+
+[Confidential digital assets](/what-are-confidential-digital-assets) encrypt treasury balances and movements while keeping them verifiable. Internal auditability is preserved through an immutable audit log, and [selective disclosure](/concepts/selective-disclosure) lets the treasury prove specific activity to an auditor or regulator without exposing the rest of the ledger.
+
+## What Ryle enables
+
+- Move balances between entities confidentially, with a full internal audit trail.
+- Reconcile supply and reserves without publishing them.
+- Grant scoped, time-bounded disclosures to auditors and regulators.
+- Operate through the Console; integrate via APIs next to existing treasury systems.
+
+## Related
+
+- [Why enterprises need privacy onchain](/problems/enterprise-privacy-onchain)
+- [Selective disclosure](/concepts/selective-disclosure)
+- [Confidential B2B settlement](/use-cases/b2b-settlement)
+- [What are confidential digital assets?](/what-are-confidential-digital-assets)
+
+## FAQ
+
+<AccordionGroup>
+  <Accordion title="Can auditors still verify treasury balances?">
+    Yes. Selective disclosure gives auditors scoped, logged visibility into specific balances and transfers without making them public.
+  </Accordion>
+  <Accordion title="Does Ryle custody treasury funds?">
+    No. Ryle is not a custodian. You connect a custody solution you already operate, and Ryle binds the asset to it.
+  </Accordion>
+</AccordionGroup>

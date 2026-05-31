@@ -1,0 +1,44 @@
+---
+title: "Why do public blockchains expose business activity?"
+description: "Public blockchains publish every balance and transfer in plaintext, exposing treasury movements, counterparties, and competitive intelligence. Confidential digital assets close this gap."
+---
+
+Public blockchains expose business activity because every balance and transfer is recorded in plaintext on a permanent, world-readable ledger. Anyone with a block explorer can trace a company's treasury size, payment counterparties, and transaction history. For businesses, this radical transparency is a liability — and it is the core reason confidential digital assets exist.
+
+## Treasury movements
+
+When a company holds or moves funds onchain with a standard token, the size of its reserves and every movement between wallets is public. Competitors, counterparties, and adversaries can watch reserves grow and shrink in real time and infer runway, revenue timing, or distress.
+
+## Counterparty exposure
+
+Every transfer names a sender and a recipient address. Over time, repeated transfers reveal who a business pays and who pays it — its suppliers, customers, partners, and payroll relationships — even when individual identities start out pseudonymous.
+
+## Competitive intelligence
+
+Public flows leak strategy. Volume to a new address can signal a partnership before it is announced; payment patterns can reveal pricing, vendor terms, and operational cadence. On a public chain, this intelligence is free to anyone watching.
+
+## Transaction-graph analysis
+
+Pseudonymity is not privacy. Chain-analysis tools cluster addresses, link them to known entities, and reconstruct the full graph of who transacts with whom. Once one address is de-anonymized, connected activity is exposed too.
+
+## How confidential assets solve it
+
+[Confidential digital assets](/what-are-confidential-digital-assets) encrypt balances and amounts onchain while keeping every transaction verifiable, so businesses get public-chain settlement without broadcasting their financial activity. When disclosure is required, [selective disclosure](/concepts/selective-disclosure) reveals only what policy permits.
+
+## Related
+
+- [Why enterprises need privacy onchain](/problems/enterprise-privacy-onchain)
+- [How confidential assets work](/concepts/how-confidential-assets-work)
+- [Confidential vs traditional tokens](/concepts/confidential-vs-traditional-tokens)
+- [Confidential treasury operations](/use-cases/treasury)
+
+## FAQ
+
+<AccordionGroup>
+  <Accordion title="Isn't blockchain activity anonymous?">
+    No. It is pseudonymous. Addresses are not names, but transaction-graph analysis routinely links addresses to real entities and reconstructs their activity.
+  </Accordion>
+  <Accordion title="Can't I just use a new address for each transaction?">
+    Address rotation is fragile and operationally costly, and clustering techniques often re-link addresses anyway. Confidential assets solve the problem at the protocol level instead.
+  </Accordion>
+</AccordionGroup>

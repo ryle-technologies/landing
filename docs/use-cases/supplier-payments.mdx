@@ -1,0 +1,43 @@
+---
+title: "Confidential supplier payments"
+description: "Confidential supplier payments let businesses pay vendors onchain without exposing vendor relationships, amounts, or terms. Ryle keeps payments private while preserving auditability."
+---
+
+Confidential supplier payments let a business pay its vendors onchain without revealing who its suppliers are, how much it pays them, or on what terms. Payment amounts and counterparties are encrypted, while the business keeps a full audit trail and can disclose specific payments when required. Ryle provides the confidential asset infrastructure to run these payment flows.
+
+## The scenario
+
+A company pays a network of suppliers and wants the speed and programmability of onchain settlement — but vendor relationships, pricing, and payment volumes are competitively sensitive.
+
+## Why public chains fail it
+
+On a public chain, every supplier payment names the recipient and the amount. Over time this exposes the full supplier list, negotiated terms, and order volumes — a competitive intelligence leak. See [public blockchain exposure](/problems/public-blockchain-exposure).
+
+## How confidentiality and selective disclosure solve it
+
+[Confidential digital assets](/what-are-confidential-digital-assets) encrypt payment amounts and keep counterparties unexposed, while remaining verifiable. [Selective disclosure](/concepts/selective-disclosure) lets the business prove a specific payment to a supplier or auditor — for dispute resolution or reconciliation — without revealing the rest of its vendor activity.
+
+## What Ryle enables
+
+- Pay suppliers in a confidential stablecoin or asset.
+- Keep vendor relationships, amounts, and terms private.
+- Prove individual payments to a counterparty or auditor on demand.
+- Integrate payments via API alongside existing AP systems.
+
+## Related
+
+- [Confidential stablecoins](/use-cases/stablecoins)
+- [Confidential B2B settlement](/use-cases/b2b-settlement)
+- [Selective disclosure](/concepts/selective-disclosure)
+- [Why enterprises need privacy onchain](/problems/enterprise-privacy-onchain)
+
+## FAQ
+
+<AccordionGroup>
+  <Accordion title="Can a supplier confirm they were paid?">
+    Yes. Selective disclosure lets the payer prove a specific payment to the supplier without exposing other vendor activity.
+  </Accordion>
+  <Accordion title="Does the supplier need blockchain expertise?">
+    No. With the optional white-label wallet, suppliers get a per-user embedded wallet provisioned automatically — no seed phrases or key management.
+  </Accordion>
+</AccordionGroup>

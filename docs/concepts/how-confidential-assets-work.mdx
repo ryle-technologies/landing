@@ -1,0 +1,48 @@
+---
+title: "How do confidential assets work?"
+description: "Confidential assets keep balances and amounts encrypted onchain while using zero-knowledge proofs to prove every transaction is valid. Ryle manages the cryptography so issuers work with assets, accounts, and policies."
+---
+
+Confidential assets work by encrypting balances and transaction amounts onchain while using zero-knowledge proofs to prove that every transaction is valid — that no value was created and nothing was double-spent — without revealing the underlying numbers. Verifiers confirm correctness; they cannot read who paid whom or how much. Ryle runs all of this cryptography behind its platform, so issuers operate in business-level concepts instead of proofs and circuits.
+
+## The high-level architecture
+
+A confidential asset has the same lifecycle as any token — issuance, transfer, holding, redemption — but the sensitive values are hidden:
+
+1. **Encrypted state.** Balances and amounts are stored onchain in encrypted form rather than plaintext.
+2. **Validity proofs.** Each operation ships with a zero-knowledge proof that it follows the rules (supply is conserved, the sender has sufficient balance), which any participant can verify.
+3. **Verification without exposure.** The network accepts the transaction because the proof checks out — not because it can see the amounts.
+4. **Settlement.** Activity settles on EVM-compatible chains (for example Ethereum, Polygon, Base, Arc, Plasma, Tempo).
+
+## Encryption and proofs, conceptually
+
+You can think of it as two layers working together: encryption hides the data, and zero-knowledge proofs guarantee the hidden data still obeys the rules. Without the proofs, encrypted balances would be unverifiable; without the encryption, the values would be public. Together they deliver confidentiality and integrity at the same time.
+
+## Verification and compliance hooks
+
+Confidentiality does not mean opacity to authorized parties. The same system supports [selective disclosure](/concepts/selective-disclosure): scoped, time-bounded, audited views for auditors, regulators, or counterparties. Every privileged action is recorded in an immutable audit log, so the asset is private by default and provable on demand.
+
+## What Ryle abstracts
+
+With Ryle, partners never write proof-generation code, manage circuits, handle signing, or coordinate the network. Proof generation runs in managed workers; gas is sponsored by Ryle's relayer so end users never hold a native gas token. Engineers integrate a small set of primitives — `Asset`, `Account`, `Mint`, `Redeem`, `Policy`, `Event` — and operators use the Console.
+
+## Related
+
+- [What are confidential digital assets?](/what-are-confidential-digital-assets)
+- [Selective disclosure](/concepts/selective-disclosure)
+- [Confidential accounts explained](/concepts/confidential-accounts)
+- [Confidential vs traditional tokens](/concepts/confidential-vs-traditional-tokens)
+
+## FAQ
+
+<AccordionGroup>
+  <Accordion title="If balances are encrypted, how does the network stop double-spending?">
+    Each transaction carries a zero-knowledge proof that the rules were followed — sufficient balance, conserved supply. The network verifies the proof without seeing the amounts.
+  </Accordion>
+  <Accordion title="What chain do confidential assets settle on?">
+    Ryle settles on EVM-compatible chains such as Ethereum, Polygon, Base, Arc, Plasma, and Tempo. The chain target is a per-deployment configuration choice, not integration code.
+  </Accordion>
+  <Accordion title="Do I need cryptography expertise to issue one?">
+    No. Ryle manages proof generation, verification, circuits, key material, and network coordination. You work with assets, accounts, and policies through the Console and APIs.
+  </Accordion>
+</AccordionGroup>

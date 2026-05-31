@@ -1,0 +1,44 @@
+---
+title: "Confidential accounts explained"
+description: "A confidential account is the identity that holds and transacts a confidential digital asset, with encrypted balances and policy-based permissions. Ryle models accounts as policy records, not public balances."
+---
+
+A confidential account is the identity that can hold and transact a confidential digital asset, where the balance and activity are kept private rather than published onchain. It carries permissions that define what it can do, and its balance is encrypted so no one — operators included — sees it by default. In Ryle, an account is modeled as a policy record per identity rather than a public balance.
+
+## What a confidential account is
+
+Where a traditional token ties a balance to a public address, a confidential account separates identity, permissions, and (encrypted) balance. The account is who can participate; the policy attached to it governs how; the balance stays confidential and verifiable through zero-knowledge proofs.
+
+## Balances
+
+Account balances are encrypted onchain. They remain provable — the network can confirm a transfer is valid without reading the amount — but they are not visible to operators, other accounts, or the public. Visibility happens only through [selective disclosure](/concepts/selective-disclosure).
+
+## Permissions
+
+Each account is governed by policy: whether it may hold the asset, transact, the limits that apply, and any KYC requirements. Operators manage these through roles (Owner, Admin, Operator, Compliance, Auditor, Viewer) without ever seeing end-user balances.
+
+## Recovery
+
+With Ryle's white-label wallet, each end user is provisioned a per-user embedded EVM wallet automatically on first login (via Privy among other providers). There are no seed phrases or recovery flows for end users to manage; identity unlocks the account transparently.
+
+## Relation to confidential assets
+
+Accounts are how [confidential digital assets](/what-are-confidential-digital-assets) are actually held and moved. An asset defines the instrument and its rules; accounts are the participants permitted to hold and transact it under policy.
+
+## Related
+
+- [What are confidential digital assets?](/what-are-confidential-digital-assets)
+- [How confidential assets work](/concepts/how-confidential-assets-work)
+- [Selective disclosure](/concepts/selective-disclosure)
+- [Confidential vs traditional tokens](/concepts/confidential-vs-traditional-tokens)
+
+## FAQ
+
+<AccordionGroup>
+  <Accordion title="Can an operator see an account's balance?">
+    No. Operators see aggregate health, never end-user balances or transaction graphs. Specific visibility requires an explicit, logged selective disclosure.
+  </Accordion>
+  <Accordion title="Do end users manage private keys or seed phrases?">
+    No. Per-user embedded EVM wallets are provisioned automatically, so there is no seed-phrase or recovery UX for end users or partner teams to manage.
+  </Accordion>
+</AccordionGroup>

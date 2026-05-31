@@ -1,0 +1,53 @@
+---
+title: "Confidential assets vs traditional tokens"
+description: "Traditional tokens publish every balance and transfer; confidential assets encrypt them while staying verifiable and adding compliance hooks like selective disclosure. A side-by-side comparison."
+---
+
+Confidential assets and traditional tokens behave the same way functionally — both can be issued, transferred, and redeemed — but they differ on privacy. Traditional tokens (like standard ERC-20s) publish every balance and transfer in plaintext, while confidential assets encrypt those values onchain and use zero-knowledge proofs to keep them verifiable. Confidential assets also add compliance hooks, such as selective disclosure, that public tokens lack.
+
+## Side-by-side comparison
+
+| Dimension | Traditional token | Confidential digital asset |
+| --- | --- | --- |
+| Balances | Public, plaintext | Encrypted onchain |
+| Transaction amounts | Public | Encrypted |
+| Counterparties | Publicly linkable | Not exposed |
+| Verifiability | Public read of state | Zero-knowledge validity proofs |
+| Compliance / disclosure | None built in | Selective disclosure, scoped and logged |
+| Auditability | Public to everyone | Auditable by policy |
+| Settlement | EVM chains | EVM chains |
+| Fit for regulated business | Weak — leaks activity | Strong — private by default, disclosable |
+
+## Privacy
+
+A traditional token's balances and transfers are readable by anyone. A confidential asset keeps them encrypted, so [public blockchain exposure](/problems/public-blockchain-exposure) of treasury, counterparties, and flows is eliminated by default.
+
+## Verifiability
+
+Public tokens are verifiable because everyone can read the state. Confidential assets achieve verifiability differently: [zero-knowledge proofs](/concepts/how-confidential-assets-work) confirm each transaction is valid without revealing the values.
+
+## Compliance
+
+Traditional tokens have no disclosure mechanism — visibility is all-or-nothing. Confidential assets add [selective disclosure](/concepts/selective-disclosure), so issuers can prove specific activity to auditors and regulators on demand.
+
+## Performance and tooling
+
+Both settle on EVM-compatible chains. With Ryle, the additional cryptography (proof generation, verification, circuits) is managed by the platform and gas is sponsored by a relayer, so the integration surface stays close to a familiar token workflow.
+
+## Related
+
+- [What are confidential digital assets?](/what-are-confidential-digital-assets)
+- [How confidential assets work](/concepts/how-confidential-assets-work)
+- [Selective disclosure](/concepts/selective-disclosure)
+- [Confidential accounts explained](/concepts/confidential-accounts)
+
+## FAQ
+
+<AccordionGroup>
+  <Accordion title="Can I add confidentiality to a token I already issue?">
+    Yes. Ryle supports a confidential layer on an asset you already issue, a brand-new confidential asset, or confidentiality on a third-party asset — all behind the same API.
+  </Accordion>
+  <Accordion title="Are confidential assets slower than traditional tokens?">
+    They involve proof generation, but Ryle runs this in managed workers and sponsors gas via its relayer, so the operational experience stays close to a standard token integration.
+  </Accordion>
+</AccordionGroup>

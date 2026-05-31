@@ -1,0 +1,40 @@
+---
+title: "What is the privacy problem of tokenized assets?"
+description: "Tokenized assets on public chains expose cap tables, holder lists, and redemption flows. Confidential tokenization keeps investor positions private while keeping supply and reserves auditable."
+---
+
+The privacy problem of tokenized assets is that putting funds, securities, or real-world assets on a public chain exposes the cap table, holder list, and redemption activity to anyone. Investor positions and transfers — information that is legally and commercially sensitive — become public. Confidential tokenization keeps those positions private while keeping supply, reserves, and operations auditable.
+
+## Cap-table exposure
+
+A tokenized fund or security on a transparent chain reveals who owns how much. The cap table — normally tightly held — becomes readable by competitors, journalists, and anyone else, undermining a basic expectation of private and regulated markets.
+
+## Holder lists
+
+Public token contracts expose the full list of holders and their balances. For regulated instruments this can violate confidentiality obligations and expose investors to targeting and surveillance.
+
+## Redemption flows
+
+Redemptions reveal who is exiting, when, and how much. Visible redemption activity can signal distress, trigger herd behavior, or leak the strategy of large holders.
+
+## How confidential tokenization solves it
+
+A [confidential tokenization platform](/use-cases/tokenization-platforms) issues assets whose holder balances and transfers are encrypted onchain but still verifiable. Supply and reserves remain provable, and [selective disclosure](/concepts/selective-disclosure) gives auditors and regulators scoped, logged visibility — so issuers meet their obligations without publishing the cap table.
+
+## Related
+
+- [Confidential tokenization platforms](/use-cases/tokenization-platforms)
+- [Selective disclosure](/concepts/selective-disclosure)
+- [Why enterprises need privacy onchain](/problems/enterprise-privacy-onchain)
+- [What are confidential digital assets?](/what-are-confidential-digital-assets)
+
+## FAQ
+
+<AccordionGroup>
+  <Accordion title="Can regulators still see what they need with confidential tokenized assets?">
+    Yes. Selective disclosure provides scoped, time-bounded, audited views into specific holders or transactions for regulators and auditors, without exposing the full cap table.
+  </Accordion>
+  <Accordion title="Is supply still verifiable if holdings are private?">
+    Yes. Zero-knowledge proofs keep total supply and reserves verifiable even though individual holder balances are encrypted.
+  </Accordion>
+</AccordionGroup>
