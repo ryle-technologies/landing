@@ -1,0 +1,147 @@
+"use client"
+
+import Link from "next/link"
+import { usePathname } from "next/navigation"
+import { LuMoon, LuSun } from "react-icons/lu"
+import { useMarketingTheme } from "@/components/marketing/MarketingThemeProvider"
+import {
+  isAlphaShellNavActive,
+  landingMarketingCtaAnchorProps,
+  LANDING_MARKETING_CONTACT_HREF,
+  LANDING_MARKETING_CTA_LABEL,
+} from "@/lib/siteNav"
+import { LandingNavWordmark } from "@/components/marketing/landing/LandingNavWordmark"
+import { landingHeroPrimaryCtaClassName } from "@/lib/landingHeroTypography"
+
+function isAbsoluteHttpUrl(href: string): boolean {
+  return href.startsWith("http://") || href.startsWith("https://")
+}
+
+interface LandingTopNavProps {
+  /** CTA label (primary pill, or single nav link for in-app `ctaHref`). */
+  ctaLabel?: string
+  /**
+   * CTA target. Defaults to {@link LANDING_MARKETING_CONTACT_HREF} (Calendly).
+   * External URLs and `mailto:` use the primary pill; in-app paths use a text link.
+   */
+  ctaHref?: string
+  className?: string
+  /**
+   * Render the light/dark toggle next to the CTA. Only enabled on
+   * `/landing/home`; the toggle is fully scoped to the marketing surround
+   * (own `localStorage` key, `dark` class on the marketing wrapper only).
+   */
+  showThemeToggle?: boolean
+}
+
+/** Horizontal site nav for the public landing pages. */
+export function LandingTopNav({
+  ctaLabel = LANDING_MARKETING_CTA_LABEL,
+  ctaHref: ctaHrefProp,
+  className,
+  showThemeToggle = false,
+}: LandingTopNavProps) {
+  const pathname = usePathname()
+  const ctaHref = ctaHrefProp ?? LANDING_MARKETING_CONTACT_HREF
+  const ctaIsMailto = ctaHref.startsWith("mailto:")
+  const ctaIsExternal = isAbsoluteHttpUrl(ctaHref)
+  const ctaUsesPrimaryPill = ctaIsMailto || ctaIsExternal
+  const ctaAnchorProps = landingMarketingCtaAnchorProps(ctaHref)
+  const alphaActive = isAlphaShellNavActive(pathname)
+
+  // `null` when this nav is rendered outside the marketing layout (defensive:
+  // avoids crashing if reused elsewhere). Toggle is silently disabled.
+  const marketingTheme = useMarketingTheme()
+  const canToggle = showThemeToggle && marketingTheme !== null
+
+  const displayedIsDark = marketingTheme?.isDark === true
+
+  return (
+    <nav
+      aria-label="Site"
+      className={[
+        "flex w-full min-w-0 max-w-full flex-wrap items-center justify-between gap-x-6 gap-y-2",
+        className,
+      ]
+        .filter(Boolean)
+        .join(" ")}
+    >
+      <div className="flex min-w-0 flex-wrap items-center justify-start gap-x-6 gap-y-2">
+        <div className="flex min-w-0 items-baseline gap-2 sm:gap-2.5">
+          <Link
+            href="/"
+            aria-label="Ryle — go to home"
+            className={[
+              "relative z-10 inline-flex shrink-0 items-baseline gap-1.5 self-baseline sm:gap-2",
+              "no-underline transition-opacity duration-500 ease-out hover:opacity-80 focus-visible:rounded-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-foreground",
+            ].join(" ")}
+          >
+            <LandingNavWordmark />
+          </Link>
+        </div>
+      </div>
+      <div className="flex shrink-0 items-center gap-x-5">
+        {canToggle ? (
+          <button
+            type="button"
+            onClick={marketingTheme!.toggle}
+            aria-label={`Switch to ${displayedIsDark ? "light" : "dark"} theme`}
+            aria-pressed={displayedIsDark}
+            className={themeToggleButtonClassName}
+          >
+            {displayedIsDark ? (
+              <LuSun size={14} className="shrink-0" aria-hidden />
+            ) : (
+              <LuMoon size={14} className="shrink-0" aria-hidden />
+            )}
+          </button>
+        ) : null}
+        {ctaUsesPrimaryPill ? (
+          <a
+            href={ctaHref}
+            className={landingHeroPrimaryCtaClassName}
+            {...ctaAnchorProps}
+          >
+            {ctaLabel}
+          </a>
+        ) : (
+          <Link
+            href={ctaHref}
+            aria-current={
+              ctaIsExternal
+                ? undefined
+                : pathname === ctaHref
+                  ? "page"
+                  : alphaActive
+                    ? "location"
+                    : undefined
+            }
+            className={[
+              topNavTextLinkClassName,
+              !ctaIsExternal && alphaActive
+                ? "text-foreground underline"
+                : "no-underline",
+            ].join(" ")}
+          >
+            {ctaLabel}
+          </Link>
+        )}
+      </div>
+    </nav>
+  )
+}
+
+const topNavTextLinkClassName = [
+  "inline-flex shrink-0 items-center self-center",
+  "cursor-pointer border-0 bg-transparent p-0",
+  "font-serif text-[17px] font-normal italic leading-none tracking-[-0.02em] text-foreground/90",
+  "underline-offset-[0.2em] transition-opacity duration-500 ease-out hover:opacity-90 hover:underline",
+  "focus-visible:rounded-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-foreground",
+].join(" ")
+
+const themeToggleButtonClassName = [
+  "inline-flex h-6 w-6 shrink-0 items-center justify-center self-center",
+  "cursor-pointer border-0 bg-transparent p-0 text-foreground/90",
+  "transition-opacity duration-500 ease-out hover:opacity-80",
+  "focus-visible:rounded-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-foreground",
+].join(" ")
