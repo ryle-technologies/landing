@@ -1,10 +1,7 @@
-"use client"
-
-import { cubicBezier, motion, type Variants } from "motion/react"
-import { LandingFooterAsciiBackground } from "@/components/marketing/landing/LandingFooterAsciiBackground"
 import {
   landingFooterSitemapContentClassName,
   landingFooterSitemapMaxWidthClass,
+  landingMarketingDotGridLayerClassName,
 } from "@/lib/landingLayout"
 import {
   FOOTER_DOCS_COLUMNS,
@@ -12,12 +9,6 @@ import {
   type FooterNavColumn,
   type FooterNavLink,
 } from "@/lib/siteNav"
-
-const closingItemEase = cubicBezier(0.16, 1, 0.3, 1)
-const closingStaggerItem: Variants = {
-  hidden: { opacity: 0, y: 12 },
-  show: { opacity: 1, y: 0, transition: { duration: 0.6, ease: closingItemEase } },
-}
 
 const footerLinkClassName =
   "text-[15px] font-normal leading-snug tracking-[-0.01em] text-muted underline-offset-2 transition-colors duration-500 ease-out hover:text-foreground hover:underline focus-visible:rounded-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-foreground"
@@ -64,12 +55,8 @@ function FooterSitemapColumn({ column }: { column: FooterNavColumn }) {
 export function LandingFooterSitemap() {
   return (
     <div className="relative w-full overflow-hidden pb-18 pt-24 sm:pb-22 sm:pt-28">
-      <LandingFooterAsciiBackground />
-      <motion.nav
-        aria-label="Footer"
-        className="relative z-10 w-full"
-        variants={closingStaggerItem}
-      >
+      <span aria-hidden className={landingMarketingDotGridLayerClassName} />
+      <nav aria-label="Footer" className="relative z-10 w-full">
       <div
         className={`relative z-10 ${landingFooterSitemapContentClassName}`}
       >
@@ -81,7 +68,7 @@ export function LandingFooterSitemap() {
           </div>
         </div>
       </div>
-      </motion.nav>
+      </nav>
     </div>
   )
 }

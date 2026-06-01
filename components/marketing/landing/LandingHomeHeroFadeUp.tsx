@@ -1,13 +1,26 @@
 "use client"
 
-import { motion, useReducedMotion, type Variants } from "motion/react"
-import type { ReactNode } from "react"
+import {
+  cubicBezier,
+  motion,
+  useInView,
+  useReducedMotion,
+  type Variants,
+} from "motion/react"
+import { useRef, type ReactNode, type RefObject } from "react"
+import { useMarketingScrollContainer } from "@/components/marketing/MarketingThemeProvider"
 
 const fadeUpInitial = { opacity: 0, y: 12 }
 /** Slide from above: enters moving top → down with fade. */
 const fadeSlideDownInitial = { opacity: 0, y: -12 }
 const fadeUpAnimate = { opacity: 1, y: 0 }
-const fadeUpTransition = { duration: 0.6, ease: [0.16, 1, 0.3, 1] as const }
+
+/**
+ * JS easing (not a bezier tuple) keeps opacity on the main thread with transform.
+ * Tuple eases can hand opacity to WAAPI and flash for a frame when the run ends.
+ */
+const fadeUpEase = cubicBezier(0.16, 1, 0.3, 1)
+const fadeUpTransition = { duration: 0.6, ease: fadeUpEase }
 
 const defaultInViewViewport = { once: false, amount: 0.28 } as const
 
@@ -49,21 +62,23 @@ export function LandingHomeHeroFadeUp({
   viewport?: { once?: boolean; amount?: number | "some" | "all" }
 }) {
   const reduceMotion = useReducedMotion()
+  const { ref, isVisible } = useMarketingInView(
+    whenVisible ? viewportProp : undefined,
+  )
+  const initial = direction === "down" ? fadeSlideDownInitial : fadeUpInitial
+  const transition = { ...fadeUpTransition, delay }
+
   if (reduceMotion) {
     return <div className={className}>{children}</div>
   }
 
-  const initial = direction === "down" ? fadeSlideDownInitial : fadeUpInitial
-  const transition = { ...fadeUpTransition, delay }
-  const viewport = { ...defaultInViewViewport, ...viewportProp }
-
   if (whenVisible) {
     return (
       <motion.div
+        ref={ref}
         className={className}
         initial={initial}
-        whileInView={fadeUpAnimate}
-        viewport={viewport}
+        animate={isVisible ? fadeUpAnimate : initial}
         transition={transition}
       >
         {children}
@@ -85,10 +100,35 @@ export function LandingHomeHeroFadeUp({
 
 type InViewViewport = { once?: boolean; amount?: number | "some" | "all" }
 
+function useMarketingInView(viewportProp: InViewViewport | undefined): {
+  ref: RefObject<HTMLDivElement | null>
+  isVisible: boolean
+} {
+  const ref = useRef<HTMLDivElement | null>(null)
+  const scrollContainerRef = useMarketingScrollContainer()
+  const viewport = { ...defaultInViewViewport, ...viewportProp }
+  const hasLatchedRef = useRef(false)
+
+  const isInView = useInView(ref, {
+    once: viewport.once,
+    amount: viewport.amount,
+    root: scrollContainerRef ?? undefined,
+  })
+
+  if (viewport.once && isInView) {
+    hasLatchedRef.current = true
+  }
+
+  const isVisible = viewport.once ? hasLatchedRef.current || isInView : isInView
+
+  return { ref, isVisible }
+}
+
 /**
- * One `whileInView` for the whole group; use with `motion` children and
- * {@link landingHomeHeroStaggerInViewItem} so the stagger runs when the block
- * first scrolls into view.
+ * Staggered in-view reveal for the whole group; use with `motion` children and
+ * {@link landingHomeHeroStaggerInViewItem}. Uses the marketing scroll container
+ * as the intersection root and latches `once` reveals so IO edge flicker cannot
+ * replay the fade.
  */
 export function LandingHomeHeroFadeStaggerInView({
   className,
@@ -100,16 +140,18 @@ export function LandingHomeHeroFadeStaggerInView({
   viewport?: InViewViewport
 }) {
   const reduceMotion = useReducedMotion()
+  const { ref, isVisible } = useMarketingInView(viewportProp)
+
   if (reduceMotion) {
     return <div className={className}>{children}</div>
   }
-  const viewport = { ...defaultInViewViewport, ...viewportProp }
+
   return (
     <motion.div
+      ref={ref}
       className={className}
       initial="hidden"
-      whileInView="show"
-      viewport={viewport}
+      animate={isVisible ? "show" : "hidden"}
       variants={landingHomeHeroStaggerInViewContainer}
     >
       {children}

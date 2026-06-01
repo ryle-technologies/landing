@@ -1,8 +1,7 @@
 "use client"
 
 import Link from "next/link"
-import { cubicBezier, motion, type Variants } from "motion/react"
-import { LandingHomeHeroFadeStaggerInView } from "@/components/marketing/landing/LandingHomeHeroFadeUp"
+import { LandingHomeClosingScrollReveal } from "@/components/marketing/landing/LandingHomeClosingScrollReveal"
 import { LandingFooterSitemap } from "@/components/marketing/landing/LandingFooterSitemap"
 import { LandingNavWordmark } from "@/components/marketing/landing/LandingNavWordmark"
 import { landingFooterWordmarkTypeClassName } from "@/lib/landingNavWordmark"
@@ -13,19 +12,6 @@ import {
   LANDING_MARKETING_CTA_LABEL,
   // LANDING_MARKETING_X_HREF,
 } from "@/lib/siteNav"
-
-/**
- * Same fade-up as the shared hero item, but the easing is a JS **function**
- * (not a bezier array). That forces Motion to animate opacity on the main
- * thread alongside the transform, instead of splitting opacity onto WAAPI.
- * The split path handed off opacity at the end of the run, which flashed the
- * title and description for one frame on real GPUs after they settled.
- */
-const closingItemEase = cubicBezier(0.16, 1, 0.3, 1)
-const closingStaggerItem: Variants = {
-  hidden: { opacity: 0, y: 12 },
-  show: { opacity: 1, y: 0, transition: { duration: 0.6, ease: closingItemEase } },
-}
 
 type LandingHomeBuildingNewBlockProps = {
   title: string
@@ -51,41 +37,25 @@ export function LandingHomeBuildingNewBlock({
   const hasHeading = Boolean(title.trim())
 
   return (
-    <LandingHomeHeroFadeStaggerInView
-      className="w-full max-w-none"
-      viewport={{ once: true, amount: 0.22 }}
-    >
+    <LandingHomeClosingScrollReveal className="w-full max-w-none">
       {hasHeading ? (
         <>
-          <motion.div
-            className="mb-5 sm:mb-6"
-            variants={closingStaggerItem}
-          >
+          <div className="mb-5 sm:mb-6">
             <LandingNavWordmark />
-          </motion.div>
-          <motion.h2
-            id={headingId}
-            className={titleClassName}
-            variants={closingStaggerItem}
-          >
+          </div>
+          <h2 id={headingId} className={titleClassName}>
             {title}
-          </motion.h2>
+          </h2>
         </>
       ) : (
         <span id={headingId} className="sr-only">
           Contact and social
         </span>
       )}
-      <motion.p
-        className={`${hasHeading ? "mt-3" : ""} ${sublineClassName}`}
-        variants={closingStaggerItem}
-      >
+      <p className={`${hasHeading ? "mt-3" : ""} ${sublineClassName}`}>
         {subtitle}
-      </motion.p>
-      <motion.div
-        className="mt-6 flex flex-wrap items-center gap-3 text-left sm:mt-7"
-        variants={closingStaggerItem}
-      >
+      </p>
+      <div className="mt-6 flex flex-wrap items-center gap-3 text-left sm:mt-7">
         <a
           href={LANDING_MARKETING_CONTACT_HREF}
           className={contactCtaClassName}
@@ -93,11 +63,10 @@ export function LandingHomeBuildingNewBlock({
         >
           {LANDING_MARKETING_CTA_LABEL}
         </a>
-      </motion.div>
+      </div>
       <div className={`${landingViewportBleedClassName} mt-10 sm:mt-11`}>
         <LandingFooterSitemap />
-        <motion.div
-          variants={closingStaggerItem}
+        <div
           role="separator"
           aria-hidden
           className="h-px w-full"
@@ -107,10 +76,7 @@ export function LandingHomeBuildingNewBlock({
           }}
         />
       </div>
-      <motion.div
-        className="mt-9 flex min-w-0 flex-nowrap items-center justify-between gap-3 text-left sm:mt-11"
-        variants={closingStaggerItem}
-      >
+      <div className="mt-9 flex min-w-0 flex-nowrap items-center justify-between gap-3 text-left sm:mt-11">
         <Link
           href="/"
           aria-label="Ryle — go to home"
@@ -121,7 +87,7 @@ export function LandingHomeBuildingNewBlock({
         <span className="shrink-0 text-right text-xs font-normal leading-none tracking-[-0.01em] text-muted/60">
           2026 / All rights reserved.
         </span>
-      </motion.div>
-    </LandingHomeHeroFadeStaggerInView>
+      </div>
+    </LandingHomeClosingScrollReveal>
   )
 }

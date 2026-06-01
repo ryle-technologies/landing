@@ -51,10 +51,6 @@ export const LANDING_HOME_SUITE_PRODUCTS_GRID_ID =
 export const landingMarketingDotGridLayerClassName =
   "pointer-events-none absolute inset-0 z-0 rounded-md [background-image:radial-gradient(circle_at_center,color-mix(in_oklab,var(--foreground)_16%,transparent)_0.5px,transparent_0.5px)] [background-size:8px_8px] [mask-image:linear-gradient(to_bottom,transparent,black)] [-webkit-mask-image:linear-gradient(to_bottom,transparent,black)] [mask-size:100%_100%] [-webkit-mask-size:100%_100%]"
 
-/** Footer menu ASCII letter field — stronger top fade, visible toward the bottom. */
-export const landingFooterAsciiBackgroundMaskClassName =
-  "[mask-image:linear-gradient(to_bottom,transparent_0%,transparent_42%,black_100%)] [-webkit-mask-image:linear-gradient(to_bottom,transparent_0%,transparent_42%,black_100%)] [mask-size:100%_100%] [-webkit-mask-size:100%_100%]"
-
 /**
  * Same dot pattern as {@link landingMarketingDotGridLayerClassName}, but the mask
  * fades out toward the **right** (visible on the left).
