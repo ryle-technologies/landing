@@ -9,6 +9,14 @@ Definitions of the core terms used across confidential digital assets and the Ry
 
 An onchain asset whose balances and transaction amounts are encrypted but remain cryptographically verifiable, letting value move on public chains without exposing sensitive financial activity. See [what are confidential digital assets](/what-are-confidential-digital-assets).
 
+## Custody
+
+The safekeeping of assets, reserves, or signing keys. **Ryle is not a custodian** — it is a technology provider. Partners connect a custody or signing solution they already operate (institutional custodian, MPC vendor, or equivalent) for treasury, reserve, and issuer operations; Ryle binds each asset to that connection. End-user wallet keys are held by the embedded-wallet provider (e.g. Privy), not by Ryle. Ryle never holds or controls assets, reserves, or wallet keys. See [FAQ](/reference/faq) and [compliance overview](/compliance/overview).
+
+## Custody connection
+
+The configuration that links a confidential asset to a partner-operated custody or signing provider for treasury, reserve, and mint/redeem operations. Ryle orchestrates operations against this connection but does not hold the keys.
+
 ## Selective disclosure
 
 The ability to reveal specific confidential activity to a chosen party — auditor, regulator, or counterparty — through a scoped, time-bounded, and logged view, without making the data public. See [selective disclosure](/concepts/selective-disclosure).
@@ -55,10 +63,11 @@ An optional customer-facing wallet partners ship under their own brand, with per
 
 ## EVM-compatible chain
 
-A blockchain compatible with the Ethereum Virtual Machine (for example Ethereum, Polygon, Base, Arc, Plasma, Tempo) where confidential assets settle.
+A blockchain compatible with the Ethereum Virtual Machine (for example Ethereum, Polygon, Base, Arc, Plasma, Tempo) where confidential assets settle. See [supported networks](/reference/supported-networks).
 
 ## Related
 
+- [Supported networks](/reference/supported-networks)
 - [What are confidential digital assets?](/what-are-confidential-digital-assets)
 - [How confidential assets work](/concepts/how-confidential-assets-work)
 - [FAQ](/reference/faq)

@@ -376,7 +376,7 @@ export function LandingHomeLowerSections() {
         <LandingHomeNavFadeOutMarker />
         <section
           aria-labelledby="landing-home-building-new-heading"
-          className="pt-48 pb-8 sm:pb-10 sm:pt-60 min-[1080px]:pb-12 min-[1080px]:pt-60"
+          className="pt-48 pb-0 sm:pt-60 min-[1080px]:pt-60"
         >
           <LandingHomeBuildingNewBlock
             headingId="landing-home-building-new-heading"
@@ -387,7 +387,7 @@ export function LandingHomeLowerSections() {
             contactCtaClassName={landingHeroPrimaryCtaClassName}
           />
         </section>
-        <LandingFooterMarquee className="-mx-6 pl-[max(1.5rem,env(safe-area-inset-left))] pr-[max(1.5rem,env(safe-area-inset-right))]" />
+        <LandingFooterMarquee className="-mx-6 -mt-8 pl-[max(1.5rem,env(safe-area-inset-left))] pr-[max(1.5rem,env(safe-area-inset-right))] sm:-mt-10 min-[1080px]:-mt-12" />
       </LandingHomeThemeScrollBoundary>
     </>
   )

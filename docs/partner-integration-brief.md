@@ -6,7 +6,7 @@
 
 ## 1. Executive summary
 
-Ryle is infrastructure for issuing, managing, and operating confidential digital assets. Through a dashboard for operators and APIs for engineering teams, partners can launch and run a confidential asset program without taking on blockchain, cryptography, or confidential-network expertise themselves. The goal is simple: make integrating Ryle feel closer to integrating a payments processor than building a blockchain product.
+Ryle is infrastructure for issuing, managing, and operating confidential digital assets. Through a dashboard for operators and APIs for engineering teams, partners can launch and run a confidential asset program without taking on blockchain, cryptography, or confidential-network expertise themselves. Ryle is a technology provider, not a custodian — it never holds or controls assets, reserves, or wallet keys. The goal is simple: make integrating Ryle feel closer to integrating a payments processor than building a blockchain product.
 
 ## 2. The problem
 
@@ -18,7 +18,7 @@ Ryle exposes three surfaces:
 
 - **Console** — a web dashboard for operators, business, and compliance teams.
 - **APIs** — a programmatic surface for developers and back-office systems.
-- **White-label Wallet** *(optional)* — a customer-facing wallet partners can ship under their own brand, with per-user embedded EVM wallets provisioned automatically (via Privy among other embedded-wallet providers): no seed-phrase or recovery UX for end users.
+- **White-label Wallet** *(optional)* — a customer-facing wallet partners can ship under their own brand, with per-user embedded EVM wallets provisioned automatically (via Privy among other embedded-wallet providers): no seed-phrase or recovery UX for end users. Wallet keys are held by the embedded-wallet provider, not by Ryle.
 
 Assets fit one of three shapes: a brand-new confidential asset, a confidential layer on an asset you already issue, or confidentiality offered on a third-party asset. The same Console, APIs, and integration model apply to all three.
 
@@ -58,7 +58,7 @@ The platform fits naturally next to existing payments, ledger, and compliance in
 
 ## 8. Security, privacy, and control
 
-The product principle is **confidential by default, visible by policy, auditable always.** End-user balances and transaction graphs are not exposed. Visibility is the result of explicit policy or a deliberate, scoped, time-bounded, audited disclosure. Every privileged action is recorded in an immutable audit log. Mechanisms are abstracted from the integrator.
+The product principle is **confidential by default, visible by policy, auditable always.** End-user balances and transaction graphs are not exposed. Visibility is the result of explicit policy or a deliberate, scoped, time-bounded, audited disclosure. Every privileged action is recorded in an immutable audit log. Mechanisms are abstracted from the integrator. Ryle is not a custodian: partners connect custody and signing they operate, and end-user wallets are secured by the embedded-wallet provider.
 
 ## 9. Example use cases
 

@@ -89,7 +89,7 @@ A typical operator can:
 
 The privacy boundary is enforced consistently in the UI: the operator sees their own actions and aggregate health, never end-user balances or transaction graphs.
 
-Underneath the white-label wallet, each end user is provisioned a per-user embedded EVM wallet automatically on first login (via Privy among other embedded-wallet providers): no seed phrases, no recovery flows, and no key material for partner teams or end users to manage.
+Underneath the white-label wallet, each end user is provisioned a per-user embedded EVM wallet automatically on first login (via Privy among other embedded-wallet providers): no seed phrases, no recovery flows, and no key material for partner teams or end users to manage. Wallet keys are held by the embedded-wallet provider, not by Ryle.
 
 ---
 
@@ -100,7 +100,7 @@ The API is built around a small set of stable, predictable primitives so enginee
 **Design philosophy:**
 
 - **Few, well-named primitives.** Assets, accounts (a policy record per identity, not a balance), mints, redemptions, policies, events. Most workflows are a small composition of these.
-- **No confidential-network plumbing in your code.** You call business-level operations. The platform handles signing, network coordination, and confidentiality on your behalf.
+- **No confidential-network plumbing in your code.** You call business-level operations. The platform coordinates signing through your connected custody and embedded-wallet providers, handles network coordination, and enforces confidentiality — without Ryle holding asset or wallet keys.
 - **Predictable request/response shapes.** Idempotent operations, stable identifiers, machine-readable error codes.
 - **Webhooks for everything.** Subscribe to lifecycle events (asset state changes, mint and redeem progression, policy updates, alerts) and consume them with replay, retries, and per-delivery logs.
 - **Sandbox and live parity.** Build and test against a sandbox environment whose schema is identical to production, then promote with confidence.

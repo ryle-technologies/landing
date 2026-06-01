@@ -5,10 +5,25 @@
  */
 export const landingContentMaxWidthClass = "max-w-5xl"
 
+/** Footer docs sitemap — narrower than main marketing column width. */
+export const landingFooterSitemapMaxWidthClass = "max-w-4xl"
+
 export const landingColumnHorizontalPadClass =
   "px-6 pl-[max(1.5rem,env(safe-area-inset-left))] pr-[max(1.5rem,env(safe-area-inset-right))]"
 
 export const landingColumnPadClass =
+  `mx-auto w-full min-w-0 ${landingContentMaxWidthClass} ${landingColumnHorizontalPadClass}`
+
+/**
+ * Break out of {@link landingColumnPadClass} to span the full viewport width
+ * (backgrounds, dividers). Pair inner content with {@link landingColumnPadClass}
+ * or {@link landingFooterSitemapContentClassName} so copy stays aligned.
+ */
+export const landingViewportBleedClassName =
+  "relative left-1/2 w-screen max-w-[100vw] -translate-x-1/2"
+
+/** Footer sitemap links — same horizontal inset as the marketing column, narrower max width. */
+export const landingFooterSitemapContentClassName =
   `mx-auto w-full min-w-0 ${landingContentMaxWidthClass} ${landingColumnHorizontalPadClass}`
 
 /**

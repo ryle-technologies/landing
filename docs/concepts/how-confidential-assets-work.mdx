@@ -12,7 +12,7 @@ A confidential asset has the same lifecycle as any token — issuance, transfer,
 1. **Encrypted state.** Balances and amounts are stored onchain in encrypted form rather than plaintext.
 2. **Validity proofs.** Each operation ships with a zero-knowledge proof that it follows the rules (supply is conserved, the sender has sufficient balance), which any participant can verify.
 3. **Verification without exposure.** The network accepts the transaction because the proof checks out — not because it can see the amounts.
-4. **Settlement.** Activity settles on EVM-compatible chains (for example Ethereum, Polygon, Base, Arc, Plasma, Tempo).
+4. **Settlement.** Activity settles on EVM-compatible chains (for example Ethereum, Polygon, Base, Arc, Plasma, Tempo). See [supported networks](/reference/supported-networks).
 
 ## Encryption and proofs, conceptually
 
@@ -40,9 +40,9 @@ With Ryle, partners never write proof-generation code, manage circuits, handle s
     Each transaction carries a zero-knowledge proof that the rules were followed — sufficient balance, conserved supply. The network verifies the proof without seeing the amounts.
   </Accordion>
   <Accordion title="What chain do confidential assets settle on?">
-    Ryle settles on EVM-compatible chains such as Ethereum, Polygon, Base, Arc, Plasma, and Tempo. The chain target is a per-deployment configuration choice, not integration code.
+    Ryle settles on EVM-compatible chains such as Ethereum, Polygon, Base, Arc, Plasma, and Tempo. The chain target is a per-deployment configuration choice, not integration code. See [supported networks](/reference/supported-networks).
   </Accordion>
   <Accordion title="Do I need cryptography expertise to issue one?">
-    No. Ryle manages proof generation, verification, circuits, key material, and network coordination. You work with assets, accounts, and policies through the Console and APIs.
+    No. Ryle manages proof generation, verification, circuits, ZK proving keys (platform cryptography only), and network coordination. Asset and wallet signing is coordinated through custody and embedded-wallet providers you connect; Ryle does not hold those keys. You work with assets, accounts, and policies through the Console and APIs.
   </Accordion>
 </AccordionGroup>
