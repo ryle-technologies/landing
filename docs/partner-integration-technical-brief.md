@@ -8,7 +8,7 @@
 
 Ryle is a managed backend your systems integrate with over HTTPS. Your backend calls the Ryle API to operate on assets and participants; Ryle delivers asynchronous events back to your endpoints via webhooks. Operators use the Console for the same surface, manually.
 
-Architecturally, the platform settles on **EVM-compatible chains** and uses **zero-knowledge proofs** to deliver confidentiality. The underlying network, signing, proof generation and verification, supporting circuits, and confidential-asset mechanics are all managed on Ryle's side and never surface in your integration code — you work with assets, accounts, and operations, not with the cryptographic machinery underneath.
+Architecturally, the platform settles on **EVM-compatible chains** and uses **zero-knowledge proofs** to deliver confidentiality. Proof generation and verification, supporting circuits, network coordination, and confidential-asset mechanics are managed on Ryle's side and never surface in your integration code — you work with assets, accounts, and operations, not with the cryptographic machinery underneath. Asset and wallet signing is coordinated through your connected custody and embedded-wallet providers; Ryle does not hold those keys.
 
 Three integration shapes are supported behind the same API surface: a brand-new confidential asset, a confidential layer on an asset you already issue, or confidentiality offered on a third-party asset.
 
@@ -71,7 +71,7 @@ A few architectural choices partners should understand at a high level.
 
 **Third-party services Ryle integrates with.** The platform composes a small set of best-in-class providers, abstracted behind the Ryle API and Console so partners do not integrate with them directly:
 
-- **Embedded-wallet provider** (Privy by default; other providers pluggable on request). Each end user is provisioned a secure, per-user EVM wallet automatically on first login: no seed phrases, no recovery flows, and no key material for partner teams or end users to manage. The user's identity unlocks the wallet transparently.
+- **Embedded-wallet provider** (Privy by default; other providers pluggable on request). Each end user is provisioned a secure, per-user EVM wallet automatically on first login: no seed phrases, no recovery flows, and no key material for partner teams or end users to manage. Wallet keys are held by the embedded-wallet provider, not by Ryle. The user's identity unlocks the wallet transparently.
 - **Managed identity providers** — Google OAuth out of the box, with OIDC/SAML federation to a partner's IdP on request.
 - **KYC providers** — configurable per asset; partners can bring their own or use a preconfigured default.
 - **Custody providers** — partners can connect custody solutions they already use (institutional custodians, MPC vendors, or other setups they operate). Ryle binds each asset to that custody connection for treasury, signing, and reserve operations. Ryle is not a custodian; keys stay with the partner's provider. A self-hosted custody product that partners can deploy into their own infrastructure is on the roadmap.
@@ -100,7 +100,7 @@ Provider choices (chain target, custody connection, KYC provider, IdP federation
 - **Confidentiality is enforced at the API boundary.** End-user balances and transaction graphs are never returned by any endpoint, to any caller. Aggregate health (supply, reserves, bucketed counts) is.
 - **Audit log** — every privileged action (operator or API) is recorded, attributed, immutable, and exportable.
 - **Selective disclosure** — when external visibility is required, the platform issues scoped, time-bounded disclosure views; access to disclosed data is itself logged.
-- **Mechanism abstraction** — confidentiality is managed entirely on Ryle's side. The platform handles zero-knowledge proof generation and verification, the supporting circuits, key material, signing, and network coordination. None of these primitives surface in your code; your integration interacts with the API contract.
+- **Mechanism abstraction** — confidentiality is managed entirely on Ryle's side. The platform handles zero-knowledge proof generation and verification, the supporting circuits, ZK proving keys (platform cryptography only — not asset or wallet keys), and network coordination. Asset signing is coordinated through your connected custody and embedded-wallet providers; Ryle does not hold asset or wallet keys. None of these primitives surface in your code; your integration interacts with the API contract.
 - **Defense in depth** — row-level access control on user-scoped data, scoped client keys, server-only privileged credentials, signed webhooks, and RBAC on every operator action.
 
 ---

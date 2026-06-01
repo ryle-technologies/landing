@@ -43,6 +43,6 @@ With Ryle, partners never write proof-generation code, manage circuits, handle s
     Ryle settles on EVM-compatible chains such as Ethereum, Polygon, Base, Arc, Plasma, and Tempo. The chain target is a per-deployment configuration choice, not integration code. See [supported networks](/reference/supported-networks).
   </Accordion>
   <Accordion title="Do I need cryptography expertise to issue one?">
-    No. Ryle manages proof generation, verification, circuits, key material, and network coordination. You work with assets, accounts, and policies through the Console and APIs.
+    No. Ryle manages proof generation, verification, circuits, ZK proving keys (platform cryptography only), and network coordination. Asset and wallet signing is coordinated through custody and embedded-wallet providers you connect; Ryle does not hold those keys. You work with assets, accounts, and policies through the Console and APIs.
   </Accordion>
 </AccordionGroup>

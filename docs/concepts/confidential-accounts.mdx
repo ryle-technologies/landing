@@ -19,7 +19,7 @@ Each account is governed by policy: whether it may hold the asset, transact, the
 
 ## Recovery
 
-With Ryle's white-label wallet, each end user is provisioned a per-user embedded EVM wallet automatically on first login (via Privy among other providers). There are no seed phrases or recovery flows for end users to manage; identity unlocks the account transparently.
+With Ryle's white-label wallet, each end user is provisioned a per-user embedded EVM wallet automatically on first login (via Privy among other providers). There are no seed phrases or recovery flows for end users to manage; identity unlocks the account transparently. Wallet keys are held by the embedded-wallet provider, not by Ryle — Ryle is not a custodian.
 
 ## Relation to confidential assets
 
@@ -39,6 +39,6 @@ Accounts are how [confidential digital assets](/what-are-confidential-digital-as
     No. Operators see aggregate health, never end-user balances or transaction graphs. Specific visibility requires an explicit, logged selective disclosure.
   </Accordion>
   <Accordion title="Do end users manage private keys or seed phrases?">
-    No. Per-user embedded EVM wallets are provisioned automatically, so there is no seed-phrase or recovery UX for end users or partner teams to manage.
+    No. Per-user embedded EVM wallets are provisioned automatically, so there is no seed-phrase or recovery UX for end users or partner teams to manage. Keys are secured by the embedded-wallet provider; Ryle does not hold wallet keys.
   </Accordion>
 </AccordionGroup>
