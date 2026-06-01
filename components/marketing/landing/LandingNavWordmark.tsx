@@ -2,12 +2,17 @@ import { landingNavWordmarkTypeClassName } from "@/lib/landingNavWordmark"
 
 type LandingNavWordmarkProps = {
   className?: string
+  /** Serif type ramp; defaults to nav size. */
+  typeClassName?: string
 }
 
 /**
  * Ryle wordmark: δ (muted) + “Ryle” (foreground/90) — shared by nav and closing block.
  */
-export function LandingNavWordmark({ className = "" }: LandingNavWordmarkProps) {
+export function LandingNavWordmark({
+  className = "",
+  typeClassName = landingNavWordmarkTypeClassName,
+}: LandingNavWordmarkProps) {
   return (
     <span
       aria-hidden
@@ -18,10 +23,10 @@ export function LandingNavWordmark({ className = "" }: LandingNavWordmarkProps) 
         .filter(Boolean)
         .join(" ")}
     >
-      <span className={[landingNavWordmarkTypeClassName, "text-muted"].join(" ")}>
+      <span className={[typeClassName, "text-muted"].join(" ")}>
         δ
       </span>
-      <span className={landingNavWordmarkTypeClassName}>Ryle</span>
+      <span className={typeClassName}>Ryle</span>
     </span>
   )
 }

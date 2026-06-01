@@ -5,3 +5,7 @@ export const landingNavWordmarkTypeClassName =
 /** Hero pin wordmark — same voice as nav, one step smaller. */
 export const landingHeroWordmarkTypeClassName =
   "font-serif text-[22px] font-normal italic leading-none tracking-[-0.04em] text-foreground/90 sm:text-[24px]"
+
+/** Footer bar wordmark — slightly smaller than nav. */
+export const landingFooterWordmarkTypeClassName =
+  "font-serif text-[22px] font-normal italic leading-none tracking-[-0.04em] text-foreground/90 sm:text-[23px]"

@@ -5,10 +5,25 @@
  */
 export const landingContentMaxWidthClass = "max-w-5xl"
 
+/** Footer docs sitemap — narrower than main marketing column width. */
+export const landingFooterSitemapMaxWidthClass = "max-w-4xl"
+
 export const landingColumnHorizontalPadClass =
   "px-6 pl-[max(1.5rem,env(safe-area-inset-left))] pr-[max(1.5rem,env(safe-area-inset-right))]"
 
 export const landingColumnPadClass =
+  `mx-auto w-full min-w-0 ${landingContentMaxWidthClass} ${landingColumnHorizontalPadClass}`
+
+/**
+ * Break out of {@link landingColumnPadClass} to span the full viewport width
+ * (backgrounds, dividers). Pair inner content with {@link landingColumnPadClass}
+ * or {@link landingFooterSitemapContentClassName} so copy stays aligned.
+ */
+export const landingViewportBleedClassName =
+  "relative left-1/2 w-screen max-w-[100vw] -translate-x-1/2"
+
+/** Footer sitemap links — same horizontal inset as the marketing column, narrower max width. */
+export const landingFooterSitemapContentClassName =
   `mx-auto w-full min-w-0 ${landingContentMaxWidthClass} ${landingColumnHorizontalPadClass}`
 
 /**
@@ -35,6 +50,10 @@ export const LANDING_HOME_SUITE_PRODUCTS_GRID_ID =
  */
 export const landingMarketingDotGridLayerClassName =
   "pointer-events-none absolute inset-0 z-0 rounded-md [background-image:radial-gradient(circle_at_center,color-mix(in_oklab,var(--foreground)_16%,transparent)_0.5px,transparent_0.5px)] [background-size:8px_8px] [mask-image:linear-gradient(to_bottom,transparent,black)] [-webkit-mask-image:linear-gradient(to_bottom,transparent,black)] [mask-size:100%_100%] [-webkit-mask-size:100%_100%]"
+
+/** Footer menu ASCII letter field — stronger top fade, visible toward the bottom. */
+export const landingFooterAsciiBackgroundMaskClassName =
+  "[mask-image:linear-gradient(to_bottom,transparent_0%,transparent_42%,black_100%)] [-webkit-mask-image:linear-gradient(to_bottom,transparent_0%,transparent_42%,black_100%)] [mask-size:100%_100%] [-webkit-mask-size:100%_100%]"
 
 /**
  * Same dot pattern as {@link landingMarketingDotGridLayerClassName}, but the mask

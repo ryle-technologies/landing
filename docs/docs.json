@@ -79,6 +79,15 @@
               "concepts/confidential-vs-traditional-tokens",
               "concepts/confidential-accounts"
             ]
+          },
+          {
+            "group": "Comparisons",
+            "icon": "git-compare-arrows",
+            "pages": [
+              "comparisons/confidential-assets-vs-privacy-coins",
+              "comparisons/confidential-assets-vs-private-chains",
+              "comparisons/confidential-token-approaches"
+            ]
           }
         ]
       },
@@ -124,18 +133,13 @@
         ]
       },
       {
-        "group": "Comparisons",
-        "icon": "git-compare-arrows",
-        "pages": [
-          "comparisons/confidential-assets-vs-privacy-coins",
-          "comparisons/confidential-assets-vs-private-chains",
-          "comparisons/confidential-token-approaches"
-        ]
-      },
-      {
         "group": "Reference",
         "icon": "list",
-        "pages": ["reference/glossary", "reference/faq"]
+        "pages": [
+          "reference/supported-networks",
+          "reference/glossary",
+          "reference/faq"
+        ]
       },
       {
         "group": "Partner integration",

@@ -65,7 +65,7 @@ Operations are addressable, idempotent (client-supplied idempotency keys), curso
 
 A few architectural choices partners should understand at a high level.
 
-**Settlement on EVM-compatible chains.** All on-chain activity — confidential transfers, mints, redemptions, balance state — settles on EVM-compatible chains (e.g. **Ethereum**, **Polygon**, **Base**, **Arc**, **Plasma**, **Tempo**, among others). Chain target and RPC endpoint are configurable per deployment.
+**Settlement on EVM-compatible chains.** All on-chain activity — confidential transfers, mints, redemptions, balance state — settles on EVM-compatible chains (e.g. **Ethereum**, **Polygon**, **Base**, **Arc**, **Plasma**, **Tempo**, among others). Chain target and RPC endpoint are configurable per deployment. See [supported networks](/reference/supported-networks) for the canonical list and roadmap.
 
 **Confidentiality via zero-knowledge proofs.** Confidential operations are produced and verified using zero-knowledge proofs. Proof generation runs in managed workers; the supporting circuits, proving keys, and verification stay inside the platform.
 

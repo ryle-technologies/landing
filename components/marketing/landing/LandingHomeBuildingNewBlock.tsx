@@ -1,8 +1,12 @@
 "use client"
 
+import Link from "next/link"
 import { cubicBezier, motion, type Variants } from "motion/react"
 import { LandingHomeHeroFadeStaggerInView } from "@/components/marketing/landing/LandingHomeHeroFadeUp"
+import { LandingFooterSitemap } from "@/components/marketing/landing/LandingFooterSitemap"
 import { LandingNavWordmark } from "@/components/marketing/landing/LandingNavWordmark"
+import { landingFooterWordmarkTypeClassName } from "@/lib/landingNavWordmark"
+import { landingViewportBleedClassName } from "@/lib/landingLayout"
 import {
   landingMarketingCtaAnchorProps,
   LANDING_MARKETING_CONTACT_HREF,
@@ -90,31 +94,31 @@ export function LandingHomeBuildingNewBlock({
           {LANDING_MARKETING_CTA_LABEL}
         </a>
       </motion.div>
+      <div className={`${landingViewportBleedClassName} mt-10 sm:mt-11`}>
+        <LandingFooterSitemap />
+        <motion.div
+          variants={closingStaggerItem}
+          role="separator"
+          aria-hidden
+          className="h-px w-full"
+          style={{
+            background:
+              "linear-gradient(90deg, var(--border) 0%, var(--border) 38%, transparent 100%)",
+          }}
+        />
+      </div>
       <motion.div
-        variants={closingStaggerItem}
-        role="separator"
-        aria-hidden
-        className="mt-10 h-px w-full max-w-none sm:mt-11"
-        style={{
-          background:
-            "linear-gradient(90deg, var(--border) 0%, var(--border) 38%, transparent 100%)",
-        }}
-      />
-      <motion.div
-        className="mt-9 flex min-w-0 flex-nowrap items-baseline justify-end gap-3 text-left sm:mt-11"
+        className="mt-9 flex min-w-0 flex-nowrap items-center justify-between gap-3 text-left sm:mt-11"
         variants={closingStaggerItem}
       >
-        {/* X social — re-enable when ready
-        <a
-          href={LANDING_MARKETING_X_HREF}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="min-w-0 shrink text-[15px] font-normal leading-none tracking-[-0.01em] text-muted underline-offset-2 transition-colors duration-500 ease-out hover:text-foreground hover:underline focus-visible:rounded-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-foreground"
+        <Link
+          href="/"
+          aria-label="Ryle — go to home"
+          className="inline-flex shrink-0 items-baseline no-underline transition-opacity duration-500 ease-out hover:opacity-80 focus-visible:rounded-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-foreground"
         >
-          follow us on x.com
-        </a>
-        */}
-        <span className="shrink-0 text-right text-[15px] font-normal leading-none tracking-[-0.01em] text-muted">
+          <LandingNavWordmark typeClassName={landingFooterWordmarkTypeClassName} />
+        </Link>
+        <span className="shrink-0 text-right text-xs font-normal leading-none tracking-[-0.01em] text-muted/60">
           2026 / All rights reserved.
         </span>
       </motion.div>

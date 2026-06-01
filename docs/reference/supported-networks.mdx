@@ -1,0 +1,52 @@
+---
+title: "Supported networks"
+description: "Where confidential digital assets settle — EVM-compatible chains today, with expanding chain support in active development. Chain target is a per-deployment configuration choice."
+sidebarTitle: "Supported networks"
+---
+
+Confidential digital assets settle on **public EVM-compatible chains**. The chain target is a **per-deployment configuration choice** in the Console — not something partners implement in integration code. Ryle manages settlement, proof generation, signing, and gas sponsorship on the selected network so your systems work with assets, accounts, and operations only.
+
+## Chain-agnostic by design
+
+Settlement target and RPC endpoint are configured per deployment and can be changed without redeployment. Partners never select contract addresses, ABIs, or RPC providers in code; those choices live in platform configuration alongside custody, KYC, and identity settings.
+
+The same API surface — assets, accounts, mint, redeem, policies, events — applies regardless of which chain a deployment uses.
+
+## Available today
+
+All on-chain activity — confidential transfers, mints, redemptions, and balance state — settles on **EVM-compatible chains**. Examples include:
+
+| Chain | Type |
+| --- | --- |
+| Ethereum | EVM-compatible |
+| Polygon | EVM-compatible |
+| Base | EVM-compatible |
+| Arc | EVM-compatible |
+| Plasma | EVM-compatible |
+| Tempo | EVM-compatible |
+
+The list above reflects chains partners commonly deploy to today. The exact chain target for your deployment is selected during onboarding and configured in the Console.
+
+## Expanding chain support
+
+Ryle is built for **EVM-compatible settlement today**, with **non-EVM chain support in active development**. As additional networks come online, the integration model stays the same: partners continue to work through the Console and APIs; chain-specific complexity remains on Ryle's side of the boundary.
+
+We will update this page as new settlement options become generally available.
+
+## What stays the same across chains
+
+Regardless of settlement network, partners get the same platform capabilities:
+
+- **Integration surface** — `Asset`, `Account`, `Mint`, `Redeem`, `Policy`, `Event` primitives; REST APIs and webhooks; operator Console.
+- **Confidentiality model** — encrypted balances and amounts with zero-knowledge validity proofs.
+- **Gas sponsorship** — Ryle's relayer submits transactions so end users do not hold native gas assets.
+- **Selective disclosure** — scoped, time-bounded, logged views for auditors, regulators, and counterparties when policy requires visibility.
+- **Audit log** — every privileged action recorded, attributed, and exportable.
+
+## Related
+
+- [Glossary](/reference/glossary) — definition of EVM-compatible chain
+- [How confidential assets work](/concepts/how-confidential-assets-work)
+- [Technical brief](/partner-integration/technical-brief) — settlement architecture for integrators
+- [Confidential payments](/products/confidential-payments)
+- [FAQ](/reference/faq)
