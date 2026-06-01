@@ -118,7 +118,7 @@ export function LandingHomeStickyNav() {
           style={landingNavTopScrollFadeStyle}
         />
         <div className="relative z-10">
-          <LandingTopNav showThemeToggle />
+          <LandingTopNav />
         </div>
       </motion.div>
     </>

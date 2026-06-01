@@ -2,8 +2,6 @@
 
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { LuMoon, LuSun } from "react-icons/lu"
-import { useMarketingTheme } from "@/components/marketing/MarketingThemeProvider"
 import {
   isAlphaShellNavActive,
   landingMarketingCtaAnchorProps,
@@ -26,12 +24,6 @@ interface LandingTopNavProps {
    */
   ctaHref?: string
   className?: string
-  /**
-   * Render the light/dark toggle next to the CTA. Only enabled on
-   * `/landing/home`; the toggle is fully scoped to the marketing surround
-   * (own `localStorage` key, `dark` class on the marketing wrapper only).
-   */
-  showThemeToggle?: boolean
 }
 
 /** Horizontal site nav for the public landing pages. */
@@ -39,7 +31,6 @@ export function LandingTopNav({
   ctaLabel = LANDING_MARKETING_CTA_LABEL,
   ctaHref: ctaHrefProp,
   className,
-  showThemeToggle = false,
 }: LandingTopNavProps) {
   const pathname = usePathname()
   const ctaHref = ctaHrefProp ?? LANDING_MARKETING_CONTACT_HREF
@@ -48,13 +39,6 @@ export function LandingTopNav({
   const ctaUsesPrimaryPill = ctaIsMailto || ctaIsExternal
   const ctaAnchorProps = landingMarketingCtaAnchorProps(ctaHref)
   const alphaActive = isAlphaShellNavActive(pathname)
-
-  // `null` when this nav is rendered outside the marketing layout (defensive:
-  // avoids crashing if reused elsewhere). Toggle is silently disabled.
-  const marketingTheme = useMarketingTheme()
-  const canToggle = showThemeToggle && marketingTheme !== null
-
-  const displayedIsDark = marketingTheme?.isDark === true
 
   return (
     <nav
@@ -81,21 +65,6 @@ export function LandingTopNav({
         </div>
       </div>
       <div className="flex shrink-0 items-center gap-x-5">
-        {canToggle ? (
-          <button
-            type="button"
-            onClick={marketingTheme!.toggle}
-            aria-label={`Switch to ${displayedIsDark ? "light" : "dark"} theme`}
-            aria-pressed={displayedIsDark}
-            className={themeToggleButtonClassName}
-          >
-            {displayedIsDark ? (
-              <LuSun size={14} className="shrink-0" aria-hidden />
-            ) : (
-              <LuMoon size={14} className="shrink-0" aria-hidden />
-            )}
-          </button>
-        ) : null}
         {ctaUsesPrimaryPill ? (
           <a
             href={ctaHref}
@@ -136,12 +105,5 @@ const topNavTextLinkClassName = [
   "cursor-pointer border-0 bg-transparent p-0",
   "font-serif text-[17px] font-normal italic leading-none tracking-[-0.02em] text-foreground/90",
   "underline-offset-[0.2em] transition-opacity duration-500 ease-out hover:opacity-90 hover:underline",
-  "focus-visible:rounded-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-foreground",
-].join(" ")
-
-const themeToggleButtonClassName = [
-  "inline-flex h-6 w-6 shrink-0 items-center justify-center self-center",
-  "cursor-pointer border-0 bg-transparent p-0 text-foreground/90",
-  "transition-opacity duration-500 ease-out hover:opacity-80",
   "focus-visible:rounded-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-foreground",
 ].join(" ")
