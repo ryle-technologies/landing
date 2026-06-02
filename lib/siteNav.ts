@@ -22,7 +22,7 @@ export const LANDING_MARKETING_X_HREF = "https://x.com/__ryle" as const
 export const DOCS_BASE_HREF = "/docs" as const
 
 /** Marketing docs link label (nav, suite block, closing CTA). */
-export const LANDING_DOCS_CTA_LABEL = "See our docs" as const
+export const LANDING_DOCS_CTA_LABEL = "Read our documentation" as const
 
 export type FooterNavLink = {
   label: string
