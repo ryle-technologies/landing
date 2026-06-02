@@ -21,6 +21,11 @@ export const LANDING_MARKETING_X_HREF = "https://x.com/__ryle" as const
 /** Docs site base path (proxied via Next.js rewrites). */
 export const DOCS_BASE_HREF = "/docs" as const
 
+/**
+ * Docs links must use a plain `<a href={DOCS_BASE_HREF}>`, not `next/link`.
+ * Client-side routing would target the marketing app; `/docs` is rewritten to Mintlify.
+ */
+
 /** Marketing docs link label (nav, suite block, closing CTA). */
 export const LANDING_DOCS_CTA_LABEL = "Read our documentation" as const
 
