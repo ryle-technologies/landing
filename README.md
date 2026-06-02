@@ -21,7 +21,7 @@ Open [http://localhost:3000](http://localhost:3000).
 
 ## Docs
 
-Partner integration docs live in [`docs/`](docs/) as a [Mintlify](https://mintlify.com) site.
+Product docs live in [`docs/`](docs/) as a [Mintlify](https://mintlify.com) site.
 
 ```bash
 pnpm docs:dev    # http://localhost:3333

@@ -20,6 +20,8 @@ import {
   landingSuiteProductCardInnerPadClass,
 } from "@/lib/landingLayout"
 import {
+  DOCS_BASE_HREF,
+  LANDING_DOCS_CTA_LABEL,
   landingMarketingCtaAnchorProps,
   LANDING_MARKETING_CONTACT_HREF,
 } from "@/lib/siteNav"
@@ -218,6 +220,15 @@ export function LandingHomeLowerSections() {
             >
               {LANDING_PRE_SECTION_SUBTITLE}
             </p>
+            <div className="mt-6 sm:mt-8">
+              <a
+                href={DOCS_BASE_HREF}
+                className={landingMarketingOutlineCtaClassName}
+                {...landingMarketingCtaAnchorProps(DOCS_BASE_HREF)}
+              >
+                {LANDING_DOCS_CTA_LABEL}
+              </a>
+            </div>
           </LandingSuiteProductsReveal>
           <LandingSuiteProductsThreeColGrid
             assetsColumn={
