@@ -67,9 +67,10 @@ export function LandingTopNav({
         </div>
       </div>
       <div className="flex shrink-0 items-center gap-x-5 sm:gap-x-6">
-        <Link href={DOCS_BASE_HREF} className={topNavDocsLinkClassName}>
+        {/* Full navigation — `/docs` is a Mintlify rewrite, not an app route. */}
+        <a href={DOCS_BASE_HREF} className={topNavDocsLinkClassName}>
           {LANDING_DOCS_CTA_LABEL}
-        </Link>
+        </a>
         {ctaUsesPrimaryPill ? (
           <a
             href={ctaHref}
