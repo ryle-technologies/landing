@@ -1,6 +1,6 @@
-# Partner documentation (Mintlify)
+# Ryle documentation (Mintlify)
 
-Published partner integration docs for Ryle, built with [Mintlify](https://mintlify.com).
+Public documentation for Ryle, built with [Mintlify](https://mintlify.com).
 
 ## Local preview
 
@@ -20,17 +20,6 @@ Optional: run `pnpm exec mint login` once to enable search and the assistant in 
 pnpm docs:validate
 pnpm docs:links
 ```
-
-## Pages
-
-| MDX page | Source markdown (archived) |
-| --- | --- |
-| [index.mdx](./index.mdx) | — |
-| [partner-integration/partner-brief.mdx](./partner-integration/partner-brief.mdx) | [partner-integration-brief.md](./partner-integration-brief.md) |
-| [partner-integration/platform-overview.mdx](./partner-integration/platform-overview.mdx) | [partner-integration-overview.md](./partner-integration-overview.md) |
-| [partner-integration/technical-brief.mdx](./partner-integration/technical-brief.mdx) | [partner-integration-technical-brief.md](./partner-integration-technical-brief.md) |
-
-Legacy `.md` files remain for GitHub reading but are excluded from the Mintlify build via [`.mintignore`](./.mintignore).
 
 ## Mintlify dashboard (deploy)
 
@@ -66,4 +55,4 @@ Add the admin MCP in Cursor: **Cmd+Shift+P** → **Open MCP settings** → add:
 }
 ```
 
-Complete OAuth when prompted. Use natural-language prompts like “check out a branch and add a FAQ page under Partner integration.”
+Complete OAuth when prompted. Use natural-language prompts like “check out a branch and add a FAQ page under Reference.”

@@ -140,15 +140,6 @@
           "reference/glossary",
           "reference/faq"
         ]
-      },
-      {
-        "group": "Partner integration",
-        "icon": "handshake",
-        "pages": [
-          "partner-integration/partner-brief",
-          "partner-integration/platform-overview",
-          "partner-integration/technical-brief"
-        ]
       }
     ]
   },
@@ -159,11 +150,6 @@
         "href": "https://www.ryle.sh",
         "icon": "globe"
       }
-    ],
-    "primary": {
-      "type": "button",
-      "label": "Partner integration",
-      "href": "/partner-integration/partner-brief"
-    }
+    ]
   }
 }

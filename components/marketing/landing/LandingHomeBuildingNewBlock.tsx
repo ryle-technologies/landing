@@ -4,9 +4,12 @@ import Link from "next/link"
 import { LandingHomeClosingScrollReveal } from "@/components/marketing/landing/LandingHomeClosingScrollReveal"
 import { LandingFooterSitemap } from "@/components/marketing/landing/LandingFooterSitemap"
 import { LandingNavWordmark } from "@/components/marketing/landing/LandingNavWordmark"
+import { landingMarketingOutlineCtaClassName } from "@/lib/landingHeroTypography"
 import { landingFooterWordmarkTypeClassName } from "@/lib/landingNavWordmark"
 import { landingViewportBleedClassName } from "@/lib/landingLayout"
 import {
+  DOCS_BASE_HREF,
+  LANDING_DOCS_CTA_LABEL,
   landingMarketingCtaAnchorProps,
   LANDING_MARKETING_CONTACT_HREF,
   LANDING_MARKETING_CTA_LABEL,
@@ -62,6 +65,13 @@ export function LandingHomeBuildingNewBlock({
           {...landingMarketingCtaAnchorProps()}
         >
           {LANDING_MARKETING_CTA_LABEL}
+        </a>
+        <a
+          href={DOCS_BASE_HREF}
+          className={landingMarketingOutlineCtaClassName}
+          {...landingMarketingCtaAnchorProps(DOCS_BASE_HREF)}
+        >
+          {LANDING_DOCS_CTA_LABEL}
         </a>
       </div>
       <div className={`${landingViewportBleedClassName} mt-10 sm:mt-11`}>
