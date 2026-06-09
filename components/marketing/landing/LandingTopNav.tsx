@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation"
 import {
   DOCS_BASE_HREF,
   LANDING_DOCS_CTA_LABEL,
+  LANDING_DOCS_CTA_LABEL_MOBILE,
   isAlphaShellNavActive,
   landingMarketingCtaAnchorProps,
   LANDING_MARKETING_CONTACT_HREF,
@@ -69,7 +70,8 @@ export function LandingTopNav({
       <div className="flex shrink-0 items-center gap-x-5 sm:gap-x-6">
         {/* Full navigation — `/docs` is a Mintlify rewrite, not an app route. */}
         <a href={DOCS_BASE_HREF} className={topNavDocsLinkClassName}>
-          {LANDING_DOCS_CTA_LABEL}
+          <span className="sm:hidden">{LANDING_DOCS_CTA_LABEL_MOBILE}</span>
+          <span className="hidden sm:inline">{LANDING_DOCS_CTA_LABEL}</span>
         </a>
         {ctaUsesPrimaryPill ? (
           <a

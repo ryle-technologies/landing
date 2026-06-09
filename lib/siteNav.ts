@@ -29,6 +29,9 @@ export const DOCS_BASE_HREF = "/docs" as const
 /** Marketing docs link label (nav, suite block, closing CTA). */
 export const LANDING_DOCS_CTA_LABEL = "Read our documentation" as const
 
+/** Shorter docs link label for cramped top nav on small viewports. */
+export const LANDING_DOCS_CTA_LABEL_MOBILE = "Read our docs" as const
+
 export type FooterNavLink = {
   label: string
   href: string
