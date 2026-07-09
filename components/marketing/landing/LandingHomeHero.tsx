@@ -27,11 +27,12 @@ const homeHeroLeadClassName =
   "max-w-none text-left font-serif text-[23px] font-normal italic leading-snug tracking-[-0.03em] text-muted transition-colors duration-500 ease-out sm:text-[32px]"
 
 /** Hero subline (word blur). */
-const HOME_LEAD =
-  "Launch digital assets, move value, and manage private operations with infrastructure built for enterprises, companies, and AI."
+const HOME_LEAD = "Public rails. Private operations."
 
-const MARKETING_BUILDING_HEADLINE_LINE_1 = "Bring assets onchain without"
-const MARKETING_BUILDING_HEADLINE_LINE_2 = "exposing sensitive activity."
+const MARKETING_BUILDING_HEADLINE_LINE_1 =
+  "Launch digital assets, move value, and manage private operations"
+const MARKETING_BUILDING_HEADLINE_LINE_2 =
+  "with infrastructure built for enterprises, fintechs, and AI."
 
 const MARKETING_BUILDING_HEADLINE = `${MARKETING_BUILDING_HEADLINE_LINE_1} ${MARKETING_BUILDING_HEADLINE_LINE_2}`
 

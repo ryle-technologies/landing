@@ -42,10 +42,13 @@ const LANDING_PRE_SECTION_SUBTITLE =
 
 /** Pillars recap block: section heading (above accordion). First block emphasized. */
 const LANDING_PILLARS_SECTION_TITLE_LEAD =
-  "Tokenization is ready for the enterprise. Exposing sensitive activity is not."
+  "Digital assets are ready for the enterprise."
 
 const LANDING_PILLARS_SECTION_TITLE_REST =
   "Ryle gives teams the infrastructure to build, launch, and operate confidential digital assets."
+
+const pillarsSectionTitleLeadClassName =
+  "text-muted text-[18px] sm:text-[28px]"
 
 const LANDING_PRE_PANEL_ASSETS_TITLE = "Operate from our platform."
 
@@ -122,7 +125,7 @@ const SUITE_EVENT_BRIDGE_TITLE =
   "Built for developers, software, and AI agents."
 
 const SUITE_EVENT_BRIDGE_DESCRIPTION =
-  "APIs, SDKs and MCP interfaces for integrating confidential assets into any product."
+  "APIs, SDKs and MCP interfaces for integrating confidential assets into your product."
 
 /** Small muted upper line on suite product cards (short headline / label). */
 const suiteCardEyebrowClass =
@@ -175,12 +178,13 @@ export function LandingHomeLowerSections() {
         className="relative z-10 py-16 sm:py-24 md:py-32 min-[1080px]:py-36"
       >
         <h2 id="landing-home-pillars-heading" className={buildingNewTitleClassName}>
-          <span className="text-foreground">
+          <span className={pillarsSectionTitleLeadClassName}>
             {LANDING_PILLARS_SECTION_TITLE_LEAD}
           </span>
-          <br className="sm:hidden" aria-hidden />
-          <span className="hidden sm:inline"> </span>
-          {LANDING_PILLARS_SECTION_TITLE_REST}
+          <br />
+          <span className="text-foreground">
+            {LANDING_PILLARS_SECTION_TITLE_REST}
+          </span>
         </h2>
         <div className="mt-32 min-w-0">
           <LandingHomePillarRecapTabs
