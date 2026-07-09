@@ -75,7 +75,7 @@ const LANDING_PRE_PANEL_POLICY_BODY =
 
 const LANDING_PRE_PANEL_ACCOUNTS_CTA_LABEL = "Try our white-label wallet"
 
-const LANDING_PRE_PANEL_DISCLOSURE_CTA_LABEL = "Request a demo"
+const LANDING_PRE_PANEL_DISCLOSURE_CTA_LABEL = "Get in touch"
 
 /** Primary pill under suite product cards; hidden on mobile (stacked grid). */
 const suiteCardCtaRowDesktopOnlyClass =

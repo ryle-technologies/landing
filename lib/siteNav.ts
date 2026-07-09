@@ -1,5 +1,5 @@
 /** Primary marketing pill label (hero, suite, footer, top nav). */
-export const LANDING_MARKETING_CTA_LABEL = "Request demo" as const
+export const LANDING_MARKETING_CTA_LABEL = "Get in touch" as const
 
 /** Demo booking URL for {@link LANDING_MARKETING_CTA_LABEL}. */
 export const LANDING_MARKETING_CONTACT_HREF =
