@@ -27,7 +27,7 @@ type LandingHomeBuildingNewBlockProps = {
 
 /**
  * Closing block: optional headline (omit when the hero already states it), technology subline,
- * Request demo (Calendly), then social + rights.
+ * Get in touch (Calendly), then social + rights.
  */
 export function LandingHomeBuildingNewBlock({
   title,
@@ -76,15 +76,6 @@ export function LandingHomeBuildingNewBlock({
       </div>
       <div className={`${landingViewportBleedClassName} mt-10 sm:mt-11`}>
         <LandingFooterSitemap />
-        <div
-          role="separator"
-          aria-hidden
-          className="h-px w-full"
-          style={{
-            background:
-              "linear-gradient(90deg, var(--border) 0%, var(--border) 38%, transparent 100%)",
-          }}
-        />
       </div>
       <div className="mt-9 flex min-w-0 flex-nowrap items-center justify-between gap-3 text-left sm:mt-11">
         <Link
