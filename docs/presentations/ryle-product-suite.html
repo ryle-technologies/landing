@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Ryle — Financial Infrastructure for the Digital Assets Economy</title>
+  <title>Ryle · Financial Infrastructure for the Digital Assets Economy</title>
   <style>
     @font-face {
       font-family: "Geist";
@@ -133,13 +133,17 @@
       justify-content: space-between;
       align-items: center;
       padding-top: 18px;
-      border-top: 1px solid var(--border);
+      border-top: none;
       color: var(--muted);
       font-size: 12px;
       letter-spacing: -0.01em;
     }
+    .footer-bar-plain {
+      border-top: none;
+      padding-top: 18px;
+    }
 
-    /* —— Cover —— */
+    /* -- Cover -- */
     .cover { justify-content: space-between; }
     .cover .hero-block { margin-top: 72px; }
     .cover .tagline {
@@ -148,7 +152,7 @@
       font-style: italic;
       font-size: 22px;
       color: var(--muted);
-      max-width: 680px;
+      max-width: 920px;
       letter-spacing: -0.02em;
       line-height: 1.3;
     }
@@ -159,7 +163,7 @@
       font-size: 13px;
     }
 
-    /* —— What we've built: 4 columns —— */
+    /* -- What we've built: 4 columns -- */
     .pillars {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
@@ -234,7 +238,7 @@
       line-height: 1;
     }
 
-    /* —— Advantages —— */
+    /* -- Advantages -- */
     .adv-stats {
       display: flex;
       gap: 40px;
@@ -347,7 +351,7 @@
       letter-spacing: -0.03em;
     }
 
-    /* —— Section dividers —— */
+    /* -- Section dividers -- */
     .divider-slide {
       background: #141210;
       color: #f5f2ee;
@@ -364,7 +368,7 @@
       letter-spacing: -0.04em;
     }
 
-    /* —— Integration three-up —— */
+    /* -- Integration three-up -- */
     .three-up {
       display: grid;
       grid-template-columns: 1fr 1fr 1fr;
@@ -399,7 +403,7 @@
       letter-spacing: -0.01em;
     }
 
-    /* —— White label integration —— */
+    /* -- White label integration -- */
     .wl-grid {
       display: grid;
       grid-template-columns: 1.05fr 1fr 1fr;
@@ -451,6 +455,43 @@
       flex: 1;
       min-height: 0;
       background: color-mix(in srgb, var(--foreground) 3.5%, var(--marketing-surface));
+    }
+    .wl-hero-list {
+      margin-top: auto;
+      padding-top: 18px;
+      border-top: 1px solid var(--border);
+    }
+    .wl-hero-list .label {
+      color: var(--foreground);
+      font-weight: 600;
+      font-size: 14px;
+      margin-bottom: 12px;
+      letter-spacing: -0.01em;
+    }
+    .wl-hero-list ul {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .wl-hero-list li {
+      padding-left: 14px;
+      position: relative;
+      font-size: 14px;
+      color: var(--foreground);
+      line-height: 1.45;
+      letter-spacing: -0.01em;
+    }
+    .wl-hero-list li::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 7px;
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: var(--foreground);
+      opacity: 0.55;
     }
     .wl-col .label {
       color: var(--foreground);
@@ -535,7 +576,7 @@
       background: color-mix(in srgb, var(--foreground) 3.5%, var(--marketing-surface));
     }
 
-    /* —— Module detail: Features / Benefits / Integrations —— */
+    /* -- Module detail: Features / Benefits / Integrations -- */
     .module-intro {
       margin-top: 10px;
       font-size: 15px;
@@ -587,7 +628,7 @@
       flex-shrink: 0;
     }
 
-    /* —— Suite cards —— */
+    /* -- Suite cards -- */
     .suite-grid {
       display: grid;
       grid-template-columns: 1fr 1fr 1fr;
@@ -699,11 +740,17 @@
       margin-top: 12px;
     }
 
-    /* —— Closing / next —— */
+    /* -- Closing / next -- */
     .grid-3 {
       display: grid;
       grid-template-columns: 1fr 1fr 1fr;
       gap: 16px;
+      margin-top: 28px;
+    }
+    .grid-4 {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 14px;
       margin-top: 28px;
     }
     .next-steps-main,
@@ -715,13 +762,17 @@
       min-height: 0;
     }
     .next-steps-main .grid-3,
-    .engagement-main .steps {
+    .next-steps-main .grid-4,
+    .engagement-main .phases-wrap {
       flex: 0 0 auto;
     }
     .card {
       border: 1px solid var(--border);
       border-radius: 6px;
       padding: 22px;
+    }
+    .grid-4 .card {
+      padding: 22px 18px;
     }
     .card .label { color: var(--muted); font-size: 14px; margin-bottom: 10px; }
     .card .title {
@@ -732,11 +783,19 @@
       margin-bottom: 10px;
       line-height: 1.2;
     }
+    .grid-4 .card .title {
+      font-size: 22px;
+      margin-bottom: 12px;
+    }
     .card p {
       font-size: 14px;
       color: var(--muted);
       line-height: 1.45;
       letter-spacing: -0.01em;
+    }
+    .grid-4 .card p {
+      font-size: 14px;
+      line-height: 1.45;
     }
     .cta {
       margin-top: 32px;
@@ -771,22 +830,83 @@
       width: 100%;
     }
 
-    .steps {
-      display: grid;
-      grid-template-columns: repeat(5, 1fr);
-      gap: 14px;
+    .phases-wrap {
       margin-top: 28px;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      overflow: hidden;
+      background: color-mix(in srgb, var(--foreground) 3.5%, var(--marketing-surface));
     }
-    .step { border-top: 1px solid var(--border); padding-top: 12px; }
-    .step .n {
+    .phases {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 0;
+    }
+    .phase {
+      padding: 22px 20px 20px;
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
+      border-right: 1px solid var(--border);
+      background: var(--surface);
+    }
+    .phase:last-child { border-right: none; }
+    .phase .n {
       font-family: var(--font-serif);
       font-style: italic;
       font-size: 26px;
       color: var(--muted);
-      margin-bottom: 8px;
+      margin-bottom: 6px;
+      line-height: 1;
     }
-    .step .t { font-weight: 600; font-size: 14px; margin-bottom: 6px; letter-spacing: -0.01em; }
-    .step .d { color: var(--muted); font-size: 12px; line-height: 1.4; letter-spacing: -0.01em; }
+    .phase .t {
+      font-weight: 600;
+      font-size: 15px;
+      margin-bottom: 4px;
+      letter-spacing: -0.01em;
+    }
+    .phase .when {
+      color: var(--muted);
+      font-size: 12px;
+      margin-bottom: 14px;
+      letter-spacing: -0.01em;
+    }
+    .phase ul {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+      flex: 1;
+    }
+    .phase li {
+      position: relative;
+      padding-left: 12px;
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.4;
+      letter-spacing: -0.01em;
+    }
+    .phase li::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 6px;
+      width: 4px;
+      height: 4px;
+      border-radius: 50%;
+      background: var(--foreground);
+      opacity: 0.45;
+    }
+    .phase .who {
+      margin-top: 16px;
+      padding-top: 12px;
+      border-top: 1px solid var(--border);
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+      color: var(--foreground);
+      line-height: 1.35;
+    }
 
     @page { size: 13.333in 7.5in; margin: 0; }
 
@@ -816,12 +936,11 @@
         <div class="hero-block">
           <p class="eyebrow">Digital assets infrastructure</p>
           <h1 style="margin-top:12px">Financial infrastructure<br />for the Digital Assets Economy.</h1>
-          <p class="tagline">Launch private digital assets on public chains — without building the stack from scratch.</p>
+          <p class="tagline">Launch digital assets, move value, and manage private operations with infrastructure built for enterprises, fintechs, and AI.</p>
         </div>
         <div class="meta">
-          <span>Product suite</span>
           <span>ryle.sh</span>
-          <span>Infra · Wallet · Confidentiality · Back Office</span>
+          <span>Financial infrastructure</span>
         </div>
       </div>
     </section>
@@ -835,7 +954,7 @@
             <img class="pillar-media" src="/presentations/built-360.png" alt="360° platform for digital assets" />
             <div class="pillar-body">
               <div class="ptitle">360° platform for digital assets</div>
-              <p>Infrastructure to issue, distribute, and operate digital assets in one stack — adopt only the modules you need.</p>
+              <p>Infrastructure to issue, distribute, and operate digital assets in one stack: adopt only the modules you need.</p>
               <div class="meta">Enterprise-grade · API-first</div>
             </div>
           </div>
@@ -843,7 +962,7 @@
             <img class="pillar-media" src="/presentations/built-modular.png" alt="Modular and scalable products" />
             <div class="pillar-body">
               <div class="ptitle">Modular &amp; scalable products</div>
-              <p>Blockchain Infrastructure for RWAs, stablecoins, and digital assets, white-label wallet, confidentiality, and back office — independently deployable.</p>
+              <p>Blockchain Infrastructure for RWAs, stablecoins, and digital assets, white-label wallet, confidentiality, and back office, independently deployable.</p>
               <div class="meta">Interoperable · Customizable</div>
             </div>
           </div>
@@ -851,7 +970,7 @@
             <img class="pillar-media" src="/presentations/built-compliance.png" alt="Security and compliance" />
             <div class="pillar-body">
               <div class="ptitle">Security &amp; compliance</div>
-              <p>Built for demanding regulatory frameworks — roles, audit logs, KYC hooks, and selective disclosure when privacy is required.</p>
+              <p>Built for demanding regulatory frameworks: roles, audit logs, KYC hooks, and selective disclosure when privacy is required.</p>
               <div class="meta">Audit trail · MiCA-ready mapping</div>
             </div>
           </div>
@@ -865,7 +984,8 @@
           </div>
         </div>
         <div class="footer-bar">
-          <span>Ryle · Platform</span>
+          <span>ryle.sh</span>
+          <span>Financial infrastructure</span>
         </div>
       </div>
     </section>
@@ -907,7 +1027,7 @@
                 <li>Technical support through sandbox and live promotion</li>
                 <li>One platform for infra, wallet, and confidentiality</li>
                 <li>REST APIs and signed webhooks for existing systems</li>
-                <li>Prebuilt modular products — adopt only what you need</li>
+                <li>Prebuilt modular products: adopt only what you need</li>
               </ul>
             </div>
           </div>
@@ -923,6 +1043,10 @@
       <div class="pad">
         <p class="eyebrow">Architecture</p>
         <h1 style="margin-top:12px">Integration</h1>
+        <div class="footer-bar">
+          <span>ryle.sh</span>
+          <span>Financial infrastructure</span>
+        </div>
       </div>
     </section>
 
@@ -930,7 +1054,7 @@
     <section class="slide">
       <div class="pad">
         <h2>Module integration: API</h2>
-        <p class="lede">Modular architecture that connects every product surface — and your systems — so you roll out only what you need.</p>
+        <p class="lede">Modular architecture that connects every product surface and your systems so you roll out only what you need.</p>
         <div class="wl-grid wl-grid-4">
           <div class="wl-hero">
             <div class="label eyebrow">Integration</div>
@@ -942,7 +1066,7 @@
             <div class="wl-card">
               <div class="idx">01</div>
               <div class="label">API gateway</div>
-              <p>Single entry point for issuance, accounts, transfers, disclosures, and webhooks — with auth, access control, and delivery logs.</p>
+              <p>Single entry point for issuance, accounts, transfers, disclosures, and webhooks, with auth, access control, and delivery logs.</p>
             </div>
           </div>
           <div class="wl-col wl-col-flush">
@@ -950,7 +1074,7 @@
             <div class="wl-card">
               <div class="idx">02</div>
               <div class="label">Flexible deployment</div>
-              <p>Start with blockchain infra, then add white-label wallet and confidentiality when the program is ready — without a rewrite.</p>
+              <p>Start with blockchain infra, then add white-label wallet and confidentiality when the program is ready, without a rewrite.</p>
             </div>
           </div>
           <div class="wl-col wl-col-flush">
@@ -963,8 +1087,8 @@
           </div>
         </div>
         <div class="footer-bar">
-          <span>Ryle · Integration</span>
-          <span>Console · APIs · Webhooks — one resource model</span>
+          <span>ryle.sh</span>
+          <span>Financial infrastructure</span>
         </div>
       </div>
     </section>
@@ -974,6 +1098,10 @@
       <div class="pad">
         <p class="eyebrow">Suite</p>
         <h1 style="margin-top:12px">Products</h1>
+        <div class="footer-bar">
+          <span>ryle.sh</span>
+          <span>Financial infrastructure</span>
+        </div>
       </div>
     </section>
 
@@ -1000,7 +1128,7 @@
             <div class="suite-body">
               <div class="idx">02</div>
               <h3>White Label Wallet</h3>
-              <p>Branded end-user wallet for holds and transfers — embedded accounts, no seed phrases.</p>
+              <p>Branded end-user wallet for holds and transfers: embedded accounts, no seed phrases.</p>
               <div class="tags">
                 <span class="tag">Your Brand</span>
                 <span class="tag">Embedded</span>
@@ -1012,7 +1140,7 @@
             <div class="suite-body">
               <div class="idx">03</div>
               <h3>Confidentiality Onchain</h3>
-              <p>Encrypted balances and transfers on public chains — disclosure and audit when privacy matters.</p>
+              <p>Encrypted balances and transfers on public chains: disclosure and audit when privacy matters.</p>
               <div class="tags">
                 <span class="tag">Selective Disclosure</span>
                 <span class="tag">Audit</span>
@@ -1024,7 +1152,7 @@
             <div class="suite-body">
               <div class="idx">04</div>
               <h3>Back Office</h3>
-              <p>Console to manage, control, and supervise digital-asset operations — roles, reporting, and audit.</p>
+              <p>Console to manage, control, and supervise digital-asset operations: roles, reporting, and audit.</p>
               <div class="tags">
                 <span class="tag">Dashboard</span>
                 <span class="tag">Operations</span>
@@ -1033,8 +1161,8 @@
           </div>
         </div>
         <div class="footer-bar">
-          <span>Ryle · Products</span>
-          <span>Modular by design</span>
+          <span>ryle.sh</span>
+          <span>Financial infrastructure</span>
         </div>
       </div>
     </section>
@@ -1043,21 +1171,30 @@
     <section class="slide">
       <div class="pad">
         <h2>Blockchain Infrastructure</h2>
-        <p class="lede">Core platform for RWAs, stablecoins, and digital assets — lifecycle, supply, and settlement on public EVM networks.</p>
+        <p class="lede">Core platform for RWAs, stablecoins, and digital assets: lifecycle, supply, and settlement on public EVM networks.</p>
         <div class="wl-grid">
           <div class="wl-hero">
             <div class="label eyebrow">Product 01</div>
             <div class="title">Issue, mint, redeem, and operate RWAs, stablecoins, and digital assets on public rails.</div>
-            <p>Partners keep custody; Ryle runs the program rails — Console for ops, APIs for product teams.</p>
+            <p>Partners keep custody; Ryle runs the program rails: Console for ops, APIs for product teams.</p>
+            <div class="wl-hero-list">
+              <div class="label">Use cases</div>
+              <ul>
+                <li>Real-estate asset tokenization</li>
+                <li>Digital securities issuance</li>
+                <li>Debt and loan tokenization</li>
+                <li>Asset-backed stablecoin creation</li>
+              </ul>
+            </div>
           </div>
           <div class="wl-col wl-col-flush">
             <img class="wl-media" src="/presentations/bc-infra-features.png" alt="Treasury vs supply" />
             <div class="wl-card">
               <div class="label">Features</div>
               <ul>
-                <li>Asset lifecycle — launch, mint, redeem, pause, wind down</li>
+                <li>Asset lifecycle: launch, mint, redeem, pause, wind down</li>
                 <li>Supply and reserve reconciliation</li>
-                <li>Policy controls — holders, caps, allowlists, pauses</li>
+                <li>Policy controls: holders, caps, allowlists, pauses</li>
                 <li>APIs &amp; webhooks for product embedding</li>
                 <li>Settlement on Ethereum, Polygon, Base, and more</li>
               </ul>
@@ -1078,8 +1215,8 @@
           </div>
         </div>
         <div class="footer-bar">
-          <span>Ryle · Product 01</span>
-          <span>Foundation for RWAs, stablecoins, and onchain products</span>
+          <span>ryle.sh</span>
+          <span>Financial infrastructure</span>
         </div>
       </div>
     </section>
@@ -1088,12 +1225,20 @@
     <section class="slide">
       <div class="pad">
         <h2>White Label Wallet</h2>
-        <p class="lede">Branded end-user wallet for holds and transfers — no seed phrases, no crypto UX to build in-house.</p>
+        <p class="lede">Branded end-user wallet for holds and transfers: no seed phrases, no crypto UX to build in-house.</p>
         <div class="wl-grid">
           <div class="wl-hero">
             <div class="label eyebrow">Product 02</div>
-            <div class="title">Ship a branded end-user wallet for holds and transfers — configured from the Console.</div>
+            <div class="title">Ship a branded end-user wallet for holds and transfers, configured from the Console.</div>
             <p>Banks, fintechs, and platforms distribute digital assets under their look &amp; feel, with the same policy and audit model as the platform.</p>
+            <div class="wl-hero-list">
+              <div class="label">Distribution</div>
+              <ul>
+                <li>Web (embedded or standalone)</li>
+                <li>Native iOS and Android apps</li>
+                <li>App Store and Google Play</li>
+              </ul>
+            </div>
           </div>
           <div class="wl-col wl-col-flush">
             <img class="wl-media" src="/presentations/wl-features.png" alt="White label wallet balance" />
@@ -1117,14 +1262,14 @@
                 <li>Institutional look &amp; feel end to end</li>
                 <li>Lower support burden vs self-custody UX</li>
                 <li>Same policy and audit model as the platform</li>
-                <li>Optional — add when you’re ready to distribute</li>
+                <li>Optional: add when you’re ready to distribute</li>
               </ul>
             </div>
           </div>
         </div>
         <div class="footer-bar">
-          <span>Ryle · Product 02</span>
-          <span>Your brand · Our wallet infrastructure</span>
+          <span>ryle.sh</span>
+          <span>Financial infrastructure</span>
         </div>
       </div>
     </section>
@@ -1133,12 +1278,22 @@
     <section class="slide">
       <div class="pad">
         <h2>Confidentiality Onchain</h2>
-        <p class="lede">Encrypted balances and transfers on public chains — without giving up auditability.</p>
+        <p class="lede">Encrypted balances and transfers on public chains, without giving up auditability.</p>
         <div class="wl-grid">
           <div class="wl-hero">
             <div class="label eyebrow">Product 03</div>
             <div class="title">Private by default. Visible by policy. Auditable always.</div>
-            <p>One product in the suite — layer confidentiality on a new asset, an existing one, or a third-party asset you support.</p>
+            <p>One product in the suite: layer confidentiality on a new asset, an existing one, or a third-party asset you support.</p>
+            <div class="wl-hero-list">
+              <div class="label">Use cases</div>
+              <ul>
+                <li>Confidential stablecoins and B2B payments</li>
+                <li>Corporate treasury without public exposure</li>
+                <li>Bank and payments flows without ledger exposure</li>
+                <li>Inter-entity treasury moves</li>
+                <li>Regulatory disclosure without a public ledger</li>
+              </ul>
+            </div>
           </div>
           <div class="wl-col wl-col-flush">
             <img class="wl-media" src="/presentations/confidential-features.png" alt="Shield confidential amount" />
@@ -1147,7 +1302,7 @@
               <ul>
                 <li>Encrypted balances, amounts, and counterparties</li>
                 <li>Zero-knowledge proofs of transfer validity</li>
-                <li>Selective disclosure — scoped, timed, logged</li>
+                <li>Selective disclosure: scoped, timed, logged</li>
                 <li>Proof of reserves without holder exposure</li>
                 <li>Immutable, attributed audit log</li>
               </ul>
@@ -1168,8 +1323,8 @@
           </div>
         </div>
         <div class="footer-bar">
-          <span>Ryle · Product 03</span>
-          <span>Confidential by default · Visible by policy · Auditable always</span>
+          <span>ryle.sh</span>
+          <span>Financial infrastructure</span>
         </div>
       </div>
     </section>
@@ -1178,12 +1333,20 @@
     <section class="slide">
       <div class="pad">
         <h2>Back Office</h2>
-        <p class="lede">The Ryle Console — manage, control, and supervise digital-asset operations with security built in.</p>
+        <p class="lede">The Ryle Console: manage, control, and supervise digital-asset operations with security built in.</p>
         <div class="wl-grid">
           <div class="wl-hero">
             <div class="label eyebrow">Product 04</div>
             <div class="title">End-to-end surface for product configuration, mint/redeem, reporting, and roles.</div>
-            <p>Ops, treasury, compliance, and leadership run the program from one panel — with real-time visibility and a full audit trail.</p>
+            <p>Ops, treasury, compliance, and leadership run the program from one panel, with real-time visibility and a full audit trail.</p>
+            <div class="wl-hero-list">
+              <div class="label">Integrations</div>
+              <ul>
+                <li>Core banking and accounting systems</li>
+                <li>Regulatory reporting systems</li>
+                <li>Analytics and BI tools</li>
+              </ul>
+            </div>
           </div>
           <div class="wl-col wl-col-flush">
             <img class="wl-media" src="/presentations/backoffice-features.png" alt="Limits and economics" />
@@ -1213,8 +1376,8 @@
           </div>
         </div>
         <div class="footer-bar">
-          <span>Ryle · Product 04</span>
-          <span>Ops · Treasury · Compliance · Leadership</span>
+          <span>ryle.sh</span>
+          <span>Financial infrastructure</span>
         </div>
       </div>
     </section>
@@ -1224,38 +1387,63 @@
       <div class="pad">
         <div class="engagement-main">
           <h2>How engagement works</h2>
-          <p class="lede">From discovery to live — pick the products you need, then expand.</p>
-          <div class="steps">
-            <div class="step">
-              <div class="n">1</div>
-              <div class="t">Discover</div>
-              <div class="d">Align on use case and which modules to start with</div>
-            </div>
-            <div class="step">
-              <div class="n">2</div>
-              <div class="t">Sandbox</div>
-              <div class="d">Keys, one asset, webhooks — exercise core flows</div>
-            </div>
-            <div class="step">
-              <div class="n">3</div>
-              <div class="t">Ready</div>
-              <div class="d">Roles, custody binding, KYC, operational checks</div>
-            </div>
-            <div class="step">
-              <div class="n">4</div>
-              <div class="t">Live</div>
-              <div class="d">KYB, signers, reserves, production endpoints</div>
-            </div>
-            <div class="step">
-              <div class="n">5</div>
-              <div class="t">Scale</div>
-              <div class="d">Add wallet, confidentiality, more assets</div>
+          <p class="lede">From first use case to live operations, then a clear path for what comes next — with our technical team embedded through launch.</p>
+          <div class="phases-wrap">
+            <div class="phases">
+              <div class="phase">
+                <div class="n">1</div>
+                <div class="t">Immersion</div>
+                <div class="when">Weeks 1–2</div>
+                <ul>
+                  <li>Align use case and modules</li>
+                  <li>Console and API walkthrough</li>
+                  <li>Sandbox: keys, first asset, webhooks</li>
+                  <li>Map custody, KYC, and roles</li>
+                </ul>
+                <div class="who">Technical team + your eng/ops</div>
+              </div>
+              <div class="phase">
+                <div class="n">2</div>
+                <div class="t">Assisted launch</div>
+                <div class="when">Weeks 3–6</div>
+                <ul>
+                  <li>Production checklist</li>
+                  <li>Custody binding and KYB</li>
+                  <li>Signers, reserves, live endpoints</li>
+                  <li>First live flows side-by-side</li>
+                </ul>
+                <div class="who">Joint · technical team in the room</div>
+              </div>
+              <div class="phase">
+                <div class="n">3</div>
+                <div class="t">Accompaniment</div>
+                <div class="when">First months live</div>
+                <ul>
+                  <li>Day-2 operations support</li>
+                  <li>Reviews and hardening</li>
+                  <li>Runbooks handed over</li>
+                  <li>Stabilize before expanding</li>
+                </ul>
+                <div class="who">You run it · technical team on call</div>
+              </div>
+              <div class="phase">
+                <div class="n">4</div>
+                <div class="t">Scale</div>
+                <div class="when">Next stage</div>
+                <ul>
+                  <li>Advise the next company stage</li>
+                  <li>Expand modules and assets</li>
+                  <li>New use cases and markets</li>
+                  <li>Commercial path for the next tier</li>
+                </ul>
+                <div class="who">Joint · product + commercial team</div>
+              </div>
             </div>
           </div>
         </div>
         <div class="footer-bar">
-          <span>Ryle · Engagement</span>
-          <span>docs.ryle.sh</span>
+          <span>ryle.sh</span>
+          <span>Financial infrastructure</span>
         </div>
       </div>
     </section>
@@ -1265,22 +1453,27 @@
       <div class="pad">
         <div class="next-steps-main">
           <h2>Next steps</h2>
-          <p class="lede">We’re ready to structure a path that fits your program.</p>
-          <div class="grid-3">
+          <p class="lede">From commercial agreement to production deployment.</p>
+          <div class="grid-4">
             <div class="card">
               <div class="label">01</div>
-              <div class="title">Discovery call</div>
-              <p>Map use case and regulatory posture to the right product mix.</p>
+              <div class="title">Commercial proposal</div>
+              <p>Agree scope, modules, pricing, and term. Align on success criteria and kick off the engagement with a named technical contact.</p>
             </div>
             <div class="card">
               <div class="label">02</div>
-              <div class="title">Sandbox access</div>
-              <p>Provision keys and exercise issuance, transfers, and ops end to end.</p>
+              <div class="title">Scope &amp; sandbox</div>
+              <p>Lock the product mix, provision API keys, stand up the sandbox environment, and run first asset flows end to end with your team.</p>
             </div>
             <div class="card">
               <div class="label">03</div>
-              <div class="title">Technical deep dive</div>
-              <p>Architecture, APIs, and module fit — under NDA as needed.</p>
+              <div class="title">Implement</div>
+              <p>Wire APIs and webhooks into your stack, bind custody and KYC providers, and configure Console roles, policies, and operational controls.</p>
+            </div>
+            <div class="card">
+              <div class="label">04</div>
+              <div class="title">Deploy live</div>
+              <p>Complete KYB, cut over production endpoints, set signers and reserves, run the go-live checklist — then deploy to production.</p>
             </div>
           </div>
         </div>
@@ -1294,6 +1487,10 @@
             <p style="font-weight:600; margin-top:6px; letter-spacing:-0.01em">calendly.com/martin-ryle/30min</p>
           </div>
         </div>
+        <div class="footer-bar">
+          <span>ryle.sh</span>
+          <span>Financial infrastructure</span>
+        </div>
       </div>
     </section>
 
@@ -1303,12 +1500,12 @@
         <div class="closing-main">
           <div class="brand" style="margin-bottom:36px"><span class="delta">δ</span> Ryle</div>
           <h1>Financial infrastructure<br />for the Digital Assets Economy.</h1>
-          <p class="lede">Launch private digital assets on public chains — without building the stack from scratch.</p>
+          <p class="lede">Launch private digital assets on public chains, without building the stack from scratch.</p>
           <a class="cta" href="https://calendly.com/martin-ryle/30min">Schedule a conversation</a>
         </div>
         <div class="footer-bar">
-          <span>Ryle · ryle.sh</span>
-          <span>Infra · Wallet · Confidentiality · Back Office</span>
+          <span>ryle.sh</span>
+          <span>Financial infrastructure</span>
         </div>
       </div>
     </section>
