@@ -1,0 +1,992 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Ryle — Pricing &amp; Commercial Model</title>
+  <style>
+    @font-face {
+      font-family: "Geist";
+      src: url("/fonts/geist-sans/Geist-Regular.woff2") format("woff2");
+      font-weight: 400;
+      font-style: normal;
+      font-display: swap;
+    }
+    @font-face {
+      font-family: "Geist";
+      src: url("/fonts/geist-sans/Geist-Medium.woff2") format("woff2");
+      font-weight: 500;
+      font-style: normal;
+      font-display: swap;
+    }
+    @font-face {
+      font-family: "Geist";
+      src: url("/fonts/geist-sans/Geist-SemiBold.woff2") format("woff2");
+      font-weight: 600;
+      font-style: normal;
+      font-display: swap;
+    }
+
+    :root {
+      --page-backdrop: #0c0b0a;
+      --marketing-surface: #141210;
+      --foreground: #f5f2ee;
+      --surface: #1c1a18;
+      --muted: #b5aea6;
+      --muted-light: #867d73;
+      --border: #2a2825;
+      --border-strong: #3a3733;
+      --background: #141210;
+      --font-sans: "Geist", ui-sans-serif, system-ui, sans-serif;
+      --font-serif: "New York", "New York Small", ui-serif, Georgia, "Times New Roman", serif;
+      --slide-w: 1280px;
+      --slide-h: 720px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--page-backdrop);
+      color: var(--foreground);
+      font-family: var(--font-sans);
+      font-size: 16px;
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .deck {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 24px;
+      padding: 32px 16px 64px;
+    }
+
+    .slide {
+      width: var(--slide-w);
+      height: var(--slide-h);
+      background: var(--marketing-surface);
+      color: var(--foreground);
+      position: relative;
+      overflow: hidden;
+      flex-shrink: 0;
+      page-break-after: always;
+      break-after: page;
+    }
+
+    .slide > * { position: relative; z-index: 1; }
+
+    .pad {
+      padding: 48px 60px;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .brand {
+      display: inline-flex;
+      align-items: baseline;
+      gap: 8px;
+      font-family: var(--font-serif);
+      font-size: 24px;
+      font-style: italic;
+      font-weight: 400;
+      line-height: 1;
+      letter-spacing: -0.04em;
+      color: color-mix(in srgb, var(--foreground) 90%, transparent);
+    }
+    .brand .delta { color: var(--muted); }
+
+    .eyebrow {
+      color: var(--muted);
+      font-size: 15px;
+      font-weight: 400;
+    }
+
+    h1, h2 {
+      font-family: var(--font-serif);
+      font-weight: 400;
+      font-style: italic;
+      line-height: 1.15;
+      letter-spacing: -0.03em;
+    }
+    h1 { font-size: 44px; max-width: 920px; }
+    h2 { font-size: 36px; }
+
+    .lede {
+      color: var(--muted);
+      font-family: var(--font-serif);
+      font-style: italic;
+      font-size: 20px;
+      line-height: 1.35;
+      letter-spacing: -0.02em;
+      margin-top: 12px;
+      white-space: nowrap;
+    }
+
+    .footer-bar {
+      margin-top: auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-top: 18px;
+      border-top: 1px solid var(--border);
+      color: var(--muted);
+      font-size: 12px;
+      letter-spacing: -0.01em;
+    }
+    .footer-bar-plain {
+      border-top: none;
+      padding-top: 18px;
+    }
+
+    /* —— Cover —— */
+    .cover { justify-content: space-between; }
+    .cover .hero-block { margin-top: 72px; }
+    .cover .tagline {
+      margin-top: 18px;
+      font-family: var(--font-serif);
+      font-style: italic;
+      font-size: 22px;
+      color: var(--muted);
+      max-width: 720px;
+      letter-spacing: -0.02em;
+      line-height: 1.3;
+    }
+    .cover .meta {
+      display: flex;
+      gap: 28px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    /* —— Shared cards / grids —— */
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-top: 28px;
+      flex: 1;
+      min-height: 0;
+    }
+    .grid-3 {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 16px;
+      margin-top: 28px;
+    }
+    .card {
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 22px;
+      background: color-mix(in srgb, var(--foreground) 3.5%, var(--marketing-surface));
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
+    }
+    .card .idx {
+      font-family: var(--font-serif);
+      font-style: italic;
+      font-size: 16px;
+      color: var(--muted);
+      margin-bottom: 8px;
+    }
+    .card .label {
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 500;
+      margin-bottom: 10px;
+      letter-spacing: -0.01em;
+    }
+    .card .title {
+      font-family: var(--font-serif);
+      font-style: italic;
+      font-size: 22px;
+      letter-spacing: -0.02em;
+      margin-bottom: 10px;
+      line-height: 1.2;
+    }
+    .card h3 {
+      font-family: var(--font-serif);
+      font-style: italic;
+      font-size: 20px;
+      font-weight: 400;
+      letter-spacing: -0.02em;
+      margin-bottom: 10px;
+      line-height: 1.2;
+    }
+    .card p {
+      font-size: 14px;
+      color: var(--muted);
+      line-height: 1.45;
+      letter-spacing: -0.01em;
+    }
+    .card ul {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-top: 4px;
+    }
+    .card li {
+      display: flex;
+      gap: 10px;
+      font-size: 14px;
+      letter-spacing: -0.01em;
+      line-height: 1.35;
+      color: var(--foreground);
+    }
+    .card li::before {
+      content: "";
+      width: 5px;
+      height: 5px;
+      margin-top: 7px;
+      border-radius: 50%;
+      background: var(--foreground);
+      opacity: 0.55;
+      flex-shrink: 0;
+    }
+    .card .meta {
+      margin-top: auto;
+      padding-top: 16px;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 500;
+      letter-spacing: -0.01em;
+    }
+
+    /* —— How we price —— */
+    .model-top {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      margin-top: 28px;
+    }
+    .model-bottom {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0;
+      margin-top: 16px;
+      flex: 1;
+      min-height: 0;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      overflow: hidden;
+    }
+    .model-bottom > div {
+      padding: 22px 24px;
+      display: flex;
+      flex-direction: column;
+    }
+    .model-bottom .left {
+      background: color-mix(in srgb, var(--foreground) 3.5%, var(--marketing-surface));
+      border-right: 1px solid var(--border);
+    }
+    .model-bottom h3 {
+      font-family: var(--font-serif);
+      font-style: italic;
+      font-size: 18px;
+      font-weight: 400;
+      letter-spacing: -0.02em;
+      margin-bottom: 14px;
+    }
+    .model-bottom ul {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 9px;
+    }
+    .model-bottom li {
+      display: flex;
+      gap: 10px;
+      font-size: 13px;
+      letter-spacing: -0.01em;
+      line-height: 1.35;
+    }
+    .model-bottom li::before {
+      content: "";
+      width: 5px;
+      height: 5px;
+      margin-top: 6px;
+      border-radius: 50%;
+      background: var(--foreground);
+      opacity: 0.55;
+      flex-shrink: 0;
+    }
+
+    /* —— Bundles —— */
+    .bundle-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      margin-top: 28px;
+      flex: 1;
+      min-height: 0;
+    }
+    .bundle {
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 24px;
+      background: color-mix(in srgb, var(--foreground) 3.5%, var(--marketing-surface));
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
+    }
+    .bundle.featured {
+      background: color-mix(in srgb, var(--foreground) 10%, var(--marketing-surface));
+      color: var(--foreground);
+      border-color: color-mix(in srgb, var(--foreground) 22%, var(--border));
+    }
+    .bundle.featured .label,
+    .bundle.featured p,
+    .bundle.featured li {
+      color: var(--muted);
+    }
+    .bundle.featured h3,
+    .bundle.featured .price,
+    .bundle.featured li {
+      color: var(--foreground);
+    }
+    .bundle.featured li::before {
+      background: var(--foreground);
+      opacity: 0.55;
+    }
+    .bundle .label {
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 500;
+      margin-bottom: 10px;
+      letter-spacing: -0.01em;
+    }
+    .bundle h3 {
+      font-family: var(--font-serif);
+      font-style: italic;
+      font-size: 26px;
+      font-weight: 400;
+      letter-spacing: -0.03em;
+      margin-bottom: 10px;
+      line-height: 1.15;
+    }
+    .bundle > p {
+      font-size: 14px;
+      color: var(--muted);
+      line-height: 1.45;
+      letter-spacing: -0.01em;
+      margin-bottom: 18px;
+    }
+    .bundle ul {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      flex: 1;
+    }
+    .bundle li {
+      display: flex;
+      gap: 10px;
+      font-size: 14px;
+      letter-spacing: -0.01em;
+      line-height: 1.35;
+    }
+    .bundle li::before {
+      content: "";
+      width: 5px;
+      height: 5px;
+      margin-top: 7px;
+      border-radius: 50%;
+      background: var(--foreground);
+      opacity: 0.55;
+      flex-shrink: 0;
+    }
+    .bundle .price {
+      margin-top: 22px;
+      padding-top: 0;
+      border-top: none;
+      font-family: var(--font-serif);
+      font-style: italic;
+      font-size: 40px;
+      letter-spacing: -0.03em;
+    }
+    .bundle.featured .price {
+      border-top-color: transparent;
+    }
+    .bundle .price span {
+      display: block;
+      margin-top: 8px;
+      font-family: var(--font-sans);
+      font-style: normal;
+      font-size: 13px;
+      letter-spacing: -0.01em;
+      opacity: 0.75;
+    }
+
+    /* —— Price table —— */
+    .price-table {
+      margin-top: 28px;
+      flex: 1;
+      min-height: 0;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      background: color-mix(in srgb, var(--foreground) 3.5%, var(--marketing-surface));
+    }
+    .price-table .row {
+      display: grid;
+      grid-template-columns: 1.4fr 1fr 1.2fr;
+      gap: 16px;
+      padding: 20px 24px;
+      border-bottom: 1px solid var(--border);
+      align-items: center;
+      flex: 1;
+    }
+    .price-table .row:last-child { border-bottom: none; }
+    .price-table .row.head {
+      flex: 0 0 auto;
+      background: color-mix(in srgb, var(--foreground) 6%, var(--marketing-surface));
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--muted);
+      letter-spacing: -0.01em;
+      text-transform: uppercase;
+    }
+    .price-table .row .name {
+      font-family: var(--font-serif);
+      font-style: italic;
+      font-size: 20px;
+      letter-spacing: -0.02em;
+    }
+    .price-table .row .val {
+      font-family: var(--font-serif);
+      font-style: italic;
+      font-size: 22px;
+      letter-spacing: -0.02em;
+    }
+    .price-table .row .note {
+      font-size: 13px;
+      color: var(--muted);
+      letter-spacing: -0.01em;
+      line-height: 1.35;
+    }
+    .tbd {
+      font-family: var(--font-serif);
+      font-style: italic;
+      color: var(--muted);
+    }
+
+    /* —— Partner term sheet —— */
+    .term-grid {
+      display: grid;
+      grid-template-columns: 1.25fr 0.9fr;
+      gap: 16px;
+      margin-top: 24px;
+      flex: 1;
+      min-height: 0;
+    }
+    .term-phases {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      min-height: 0;
+      height: 100%;
+    }
+    .term-phase {
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 14px 18px;
+      background: color-mix(in srgb, var(--foreground) 3.5%, var(--marketing-surface));
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      min-height: 0;
+    }
+    .term-phase .title-row {
+      display: flex;
+      align-items: baseline;
+      gap: 8px;
+      margin-bottom: 6px;
+      line-height: 1.2;
+    }
+    .term-phase .idx {
+      font-family: var(--font-serif);
+      font-style: italic;
+      font-size: 18px;
+      color: var(--muted);
+      letter-spacing: -0.02em;
+      flex-shrink: 0;
+    }
+    .term-phase h3 {
+      font-family: var(--font-serif);
+      font-style: italic;
+      font-size: 18px;
+      font-weight: 400;
+      letter-spacing: -0.02em;
+      margin-bottom: 0;
+      line-height: 1.2;
+    }
+    .term-phase p {
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.35;
+      letter-spacing: -0.01em;
+      flex: 1;
+    }
+    .term-phase .meta {
+      margin-top: 8px;
+      font-size: 12px;
+      font-weight: 500;
+      letter-spacing: -0.01em;
+      color: var(--foreground);
+    }
+    .term-side {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      min-height: 0;
+      height: 100%;
+    }
+    .term-econ-card {
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 28px 26px;
+      background: color-mix(in srgb, var(--foreground) 3.5%, var(--marketing-surface));
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      min-height: 0;
+    }
+    .term-econ-card .k {
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+      text-transform: uppercase;
+      margin-bottom: 10px;
+      color: var(--muted);
+    }
+    .term-econ-card .v {
+      font-family: var(--font-serif);
+      font-style: italic;
+      font-size: 40px;
+      letter-spacing: -0.03em;
+      line-height: 1.1;
+      color: var(--foreground);
+    }
+    .term-econ-card .d {
+      margin-top: 10px;
+      font-size: 13px;
+      color: var(--muted);
+      letter-spacing: -0.01em;
+      line-height: 1.4;
+    }
+    .term-econ-card .notes {
+      margin-top: 22px;
+      padding-top: 18px;
+      border-top: 1px solid var(--border);
+      flex: 1;
+      min-height: 0;
+    }
+    .term-econ-card .notes h3 {
+      font-family: var(--font-serif);
+      font-style: italic;
+      font-size: 18px;
+      font-weight: 400;
+      margin-bottom: 12px;
+      letter-spacing: -0.02em;
+      color: var(--foreground);
+    }
+    .term-econ-card .notes ul {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 9px;
+    }
+    .term-econ-card .notes li {
+      display: flex;
+      gap: 8px;
+      font-size: 13px;
+      letter-spacing: -0.01em;
+      line-height: 1.35;
+      color: var(--foreground);
+    }
+    .term-econ-card .notes li::before {
+      content: "";
+      width: 4px;
+      height: 4px;
+      margin-top: 7px;
+      border-radius: 50%;
+      background: var(--foreground);
+      opacity: 0.55;
+      flex-shrink: 0;
+    }
+    .term-econ-card .included {
+      margin-top: 18px;
+      padding-top: 16px;
+      border-top: 1px solid var(--border);
+    }
+    .term-econ-card .included h3 {
+      font-family: var(--font-serif);
+      font-style: italic;
+      font-size: 18px;
+      font-weight: 400;
+      margin-bottom: 12px;
+      letter-spacing: -0.02em;
+      color: var(--foreground);
+    }
+    .term-econ-card .included ul {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 9px;
+    }
+    .term-econ-card .included li {
+      display: flex;
+      gap: 8px;
+      font-size: 13px;
+      letter-spacing: -0.01em;
+      line-height: 1.35;
+      color: var(--foreground);
+    }
+    .term-econ-card .included li::before {
+      content: "✓";
+      color: var(--foreground);
+      font-weight: 700;
+      font-size: 13px;
+      line-height: 1.35;
+      flex-shrink: 0;
+      opacity: 0.85;
+    }
+
+    /* —— Centered next steps —— */
+    .centered-main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      min-height: 0;
+    }
+    .centered-main .grid-3 { flex: 0 0 auto; }
+
+    /* —— Close —— */
+    .cta {
+      margin-top: 32px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      align-self: flex-start;
+      width: fit-content;
+      background: var(--foreground);
+      color: var(--marketing-surface);
+      padding: 10px 18px;
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+      border-radius: 999px;
+      text-decoration: none;
+      line-height: 1;
+    }
+    .closing { justify-content: flex-start; }
+    .closing-main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: flex-start;
+      min-height: 0;
+    }
+    .closing .footer-bar {
+      margin-top: 0;
+      width: 100%;
+    }
+
+    @page { size: 13.333in 7.5in; margin: 0; }
+
+    @media print {
+      html, body { background: #141210; width: 13.333in; margin: 0; padding: 0; }
+      .deck { padding: 0; gap: 0; display: block; }
+      .slide {
+        width: 13.333in;
+        height: 7.5in;
+        page-break-after: always;
+        break-after: page;
+        break-inside: avoid;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+      .slide:last-child { page-break-after: auto; }
+    }
+  </style>
+</head>
+<body>
+  <div class="deck">
+
+    <!-- 1. Cover -->
+    <section class="slide">
+      <div class="pad cover">
+        <div class="brand"><span class="delta">δ</span> Ryle</div>
+        <div class="hero-block">
+          <p class="eyebrow">Pricing &amp; commercial model</p>
+          <h1 style="margin-top:12px">Financial infrastructure<br />for the Digital Assets Economy.</h1>
+          <p class="tagline">Launch private digital assets on public chains — without building the stack from scratch.</p>
+        </div>
+        <div class="meta">
+          <span>Product suite</span>
+          <span>ryle.sh</span>
+          <span>Infra · Wallet · Confidentiality · Back Office</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- 2. How we price -->
+    <section class="slide">
+      <div class="pad">
+        <h2>How we price</h2>
+        <div class="model-top">
+          <div class="card">
+            <div class="idx">01</div>
+            <h3>Platform</h3>
+            <p>Which products are in scope — à la carte or as a bundle — plus sandbox and live.</p>
+          </div>
+          <div class="card">
+            <div class="idx">02</div>
+            <h3>Program scale</h3>
+            <p>Driver tied to growth — live assets, activity, or wallet users. Meter TBD per partner.</p>
+          </div>
+          <div class="card">
+            <div class="idx">03</div>
+            <h3>Services</h3>
+            <p>Optional discovery, integration, and go-live — never required to use the platform.</p>
+          </div>
+        </div>
+        <div class="model-bottom">
+          <div class="left">
+            <h3>Ryle provides</h3>
+            <ul>
+              <li>Infra, Back Office, Confidentiality, optional Wallet</li>
+              <li>Console, APIs, webhooks, environments, updates</li>
+            </ul>
+          </div>
+          <div>
+            <h3>You bring</h3>
+            <ul>
+              <li>Brand, custody, KYC program, and counsel</li>
+              <li>Business model and product integration</li>
+            </ul>
+          </div>
+        </div>
+        <div class="footer-bar">
+          <span>Ryle · Commercial</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3. Packaging -->
+    <section class="slide">
+      <div class="pad">
+        <h2>Recommended packaging</h2>
+        <div class="bundle-grid">
+          <div class="bundle">
+            <div class="label">Bundle 01</div>
+            <h3>Launch</h3>
+            <p>Issuance and operations on public rails.</p>
+            <ul>
+              <li>Blockchain Infrastructure</li>
+              <li>Back Office</li>
+              <li>Sandbox + live · APIs &amp; webhooks</li>
+            </ul>
+            <div class="price">USD 6.500/mo<span>Flat fee</span></div>
+          </div>
+          <div class="bundle featured">
+            <div class="label">Bundle 02 · Recommended</div>
+            <h3>Distribute</h3>
+            <p>Launch plus branded end-user UX — the path we recommend for Growie-class programs.</p>
+            <ul>
+              <li>Everything in Launch</li>
+              <li>White Label Wallet</li>
+            </ul>
+            <div class="price">USD 8.500/mo<span>Flat fee</span></div>
+          </div>
+          <div class="bundle">
+            <div class="label">Add-on · Optional</div>
+            <h3>Private</h3>
+            <p>Add confidentiality on public chains when privacy is a requirement.</p>
+            <ul>
+              <li>Add-on to Launch or Distribute</li>
+              <li>Confidentiality Onchain</li>
+              <li>Disclosure, audit, proof of reserves</li>
+            </ul>
+            <div class="price">+USD 2.500/mo<span>Flat fee · Up to 5.000 transactions</span></div>
+          </div>
+        </div>
+        <div class="footer-bar footer-bar-plain">
+          <span>Ryle · Packaging</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- 4. Deal structure -->
+    <section class="slide">
+      <div class="pad">
+        <h2>Deal structure</h2>
+        <div class="price-table">
+          <div class="row head">
+            <div>Component</div>
+            <div>Shape</div>
+            <div>Notes</div>
+          </div>
+          <div class="row">
+            <div class="name">Onboarding / setup</div>
+            <div class="val">Instant</div>
+            <div class="note">Upon payment in advance of the first monthly fee</div>
+          </div>
+          <div class="row">
+            <div class="name">Contract</div>
+            <div class="val">Minimum 3 months</div>
+            <div class="note">Initial term · then month-to-month or renewal</div>
+          </div>
+          <div class="row">
+            <div class="name">Monthly platform</div>
+            <div class="val">USD 6.500–8.500/mo</div>
+            <div class="note">Launch USD 6.500 · Distribute USD 8.500 · Private +USD 2.500 / mo</div>
+          </div>
+          <div class="row">
+            <div class="name">Usage / scale</div>
+            <div class="val">8–15 bps · or 8–12%</div>
+            <div class="note">bps on AUM · or % of Growie platform fees — pick one base</div>
+          </div>
+          <div class="row">
+            <div class="name">Professional services</div>
+            <div class="val">USD 120/hr</div>
+            <div class="note">Billed hourly · discovery, integration, go-live as needed</div>
+          </div>
+        </div>
+        <div class="footer-bar">
+          <span>Ryle · Pricing</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- 5. Growie term sheet -->
+    <section class="slide">
+      <div class="pad">
+        <h2>Growie · Commercial term sheet</h2>
+        <div class="term-grid">
+          <div class="term-phases">
+            <div class="term-phase">
+              <div class="title-row">
+                <div class="idx">Phase 0</div>
+                <h3>Discover</h3>
+              </div>
+              <p>Map replace vs reuse. Board risk memo: ownership, audit, continuity, exit.</p>
+            </div>
+            <div class="term-phase">
+              <div class="title-row">
+                <div class="idx">Phase 1</div>
+                <h3>Launch</h3>
+              </div>
+              <p>Ryle backend + Console/API. Real accounts, automated money movement, frontend parity.</p>
+            </div>
+            <div class="term-phase">
+              <div class="title-row">
+                <div class="idx">Phase 2</div>
+                <h3>Distribute</h3>
+              </div>
+              <p>Add White Label Wallet — branded end-user holds and transfers when Launch is live.</p>
+            </div>
+            <div class="term-phase">
+              <div class="title-row">
+                <div class="idx">Phase 3</div>
+                <h3>Public offering path</h3>
+              </div>
+              <p>Public-offering-ready infrastructure — in active development. Token portability, external wallets, and the digital-representation model they need to scale.</p>
+              <div class="meta">Not included · Let’s discuss it together when we cross that bridge</div>
+            </div>
+          </div>
+          <div class="term-side">
+            <div class="term-econ-card">
+              <div class="k">Flat platform</div>
+              <div class="v">USD 8.500/mo</div>
+              <div class="d">Distribute · flat fee</div>
+              <div class="notes">
+                <h3>Considerations for Growie:</h3>
+                <ul>
+                  <li>Data, customers, brand, access stay with Growie</li>
+                  <li>Exportable audit trail · disclosure on demand</li>
+                  <li>Documented exit &amp; data portability path</li>
+                  <li>Continuity plan if the relationship ends</li>
+                  <li>Written reuse-vs-replace of Globant assets</li>
+                </ul>
+              </div>
+              <div class="included">
+                <h3>Included</h3>
+                <ul>
+                  <li>Sandbox and live environments</li>
+                  <li>Console, APIs, and signed webhooks</li>
+                  <li>Product updates on the shared roadmap</li>
+                  <li>Docs, onboarding path, standard support</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="footer-bar footer-bar-plain">
+          <span>Ryle · Growie</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- 6. Next steps -->
+    <section class="slide">
+      <div class="pad">
+        <div class="centered-main">
+          <h2>Next steps</h2>
+          <div class="grid-3">
+            <div class="card">
+              <div class="label">01</div>
+              <div class="title">Discovery call</div>
+              <p>Align on use case, posture, and the right bundle to start.</p>
+            </div>
+            <div class="card">
+              <div class="label">02</div>
+              <div class="title">Sandbox access</div>
+              <p>Exercise issuance, transfers, disclosure, and ops end to end.</p>
+            </div>
+            <div class="card">
+              <div class="label">03</div>
+              <div class="title">Commercial proposal</div>
+              <p>Platform mix, scale driver, and optional services — under NDA as needed.</p>
+            </div>
+          </div>
+        </div>
+        <div style="display:flex; justify-content:space-between; padding-top:24px">
+          <div>
+            <p class="eyebrow">Contact</p>
+            <p style="font-weight:600; margin-top:6px; letter-spacing:-0.01em">ryle.sh · docs.ryle.sh</p>
+          </div>
+          <div style="text-align:right">
+            <p class="eyebrow">Schedule</p>
+            <p style="font-weight:600; margin-top:6px; letter-spacing:-0.01em">calendly.com/martin-ryle/30min</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 8. Close -->
+    <section class="slide">
+      <div class="pad closing">
+        <div class="closing-main">
+          <div class="brand" style="margin-bottom:36px"><span class="delta">δ</span> Ryle</div>
+          <h1>Financial infrastructure<br />for the Digital Assets Economy.</h1>
+          <p class="lede">Launch private digital assets on public chains — without building the stack from scratch.</p>
+          <a class="cta" href="https://calendly.com/martin-ryle/30min">Schedule a conversation</a>
+        </div>
+        <div class="footer-bar">
+          <span>Ryle · ryle.sh</span>
+          <span>Infra · Wallet · Confidentiality · Back Office</span>
+        </div>
+      </div>
+    </section>
+
+  </div>
+</body>
+</html>
