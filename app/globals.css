@@ -147,9 +147,10 @@ select,
 .marketing-viewport-bleed {
   --page-backdrop: #f5f2ee;
   --marketing-surface: #f5f2ee;
-  --foreground: #141210;
-  --muted: #867d73;
-  --muted-light: #a0988e;
+  /* Darker navy ink (same family as hero water ~#617197). */
+  --foreground: #1a2740;
+  --muted: #5c6b84;
+  --muted-light: #7a879c;
   --background: #ffffff;
   --surface: #ffffff;
   --surface-tint: #fbfaf8;
@@ -157,7 +158,7 @@ select,
   --border-strong: #ddd8d2;
   --hero-skin-tint: #6b5d4a;
   --marketing-fab-bg: #ffffff;
-  --marketing-fab-fg: #141210;
+  --marketing-fab-fg: #1a2740;
   --marketing-theme-transition-duration: 900ms;
   --marketing-theme-transition-timing: ease-in-out;
   transition:
@@ -192,18 +193,19 @@ select,
 }
 
 .marketing-viewport-bleed.dark {
-  --marketing-surface: #141210;
-  --foreground: var(--page-backdrop);
-  --muted: #b5aea6;
-  --muted-light: #9a938a;
-  --background: #141210;
-  --surface: #1e1c19;
-  --surface-tint: #2c2a27;
-  --border: #2a2825;
-  --border-strong: #3a3733;
+  /* Deep navy aligned with the hero etching blues (~#617197 water). */
+  --marketing-surface: #0f1726;
+  --foreground: #c5d0e3;
+  --muted: #8e9bb0;
+  --muted-light: #6f7d93;
+  --background: #0f1726;
+  --surface: #162033;
+  --surface-tint: #1c2940;
+  --border: #243247;
+  --border-strong: #334560;
   --hero-skin-tint: #8f8270;
   --marketing-fab-bg: #f5f2ee;
-  --marketing-fab-fg: #141210;
+  --marketing-fab-fg: #1a2740;
 }
 
 .marketing-viewport-bleed *,
@@ -263,7 +265,7 @@ html:has(.marketing-viewport-bleed) body {
 
 html:has(.marketing-viewport-bleed.dark),
 html:has(.marketing-viewport-bleed.dark) body {
-  background-color: #141210;
+  background-color: #0f1726;
   background-image: none;
   transition: background-color var(--marketing-theme-transition-duration, 900ms)
     var(--marketing-theme-transition-timing, ease-in-out);
