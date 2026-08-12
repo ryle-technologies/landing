@@ -1,6 +1,5 @@
 import dynamic from "next/dynamic"
 import { LandingHomeHeroPinContent } from "@/components/marketing/landing/LandingHomeHeroPinContent"
-import { LandingHomeHeroPinLayout } from "@/components/marketing/landing/LandingHomeHeroPinLayout"
 import {
   LandingHomeNavScrollScope,
   LandingHomeStickyNav,
@@ -22,13 +21,6 @@ const LandingHomeLowerSections = dynamic(
     ),
 )
 
-/** Hero subline (muted). */
-const homeHeroLeadClassName =
-  "max-w-none text-left font-serif text-[23px] font-normal italic leading-snug tracking-[-0.03em] text-muted transition-colors duration-500 ease-out sm:text-[32px]"
-
-/** Hero subline (word blur). */
-const HOME_LEAD = "Public rails. Private operations."
-
 const MARKETING_BUILDING_HEADLINE_LINE_1 =
   "Launch digital assets, move value, and manage private operations"
 const MARKETING_BUILDING_HEADLINE_LINE_2 =
@@ -39,13 +31,6 @@ const MARKETING_BUILDING_HEADLINE = `${MARKETING_BUILDING_HEADLINE_LINE_1} ${MAR
 /** Hero `h1` below `sm` — fixed two lines. */
 const MARKETING_BUILDING_HEADLINE_TWO_LINE = `${MARKETING_BUILDING_HEADLINE_LINE_1}\n${MARKETING_BUILDING_HEADLINE_LINE_2}`
 
-/**
- * Extra document height after the hero / sticky-nav handoff so users scroll
- * further before the next landing block appears.
- */
-const landingPostHeroScrollBufferClass =
-  "h-[36dvh] min-h-[14rem] w-full shrink-0"
-
 export function LandingHomeHero() {
   return (
     <div className={landingColumnPadClass}>
@@ -54,20 +39,17 @@ export function LandingHomeHero() {
         aria-label="Home"
         className="w-full min-w-0 scroll-mt-6"
       >
-        <LandingHomeHeroPinLayout className="w-full max-w-none pb-0">
+        <div className="w-full max-w-none pb-0">
           <LandingHomeHeroPinContent
             contactHref={LANDING_MARKETING_CONTACT_HREF}
             homeHeroCtaClassName={landingHeroPrimaryCtaClassName}
             heroTitle={MARKETING_BUILDING_HEADLINE}
             heroTitleTwoLine={MARKETING_BUILDING_HEADLINE_TWO_LINE}
-            homeHeroLeadClassName={homeHeroLeadClassName}
-            homeLead={HOME_LEAD}
           />
-        </LandingHomeHeroPinLayout>
+        </div>
         <LandingHomeNavScrollScope>
-          <div className="relative z-20 -mt-[100dvh]">
+          <div className="relative z-20">
             <LandingHomeStickyNav />
-            <div aria-hidden className={landingPostHeroScrollBufferClass} />
             <LandingHomeLowerSections />
           </div>
         </LandingHomeNavScrollScope>
