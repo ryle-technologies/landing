@@ -1,12 +1,8 @@
-import type { CSSProperties } from "react"
+import Image from "next/image"
 import Link from "next/link"
-import { AlphaWebHeroImageAscii } from "@/components/beta/AlphaWebHeroImageAscii"
 import { LandingHomeChainsMarquee } from "@/components/marketing/landing/LandingHomeChainsMarquee"
 import { LandingHomeHeroFadeUp } from "@/components/marketing/landing/LandingHomeHeroFadeUp"
-import {
-  LandingHomeHeroLeadTextEffect,
-  LandingHomeHeroTextEffect,
-} from "@/components/marketing/landing/LandingHomeHeroTextEffect"
+import { LandingHomeHeroTextEffect } from "@/components/marketing/landing/LandingHomeHeroTextEffect"
 import { RELEASE_SECTION_HERO } from "@/components/marketing/landing/data"
 import { landingHeroWordmarkTypeClassName } from "@/lib/landingNavWordmark"
 import {
@@ -14,37 +10,13 @@ import {
   LANDING_MARKETING_CTA_LABEL,
 } from "@/lib/siteNav"
 
-/** Fade-in delay for primary CTA + supported networks (after headline + lead start). */
-const HERO_CTA_FADE_DELAY_S = 1.45
+/** Fade-in delay for primary CTA + supported networks (after headline start). */
+const HERO_CTA_FADE_DELAY_S = 1.1
 /** Label before chain logos marquee (hero CTAs row). */
 const SUPPORTED_NETWORKS_LABEL = "Supported Networks: "
-/** Start hero subline after headline per-word blur (stagger + segment duration). */
-const HERO_LEAD_TEXT_EFFECT_DELAY_S = 0.95
 
-/** Desktop (lg+): uniform scale for the hero ASCII + image block (layout + visuals). */
-const LANDING_HOME_HERO_IMAGE_DESKTOP_ZOOM = 0.75
-
-/** Decorative chevron down (below hero CTAs). */
-function LandingHomeHeroScrollArrow() {
-  return (
-    <span
-      aria-hidden
-      className="mt-8 inline-flex shrink-0 text-muted [&_svg]:h-[1.125rem] [&_svg]:w-[1.125rem]"
-    >
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      >
-        <path d="m6 9 6 6 6-6" />
-      </svg>
-    </span>
-  )
-}
+/** Intrinsic ratio of `RELEASE_SECTION_HERO.alpha` (1024×628). */
+const HERO_IMAGE_ASPECT = "1024 / 628"
 
 type LandingHomeHeroPinContentProps = {
   contactHref: string
@@ -52,21 +24,16 @@ type LandingHomeHeroPinContentProps = {
   heroTitle: string
   /** Below `sm`: two-line headline (`\\n` between lines). */
   heroTitleTwoLine: string
-  homeHeroLeadClassName: string
-  /** Hero subline (word blur). */
-  homeLead: string
 }
 
 /**
- * Pinned-hero main column: hero image + ASCII, title effect, lead, primary CTA + chains marquee.
+ * Pinned-hero main column: brand, headline, CTA + chains, then hero image.
  */
 export function LandingHomeHeroPinContent({
   contactHref,
   homeHeroCtaClassName,
   heroTitle,
   heroTitleTwoLine,
-  homeHeroLeadClassName,
-  homeLead,
 }: LandingHomeHeroPinContentProps) {
   return (
     <>
@@ -81,7 +48,9 @@ export function LandingHomeHeroPinContent({
         >
           <span
             aria-hidden
-            className={[landingHeroWordmarkTypeClassName, "text-muted"].join(" ")}
+            className={[landingHeroWordmarkTypeClassName, "text-muted"].join(
+              " ",
+            )}
           >
             δ
           </span>
@@ -89,54 +58,49 @@ export function LandingHomeHeroPinContent({
             Ryle
           </span>
         </Link>
-        <div
-          className="w-full min-w-0 lg:origin-top-left lg:[zoom:var(--landing-home-hero-image-zoom)]"
-          style={
-            {
-              "--landing-home-hero-image-zoom": LANDING_HOME_HERO_IMAGE_DESKTOP_ZOOM,
-            } as CSSProperties
-          }
-        >
-          <AlphaWebHeroImageAscii
-            imageSrc={RELEASE_SECTION_HERO.alpha.src}
-            imageAlt={RELEASE_SECTION_HERO.alpha.alt}
-            className="w-full min-w-0 max-w-none"
+
+        <div className="mt-10 sm:mt-14">
+          <LandingHomeHeroTextEffect
+            title={heroTitle}
+            titleTwoLine={heroTitleTwoLine}
           />
         </div>
-      </div>
-      <LandingHomeHeroTextEffect
-        title={heroTitle}
-        titleTwoLine={heroTitleTwoLine}
-      />
-      <div className="mt-3 min-w-0">
-        <LandingHomeHeroLeadTextEffect
-          text={homeLead}
-          className={homeHeroLeadClassName}
-          delay={HERO_LEAD_TEXT_EFFECT_DELAY_S}
-        />
-      </div>
-      <div className="mt-8 flex w-full min-w-0 items-start justify-start text-left">
-        <LandingHomeHeroFadeUp
-          delay={HERO_CTA_FADE_DELAY_S}
-          className="flex shrink-0 flex-col items-start"
-        >
-          <div className="flex flex-wrap items-center gap-x-5 gap-y-2 sm:gap-x-6">
-            <a
-              href={contactHref}
-              className={homeHeroCtaClassName}
-              {...landingMarketingCtaAnchorProps(contactHref)}
-            >
-              {LANDING_MARKETING_CTA_LABEL}
-            </a>
-            <div className="flex min-w-0 max-w-full items-center gap-2 sm:gap-2.5">
-              <span className="shrink-0 whitespace-nowrap text-xs font-normal leading-none text-muted-light transition-colors duration-500 ease-out sm:text-[13px]">
-                {SUPPORTED_NETWORKS_LABEL}
-              </span>
-              <LandingHomeChainsMarquee />
+        <div className="mt-10 flex w-full min-w-0 items-start justify-start text-left sm:mt-12">
+          <LandingHomeHeroFadeUp
+            delay={HERO_CTA_FADE_DELAY_S}
+            className="flex shrink-0 flex-col items-start"
+          >
+            <div className="flex flex-wrap items-center gap-x-5 gap-y-2 sm:gap-x-6">
+              <a
+                href={contactHref}
+                className={homeHeroCtaClassName}
+                {...landingMarketingCtaAnchorProps(contactHref)}
+              >
+                {LANDING_MARKETING_CTA_LABEL}
+              </a>
+              <div className="flex min-w-0 max-w-full items-center gap-2 sm:gap-2.5">
+                <span className="shrink-0 whitespace-nowrap text-xs font-normal leading-none text-muted-light transition-colors duration-500 ease-out sm:text-[13px]">
+                  {SUPPORTED_NETWORKS_LABEL}
+                </span>
+                <LandingHomeChainsMarquee />
+              </div>
             </div>
-          </div>
-          <LandingHomeHeroScrollArrow />
-        </LandingHomeHeroFadeUp>
+          </LandingHomeHeroFadeUp>
+        </div>
+      </div>
+
+      <div
+        className="relative w-full min-w-0 overflow-hidden"
+        style={{ aspectRatio: HERO_IMAGE_ASPECT }}
+      >
+        <Image
+          src={RELEASE_SECTION_HERO.alpha.src}
+          alt={RELEASE_SECTION_HERO.alpha.alt}
+          fill
+          priority
+          className="object-cover object-center"
+          sizes="(min-width: 1080px) min(72rem, 100vw), 100vw"
+        />
       </div>
     </>
   )
