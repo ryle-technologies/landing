@@ -37,7 +37,7 @@ export function LandingHomeHeroPinContent({
 }: LandingHomeHeroPinContentProps) {
   return (
     <>
-      <div className="mb-8 w-full min-w-0 pt-5 sm:mb-10 sm:pt-6">
+      <div className="mb-14 w-full min-w-0 pt-5 sm:mb-16 sm:pt-6">
         <Link
           href="/"
           aria-label="Ryle — go to home"
