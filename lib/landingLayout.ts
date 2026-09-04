@@ -2,8 +2,15 @@
  * Shared layout for `/landing/home` and the desktop shell top nav so widths stay aligned.
  *
  * Native `max-w-5xl` (64rem → 1024px at 16px root).
+ * Marketing nav bars use {@link landingColumnHorizontalPadClass} only (full viewport width).
  */
 export const landingContentMaxWidthClass = "max-w-5xl"
+
+/**
+ * New-landing sections (everything except the hero).
+ * Native `max-w-3xl` (48rem → 768px at 16px root).
+ */
+export const landingNewContentMaxWidthClass = "max-w-3xl"
 
 /** Footer docs sitemap — narrower than main marketing column width. */
 export const landingFooterSitemapMaxWidthClass = "max-w-4xl"
@@ -13,6 +20,9 @@ export const landingColumnHorizontalPadClass =
 
 export const landingColumnPadClass =
   `mx-auto w-full min-w-0 ${landingContentMaxWidthClass} ${landingColumnHorizontalPadClass}`
+
+export const landingNewColumnPadClass =
+  `mx-auto w-full min-w-0 ${landingNewContentMaxWidthClass} ${landingColumnHorizontalPadClass}`
 
 /**
  * Break out of {@link landingColumnPadClass} to span the full viewport width

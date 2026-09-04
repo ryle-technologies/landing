@@ -76,7 +76,7 @@ const subscribeMarketingTheme = (onStoreChange: () => void) => {
 
 type MarketingThemeProviderProps = {
   children: ReactNode
-  /** SSR / first paint theme (landing uses `false` for light hero). */
+  /** SSR / first paint theme from the marketing-theme cookie. */
   initialIsDark?: boolean
 }
 
@@ -137,7 +137,15 @@ export function MarketingThemeProvider({
   }, [isDark, setTheme])
 
   useLayoutEffect(() => {
-    marketingThemeSnapshot = initialIsDarkRef.current
+    const stored = readMarketingThemeFromLocalStorage()
+    const next = stored ?? initialIsDarkRef.current
+
+    if (marketingThemeSnapshot === next) {
+      return
+    }
+
+    marketingThemeSnapshot = next
+    window.dispatchEvent(new Event(MARKETING_THEME_EVENT))
   }, [])
 
   const scrollContainerRef = useRef<HTMLDivElement | null>(null)

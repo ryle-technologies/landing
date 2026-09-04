@@ -23,6 +23,8 @@ type LandingHomeBuildingNewBlockProps = {
   sublineClassName: string
   contactCtaClassName: string
   headingId: string
+  /** Contact CTA label (defaults to {@link LANDING_MARKETING_CTA_LABEL}). */
+  contactCtaLabel?: string
 }
 
 /**
@@ -36,6 +38,7 @@ export function LandingHomeBuildingNewBlock({
   sublineClassName,
   contactCtaClassName,
   headingId,
+  contactCtaLabel = LANDING_MARKETING_CTA_LABEL,
 }: LandingHomeBuildingNewBlockProps) {
   const hasHeading = Boolean(title.trim())
 
@@ -64,7 +67,7 @@ export function LandingHomeBuildingNewBlock({
           className={contactCtaClassName}
           {...landingMarketingCtaAnchorProps()}
         >
-          {LANDING_MARKETING_CTA_LABEL}
+          {contactCtaLabel}
         </a>
         <a
           href={DOCS_BASE_HREF}

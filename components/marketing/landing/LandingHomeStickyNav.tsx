@@ -17,10 +17,7 @@ import {
 } from "motion/react"
 import { LandingTopNav } from "@/components/marketing/landing/LandingTopNav"
 import { useMarketingScrollContainer } from "@/components/marketing/MarketingThemeProvider"
-import {
-  landingColumnHorizontalPadClass,
-  landingContentMaxWidthClass,
-} from "@/lib/landingLayout"
+import { landingColumnHorizontalPadClass } from "@/lib/landingLayout"
 
 /** Ref to the closing-section scroll marker (see {@link LandingHomeNavFadeOutMarker}). */
 const LandingNavFadeOutContext =
@@ -102,11 +99,10 @@ export function LandingHomeStickyNav() {
         style={{
           opacity,
           scale: reduceMotion ? 1 : scale,
-          x: "-50%",
           y: reduceMotion ? 0 : y,
         }}
         className={[
-          `fixed top-0 left-1/2 z-50 w-full ${landingContentMaxWidthClass}`,
+          "fixed inset-x-0 top-0 z-50 w-full max-w-none",
           `${landingColumnHorizontalPadClass} py-4 sm:py-5`,
           "origin-top",
           isInteractive ? "pointer-events-auto" : "pointer-events-none",

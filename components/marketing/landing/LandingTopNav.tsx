@@ -12,6 +12,7 @@ import {
   LANDING_MARKETING_CTA_LABEL,
 } from "@/lib/siteNav"
 import { LandingNavWordmark } from "@/components/marketing/landing/LandingNavWordmark"
+import { LandingThemeToggle } from "@/components/marketing/landing/LandingThemeToggle"
 import { landingHeroPrimaryCtaClassName } from "@/lib/landingHeroTypography"
 
 function isAbsoluteHttpUrl(href: string): boolean {
@@ -73,36 +74,39 @@ export function LandingTopNav({
           <span className="sm:hidden">{LANDING_DOCS_CTA_LABEL_MOBILE}</span>
           <span className="hidden sm:inline">{LANDING_DOCS_CTA_LABEL}</span>
         </a>
-        {ctaUsesPrimaryPill ? (
-          <a
-            href={ctaHref}
-            className={landingHeroPrimaryCtaClassName}
-            {...ctaAnchorProps}
-          >
-            {ctaLabel}
-          </a>
-        ) : (
-          <Link
-            href={ctaHref}
-            aria-current={
-              ctaIsExternal
-                ? undefined
-                : pathname === ctaHref
-                  ? "page"
-                  : alphaActive
-                    ? "location"
-                    : undefined
-            }
-            className={[
-              topNavTextLinkClassName,
-              !ctaIsExternal && alphaActive
-                ? "text-foreground underline"
-                : "no-underline",
-            ].join(" ")}
-          >
-            {ctaLabel}
-          </Link>
-        )}
+        <div className="flex shrink-0 items-center gap-x-3">
+          {ctaUsesPrimaryPill ? (
+            <a
+              href={ctaHref}
+              className={landingHeroPrimaryCtaClassName}
+              {...ctaAnchorProps}
+            >
+              {ctaLabel}
+            </a>
+          ) : (
+            <Link
+              href={ctaHref}
+              aria-current={
+                ctaIsExternal
+                  ? undefined
+                  : pathname === ctaHref
+                    ? "page"
+                    : alphaActive
+                      ? "location"
+                      : undefined
+              }
+              className={[
+                topNavTextLinkClassName,
+                !ctaIsExternal && alphaActive
+                  ? "text-foreground underline"
+                  : "no-underline",
+              ].join(" ")}
+            >
+              {ctaLabel}
+            </Link>
+          )}
+          <LandingThemeToggle />
+        </div>
       </div>
     </nav>
   )

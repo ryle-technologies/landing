@@ -9,10 +9,15 @@ const maskBgClass = "bg-[var(--marketing-surface)]";
 
 type LandingFooterMarqueeProps = {
   className?: string;
+  /** Marquee words (defaults to Instant / Private / Verifiable). */
+  words?: readonly string[];
 };
 
 /** Marketing site footer: infinite horizontal marquee (Instant / Private / Verifiable). */
-export function LandingFooterMarquee({ className = "" }: LandingFooterMarqueeProps) {
+export function LandingFooterMarquee({
+  className = "",
+  words = FOOTER_MARQUEE_WORDS,
+}: LandingFooterMarqueeProps) {
   return (
     <section
       aria-hidden="true"
@@ -49,7 +54,7 @@ export function LandingFooterMarquee({ className = "" }: LandingFooterMarqueePro
               className="flex shrink-0 items-baseline gap-[0.34em] pr-[0.34em]"
             >
               {FOOTER_MARQUEE_REPEATS.flatMap((repeatIndex) =>
-                FOOTER_MARQUEE_WORDS.map((word) => (
+                words.map((word) => (
                   <span key={`${trackIndex}-${repeatIndex}-${word}`}>{word}</span>
                 )),
               )}

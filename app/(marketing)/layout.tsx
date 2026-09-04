@@ -1,10 +1,15 @@
 import type { Metadata } from "next";
 import type { Viewport } from "next";
+import { cookies } from "next/headers";
 import {
   buildRootMetadata,
   DEFAULT_SITE_DESCRIPTION,
 } from "@/lib/metadata";
 import { MarketingThemeProvider } from "@/components/marketing/MarketingThemeProvider";
+import {
+  isMarketingThemeDark,
+  MARKETING_THEME_COOKIE,
+} from "@/lib/marketingTheme";
 
 /** Marketing routes inherit root metadata; reaffirm canonical for `/`. */
 export const metadata: Metadata = {
@@ -32,18 +37,15 @@ export const viewport: Viewport = {
  * `/landing/home` only repaints the marketing surround and never touches the
  * wallet/app theme on `<html>`.
  */
-export default function MarketingLayout({
+export default async function MarketingLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  /*
-   * Landing scroll crossfade is light (hero) → dark (suite onward). Persisted
-   * theme prefs apply only via the nav toggle, not SSR/cookie, so hydration
-   * matches the hero and scroll can drive the handoff.
-   */
+  const themeCookie = (await cookies()).get(MARKETING_THEME_COOKIE)?.value;
+
   return (
-    <MarketingThemeProvider initialIsDark={false}>
+    <MarketingThemeProvider initialIsDark={isMarketingThemeDark(themeCookie)}>
       {children}
     </MarketingThemeProvider>
   );

@@ -5,7 +5,6 @@ import { LandingHomeBuildingNewBlock } from "@/components/marketing/landing/Land
 import {
   LandingHomeNavFadeOutMarker,
 } from "@/components/marketing/landing/LandingHomeStickyNav"
-import { LandingHomeThemeScrollBoundary } from "@/components/marketing/landing/LandingHomeThemeScrollBoundary"
 import { LandingFooterMarquee } from "@/components/marketing/landing/LandingFooterMarquee"
 import { LandingSuiteProductsThreeColGrid } from "@/components/marketing/landing/LandingSuiteProductsThreeColGrid"
 import { LandingSuiteProductsReveal } from "@/components/marketing/landing/LandingSuiteProductsReveal"
@@ -205,11 +204,6 @@ export function LandingHomeLowerSections() {
           />
         </div>
       </section>
-      <div
-        aria-hidden
-        className="mb-48 w-full shrink-0 sm:mb-64 min-[1080px]:mb-96"
-      />
-      <LandingHomeThemeScrollBoundary>
         <section
           aria-labelledby="landing-home-suite-heading"
           className="relative z-10 pt-10 pb-12 sm:pt-12 min-[1080px]:pt-14"
@@ -403,7 +397,6 @@ export function LandingHomeLowerSections() {
           />
         </section>
         <LandingFooterMarquee className="-mx-6 -mt-8 pl-[max(1.5rem,env(safe-area-inset-left))] pr-[max(1.5rem,env(safe-area-inset-right))] sm:-mt-10 min-[1080px]:-mt-12" />
-      </LandingHomeThemeScrollBoundary>
     </>
   )
 }
