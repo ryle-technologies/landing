@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useId, useState } from "react"
+import { useEffect, useState } from "react"
 import {
   MotionValue,
   motion,
@@ -19,55 +19,60 @@ const TRANSITION = {
 
 function Digit({ value, place }: { value: number; place: number }) {
   const valueRoundedToPlace = ((Math.floor(value / place) % 10) + 10) % 10
-  // One MotionValue per mount so `useSpring` keeps a stable source and rolls.
+  // Stable source so `useSpring` keeps one spring and rolls between digits.
+  // Drive the source — setting the spring itself jumps to the target, then
+  // the tape has to catch up (the flash of the final number before the roll).
   const [source] = useState(() => motionValue(valueRoundedToPlace))
   const animatedValue = useSpring(source, TRANSITION)
+  const [spacerRef, spacer] = useMeasure({ offsetSize: true })
 
   useEffect(() => {
-    animatedValue.set(valueRoundedToPlace)
-  }, [animatedValue, valueRoundedToPlace])
+    source.set(valueRoundedToPlace)
+  }, [source, valueRoundedToPlace])
 
   return (
     <div className="relative inline-block w-[0.82ch] shrink-0 overflow-x-visible overflow-y-clip text-center leading-none tabular-nums">
-      <div className="invisible">0</div>
-      {Array.from({ length: 10 }, (_, i) => (
-        <OdometerStack key={i} mv={animatedValue} number={i} />
-      ))}
+      <div ref={spacerRef} className="invisible">
+        0
+      </div>
+      {spacer.height
+        ? Array.from({ length: 10 }, (_, i) => (
+            <OdometerGlyph
+              key={i}
+              mv={animatedValue}
+              number={i}
+              height={spacer.height}
+            />
+          ))
+        : null}
     </div>
   )
 }
 
-function OdometerStack({ mv, number }: { mv: MotionValue<number>; number: number }) {
-  const uniqueId = useId()
-  // offsetSize: ignore ancestor CSS transforms (the phone frame is scaled on desktop).
-  const [ref, bounds] = useMeasure({ offsetSize: true })
-
+function OdometerGlyph({
+  mv,
+  number,
+  height,
+}: {
+  mv: MotionValue<number>
+  number: number
+  height: number
+}) {
   const y = useTransform(mv, (latest) => {
-    if (!bounds.height) return 0
     const placeValue = latest % 10
     const offset = (10 + number - placeValue) % 10
-    let memo = offset * bounds.height
+    let memo = offset * height
     if (offset > 5) {
-      memo -= 10 * bounds.height
+      memo -= 10 * height
     }
     return memo
   })
 
-  if (!bounds.height) {
-    return (
-      <span ref={ref} className="invisible absolute">
-        {number}
-      </span>
-    )
-  }
-
   return (
     <motion.span
       style={{ y }}
-      layoutId={`${uniqueId}-${number}`}
+      initial={false}
       className="absolute inset-0 flex items-center justify-center"
-      transition={TRANSITION}
-      ref={ref}
     >
       {number}
     </motion.span>

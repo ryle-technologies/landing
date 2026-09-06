@@ -1,6 +1,7 @@
 import type { ComponentType, SVGProps } from "react"
 import {
   BadgeCheck,
+  Banknote,
   Boxes,
   CreditCard,
   Globe,
@@ -16,13 +17,14 @@ import {
  * Tailwind + lucide so the landing keeps its dependency surface.
  */
 
-type ProductId =
-  | "cards"
-  | "remittances"
-  | "wallet"
+export type ProductId =
   | "assets"
-  | "custody"
+  | "wallet"
+  | "cards"
   | "proofs"
+  | "custody"
+  | "remittances"
+  | "payments"
 
 type Tone = "live" | "attention" | "setup"
 
@@ -36,32 +38,19 @@ type ProductCard = {
   metrics: { label: string; value: string }[]
 }
 
-/** Cards, remittances and wallet lead; issuance products follow (app order). */
+/** Order matches the console showcase pills. */
 export const CONSOLE_PRODUCT_CARDS: ProductCard[] = [
   {
-    id: "cards",
-    title: "Cards",
-    description: "Issue hybrid cards funded by fiat and stablecoins.",
-    cta: "Open cards",
+    id: "assets",
+    title: "Assets",
+    description: "Issue and operate confidential tokenized assets.",
+    cta: "Open assets",
     tone: "live",
-    statusLabel: "Live",
+    statusLabel: "3 live",
     metrics: [
-      { label: "Active cards", value: "1,272" },
-      { label: "In custody", value: "$3.01M" },
-      { label: "30-day spend", value: "$4.82M" },
-    ],
-  },
-  {
-    id: "remittances",
-    title: "Remittances",
-    description: "Move money across corridors on stablecoin rails.",
-    cta: "Open remittances",
-    tone: "live",
-    statusLabel: "Live",
-    metrics: [
-      { label: "30-day volume", value: "€4.25M" },
-      { label: "Transfers", value: "10,262" },
-      { label: "Median delivery", value: "48s" },
+      { label: "Live", value: "3" },
+      { label: "Drafts", value: "1" },
+      { label: "Allowlisted", value: "1.2K" },
     ],
   },
   {
@@ -78,16 +67,29 @@ export const CONSOLE_PRODUCT_CARDS: ProductCard[] = [
     ],
   },
   {
-    id: "assets",
-    title: "Assets",
-    description: "Issue and operate confidential tokenized assets.",
-    cta: "Open assets",
+    id: "cards",
+    title: "Cards",
+    description: "Issue hybrid cards funded by fiat and stablecoins.",
+    cta: "Open cards",
     tone: "live",
-    statusLabel: "3 live",
+    statusLabel: "Live",
     metrics: [
-      { label: "Live", value: "3" },
-      { label: "Drafts", value: "1" },
-      { label: "Allowlisted", value: "1.2K" },
+      { label: "Active cards", value: "1,272" },
+      { label: "In custody", value: "$3.01M" },
+      { label: "30-day spend", value: "$4.82M" },
+    ],
+  },
+  {
+    id: "proofs",
+    title: "Proofs",
+    description: "Record signed, verifiable proof of what happened.",
+    cta: "Open proofs",
+    tone: "attention",
+    statusLabel: "2 pending",
+    metrics: [
+      { label: "Categories", value: "4" },
+      { label: "Proofs", value: "1.4K" },
+      { label: "Pending", value: "2" },
     ],
   },
   {
@@ -104,46 +106,62 @@ export const CONSOLE_PRODUCT_CARDS: ProductCard[] = [
     ],
   },
   {
-    id: "proofs",
-    title: "Proofs",
-    description: "Record signed, verifiable proof of what happened.",
-    cta: "Open proofs",
-    tone: "attention",
-    statusLabel: "2 pending",
+    id: "remittances",
+    title: "Remittances",
+    description: "Move money across corridors on stablecoin rails.",
+    cta: "Open remittances",
+    tone: "live",
+    statusLabel: "Live",
     metrics: [
-      { label: "Categories", value: "4" },
-      { label: "Proofs", value: "1.4K" },
-      { label: "Pending", value: "2" },
+      { label: "30-day volume", value: "€4.25M" },
+      { label: "Transfers", value: "10,262" },
+      { label: "Median delivery", value: "48s" },
+    ],
+  },
+  {
+    id: "payments",
+    title: "Payments",
+    description: "Move value instantly — transfers, payouts, and settlement.",
+    cta: "Open payments",
+    tone: "live",
+    statusLabel: "Live",
+    metrics: [
+      { label: "30-day volume", value: "$8.40M" },
+      { label: "Payments", value: "24,180" },
+      { label: "Median settle", value: "T+0" },
     ],
   },
 ]
 
 const PRODUCT_ICON: Record<ProductId, ComponentType<SVGProps<SVGSVGElement>>> = {
-  cards: CreditCard,
-  remittances: Globe,
-  wallet: KeyRound,
   assets: Boxes,
-  custody: ShieldCheck,
+  wallet: KeyRound,
+  cards: CreditCard,
   proofs: BadgeCheck,
+  custody: ShieldCheck,
+  remittances: Globe,
+  payments: Banknote,
 }
 
 /** Signature colour per product, so a card is recognisable before it is read. */
 const PRODUCT_WASH: Record<ProductId, string> = {
-  cards: "from-amber-500/8",
-  remittances: "from-cyan-500/10",
-  wallet: "from-emerald-500/10",
   assets: "from-blue-500/10",
-  custody: "from-emerald-500/10",
+  wallet: "from-emerald-500/10",
+  cards: "from-amber-500/8",
   proofs: "from-violet-500/10",
+  custody: "from-emerald-500/10",
+  remittances: "from-cyan-500/10",
+  payments: "from-rose-500/10",
 }
 
 const PRODUCT_MEDALLION: Record<ProductId, string> = {
-  cards: "bg-amber-500/15 text-amber-700",
-  remittances: "bg-cyan-500/12 text-cyan-700",
-  wallet: "bg-emerald-500/12 text-emerald-700",
   assets: "bg-blue-500/12 text-blue-700",
-  custody: "bg-emerald-500/12 text-emerald-700",
+  wallet: "bg-emerald-500/12 text-emerald-700",
+  cards: "bg-amber-500/15 text-amber-700",
   proofs: "bg-violet-500/12 text-violet-700",
+  custody: "bg-emerald-500/12 text-emerald-700",
+  remittances: "bg-cyan-500/12 text-cyan-700",
+  payments: "bg-rose-500/12 text-rose-700",
 }
 
 /** HeroUI `Chip variant="soft"` colours: success / warning / default. */

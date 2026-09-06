@@ -6,6 +6,18 @@ export const landingHeroHeadlineClassName =
 export const landingHeroH1ClassName =
   "font-serif font-normal italic leading-snug tracking-normal text-[28px] sm:text-[36px]"
 
+/** Giant display type shared by the new-landing h1 and the 2,000,000 figure. */
+export const landingNewHeroDisplayClassName =
+  "font-sans text-[clamp(72px,14vw,120px)] leading-none tracking-tighter text-foreground"
+
+/** Section-scale display type — same face and tracking as the h1, stepped down. */
+export const landingNewSectionDisplayClassName =
+  "font-sans text-[clamp(40px,6vw,56px)] leading-none tracking-tighter text-foreground"
+
+/** Large section display — same face as the h1, ~90px. */
+export const landingNewLargeDisplayClassName =
+  "font-sans text-[clamp(44px,9vw,90px)] leading-none tracking-tighter text-foreground"
+
 /** Serif styles for section titles (e.g. building-new) matching hero scale from `sm`. */
 export const landingHeroTitleClassName =
   "font-serif font-normal italic leading-snug tracking-[-0.03em] text-[22px] sm:text-[36px]"

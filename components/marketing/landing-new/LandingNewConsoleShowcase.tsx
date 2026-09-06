@@ -1,6 +1,13 @@
 "use client"
 
-import { useCallback, useLayoutEffect, useRef, useState } from "react"
+import {
+  useCallback,
+  useLayoutEffect,
+  useRef,
+  useState,
+  type MutableRefObject,
+  type RefObject,
+} from "react"
 import Image from "next/image"
 import { Copy } from "lucide-react"
 import { useReducedMotion } from "motion/react"
@@ -8,27 +15,37 @@ import { useReducedMotion } from "motion/react"
 import {
   CONSOLE_PRODUCT_CARDS,
   LandingNewConsoleProductCard,
+  type ProductId,
 } from "@/components/marketing/landing-new/LandingNewConsoleProductCards"
 import {
   LANDING_CONSOLE_HOLD_MS,
   LANDING_SNAP_MS,
 } from "@/lib/landingSnapMotion"
-import { useLandingSnapLoop } from "@/lib/useLandingSnapLoop"
-
-const TABS = ["Overview", "Issuance", "Payments", "Cards"] as const
-
-type ConsoleTab = (typeof TABS)[number]
+import {
+  useLandingSnapLoop,
+  type LandingSnapLoopControl,
+} from "@/lib/useLandingSnapLoop"
 
 const LOOPED_PRODUCT_CARDS = [
   ...CONSOLE_PRODUCT_CARDS,
   ...CONSOLE_PRODUCT_CARDS,
 ]
 
+type ProductCardsSnapTrackProps = {
+  onActiveIdChange: (id: ProductId) => void
+  controlRef: MutableRefObject<LandingSnapLoopControl | null>
+  viewportRef: RefObject<HTMLDivElement | null>
+}
+
 /**
  * One card at a time: hold, then the same ease-in-out snap as the
  * use-case carousel. Two copies so the wrap is seamless.
  */
-function ProductCardsSnapTrack() {
+function ProductCardsSnapTrack({
+  onActiveIdChange,
+  controlRef,
+  viewportRef,
+}: ProductCardsSnapTrackProps) {
   const reduceMotion = useReducedMotion() ?? false
   const trackRef = useRef<HTMLDivElement>(null)
   const slotPxRef = useRef(0)
@@ -63,6 +80,14 @@ function ProductCardsSnapTrack() {
     [],
   )
 
+  const handleIndexChange = useCallback(
+    (index: number) => {
+      const card = CONSOLE_PRODUCT_CARDS[index]
+      if (card) onActiveIdChange(card.id)
+    },
+    [onActiveIdChange],
+  )
+
   useLandingSnapLoop({
     enabled: !reduceMotion,
     getStepPx,
@@ -70,10 +95,15 @@ function ProductCardsSnapTrack() {
     apply,
     holdMs: LANDING_CONSOLE_HOLD_MS,
     snapMs: LANDING_SNAP_MS,
+    onIndexChange: handleIndexChange,
+    controlRef,
   })
 
   return (
-    <div className="relative mt-2.5 -mx-4 overflow-hidden motion-reduce:overflow-x-auto motion-reduce:[scrollbar-width:none]">
+    <div
+      ref={viewportRef}
+      className="relative mt-2.5 -mx-4 overflow-hidden motion-reduce:overflow-x-auto motion-reduce:[scrollbar-width:none]"
+    >
       <div
         ref={trackRef}
         className="flex w-max gap-3 pl-3 will-change-transform"
@@ -93,10 +123,37 @@ function ProductCardsSnapTrack() {
 }
 
 /**
- * Right column: landscape well, inset chrome window, tabs.
+ * Right column: landscape well, inset chrome window, pills tied to the
+ * product cards in the strip.
  */
 export function LandingNewConsoleShowcase() {
-  const [tab, setTab] = useState<ConsoleTab>("Overview")
+  const reduceMotion = useReducedMotion() ?? false
+  const [activeId, setActiveId] = useState<ProductId>(CONSOLE_PRODUCT_CARDS[0].id)
+  const snapControlRef = useRef<LandingSnapLoopControl | null>(null)
+  const viewportRef = useRef<HTMLDivElement>(null)
+
+  const seekToProduct = useCallback(
+    (id: ProductId) => {
+      const index = CONSOLE_PRODUCT_CARDS.findIndex((card) => card.id === id)
+      if (index < 0) return
+      setActiveId(id)
+
+      if (reduceMotion) {
+        const viewport = viewportRef.current
+        const track = viewport?.firstElementChild as HTMLElement | null
+        const first = track?.firstElementChild as HTMLElement | null
+        if (!viewport || !track || !first) return
+        const styles = getComputedStyle(track)
+        const gap = Number.parseFloat(styles.columnGap || styles.gap) || 0
+        const slot = first.getBoundingClientRect().width + gap
+        viewport.scrollTo({ left: index * slot, behavior: "smooth" })
+        return
+      }
+
+      snapControlRef.current?.seekToIndex(index)
+    },
+    [reduceMotion],
+  )
 
   return (
     <div className="min-w-0">
@@ -128,33 +185,36 @@ export function LandingNewConsoleShowcase() {
               <p className="text-[11px] font-medium text-neutral-500">
                 Products available in your account
               </p>
-              <ProductCardsSnapTrack />
+              <ProductCardsSnapTrack
+                onActiveIdChange={setActiveId}
+                controlRef={snapControlRef}
+                viewportRef={viewportRef}
+              />
             </div>
-            <span className="sr-only">{tab}</span>
           </div>
         </div>
       </div>
       <div
         role="tablist"
-        aria-label="Console views"
+        aria-label="Console products"
         className="mt-3.5 flex flex-wrap items-center gap-x-1 gap-y-1"
       >
-        {TABS.map((item) => {
-          const selected = item === tab
+        {CONSOLE_PRODUCT_CARDS.map((card) => {
+          const selected = card.id === activeId
           return (
             <button
-              key={item}
+              key={card.id}
               type="button"
               role="tab"
               aria-selected={selected}
-              onClick={() => setTab(item)}
+              onClick={() => seekToProduct(card.id)}
               className={
                 selected
                   ? "rounded-full bg-black/[0.06] px-3 py-1 text-[13px] text-neutral-700 dark:bg-white/10 dark:text-white/80"
                   : "rounded-full px-3 py-1 text-[13px] text-neutral-400 hover:text-neutral-600 dark:text-white/40 dark:hover:text-white/70"
               }
             >
-              {item}
+              {card.title}
             </button>
           )
         })}

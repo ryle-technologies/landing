@@ -5,6 +5,7 @@ import { LandingHomeChainsMarquee } from "@/components/marketing/landing/Landing
 import { LandingThemeToggle } from "@/components/marketing/landing/LandingThemeToggle"
 import { LandingHomeHeroFadeUp } from "@/components/marketing/landing/LandingHomeHeroFadeUp"
 import { LandingHomeHeroTextEffect } from "@/components/marketing/landing/LandingHomeHeroTextEffect"
+import { LandingNewHeroGridPlate } from "@/components/marketing/landing-new/LandingNewHeroGridPlate"
 import { RELEASE_SECTION_HERO } from "@/components/marketing/landing/data"
 import {
   landingColumnHorizontalPadClass,
@@ -38,8 +39,10 @@ type LandingHomeHeroPinContentProps = {
   ctaLabel?: string
   /** Cycles the last headline verb (x.ai-style letter morph). */
   rotatingWords?: readonly string[]
-  /** Replaces the default hero image (e.g. the interactive wallet demo). */
+  /** Replaces the default hero image. Pass `null` to hide the visual. */
   heroVisual?: ReactNode
+  /** Overrides the default serif h1 scale. */
+  heroTitleClassName?: string
 }
 
 /**
@@ -55,10 +58,17 @@ export function LandingHomeHeroPinContent({
   ctaLabel = LANDING_MARKETING_CTA_LABEL,
   rotatingWords,
   heroVisual,
+  heroTitleClassName,
 }: LandingHomeHeroPinContentProps) {
   return (
     <>
-      <div className="mb-14 w-full min-w-0 sm:mb-16">
+      <div
+        className={
+          heroVisual === null
+            ? "w-full min-w-0"
+            : "mb-14 w-full min-w-0 sm:mb-16"
+        }
+      >
         <div
           className={[
             landingViewportBleedClassName,
@@ -100,43 +110,46 @@ export function LandingHomeHeroPinContent({
             {eyebrow}
           </p>
         ) : null}
-        <div className="mt-10 sm:mt-14">
+        <LandingNewHeroGridPlate className="mt-10 sm:mt-14">
           <LandingHomeHeroTextEffect
             title={heroTitle}
             titleTwoLine={heroTitleTwoLine}
             rotatingWords={rotatingWords}
+            className={heroTitleClassName}
           />
-        </div>
-        {subline ? (
-          <p className="mt-4 max-w-[56rem] text-left font-serif text-[21px] font-normal italic leading-snug tracking-[-0.02em] text-muted transition-colors duration-500 ease-out sm:mt-5 sm:text-[24px]">
-            {subline}
-          </p>
-        ) : null}
-        <div className="mt-10 flex w-full min-w-0 items-start justify-start text-left sm:mt-12">
-          <LandingHomeHeroFadeUp
-            delay={HERO_CTA_FADE_DELAY_S}
-            className="flex shrink-0 flex-col items-start"
-          >
-            <div className="flex flex-wrap items-center gap-x-5 gap-y-2 sm:gap-x-6">
-              <a
-                href={contactHref}
-                className={homeHeroCtaClassName}
-                {...landingMarketingCtaAnchorProps(contactHref)}
-              >
-                {ctaLabel}
-              </a>
-              <div className="flex min-w-0 max-w-full items-center gap-2 sm:gap-2.5">
-                <span className="shrink-0 whitespace-nowrap text-xs font-normal leading-none text-muted-light transition-colors duration-500 ease-out sm:text-[13px]">
-                  {SUPPORTED_NETWORKS_LABEL}
-                </span>
-                <LandingHomeChainsMarquee />
+          {subline ? (
+            <p className="mt-4 max-w-[56rem] text-left font-serif text-[21px] font-normal italic leading-snug tracking-[-0.02em] text-muted transition-colors duration-500 ease-out sm:mt-5 sm:text-[24px]">
+              {subline}
+            </p>
+          ) : null}
+          <div className="mt-10 flex w-full min-w-0 items-start justify-start text-left sm:mt-12">
+            <LandingHomeHeroFadeUp
+              delay={HERO_CTA_FADE_DELAY_S}
+              className="flex shrink-0 flex-col items-start"
+            >
+              <div className="flex flex-wrap items-center gap-x-5 gap-y-2 sm:gap-x-6">
+                <a
+                  href={contactHref}
+                  className={homeHeroCtaClassName}
+                  {...landingMarketingCtaAnchorProps(contactHref)}
+                >
+                  {ctaLabel}
+                </a>
+                <div className="flex min-w-0 max-w-full items-center gap-2 sm:gap-2.5">
+                  <span className="shrink-0 whitespace-nowrap text-xs font-normal leading-none text-muted-light transition-colors duration-500 ease-out sm:text-[13px]">
+                    {SUPPORTED_NETWORKS_LABEL}
+                  </span>
+                  <LandingHomeChainsMarquee />
+                </div>
               </div>
-            </div>
-          </LandingHomeHeroFadeUp>
-        </div>
+            </LandingHomeHeroFadeUp>
+          </div>
+        </LandingNewHeroGridPlate>
       </div>
 
-      {heroVisual ?? (
+      {heroVisual !== undefined ? (
+        heroVisual
+      ) : (
         <div
           className="relative w-full min-w-0 overflow-hidden"
           style={{ aspectRatio: HERO_IMAGE_ASPECT }}

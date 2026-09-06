@@ -57,7 +57,7 @@ const SCENE_DURATION_MS: Record<WalletDemoAutoplayAction, number> = {
   send: 18_000,
   receive: 23_000,
   swap: 21_000,
-  request: 16_000,
+  request: 18_000,
   pay: 12_000,
 }
 
@@ -75,9 +75,10 @@ const sleep = (ms: number) => new Promise<void>((r) => setTimeout(r, ms))
  * 3. Swap — cursor stays on the phone after Receive, taps Swap, types 300,
  *    waits for the quote, dwells, swipes to exchange and waits for the legs.
  * 4. Request — taps Request, types €33, Continues, names it “Dinner last
- *    night”, taps WhatsApp; the sheet closes and the scene ends.
- * 5. Pay — a request link “opens” (Sofía / Friday dinner / €74), cursor taps
- *    Send transfer, then Paying → Paid and a new activity row.
+ *    night”, taps WhatsApp; the sheet closes, a “Payment request created”
+ *    toast lands, then the scene ends.
+ * 5. Pay — that same request link opens (€33 / Dinner last night), cursor
+ *    taps Send transfer, then Paying → Paid and a new activity row.
  *
  * The chip ring is a live linear 0→1 clock for the scene (starts when the
  * play control appears), finishing on the last beat. The next scene starts
@@ -553,6 +554,7 @@ export function WalletDemoAutoplay({ yieldToUser = true }: { yieldToUser?: boole
       await moveAndClick('[data-demo-target="request-whatsapp"]', 200, id)
       await waitUntilGone('[data-demo-target="close-request"]', id)
       await wait(SHEET_CLOSE_MS, id)
+      await wait(DWELL_MS, id)
       await finishLinearProgress(id)
     }
 
@@ -563,7 +565,7 @@ export function WalletDemoAutoplay({ yieldToUser = true }: { yieldToUser?: boole
       }
       await begin("pay", id, forceReset)
 
-      // Request link “opens”: the pay sheet lands with Sofía’s €74 dinner request.
+      // Same request link Request just shared: Dinner last night / €33.
       store.getState().openPayRequest()
       await wait(SHEET_OPEN_MS, id)
 

@@ -1,429 +1,591 @@
 "use client"
 
-import { useCallback, useEffect, useRef, useState, type ReactNode } from "react"
-import useEmblaCarousel, { type UseEmblaCarouselType } from "embla-carousel-react"
-import { useReducedMotion } from "motion/react"
-import { ChevronLeft, ChevronRight } from "lucide-react"
 import {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+  type CSSProperties,
+  type ReactNode,
+} from "react"
+import { useReducedMotion } from "motion/react"
+import { useMarketingTheme } from "@/components/marketing/MarketingThemeProvider"
+import {
+  LandingNewUseCaseShape,
+  USE_CASE_SHAPE_REVERT_MS,
+} from "@/components/marketing/landing-new/LandingNewUseCaseShape"
+import type { LandingNewUseCaseShapeKind } from "@/lib/landingNewUseCaseSolids"
+import {
+  HERO_GRID_CELL_PX,
+  HERO_GRID_LINE_DARK,
+  HERO_GRID_LINE_LIGHT,
+} from "@/lib/landingNewHeroGrid"
+import {
+  LANDING_SNAP_EASE_BEZIER,
   LANDING_SNAP_HOLD_MS,
   LANDING_SNAP_MS,
-  landingSnapEaseInOutCubic,
 } from "@/lib/landingSnapMotion"
 
-type EmblaCarouselType = NonNullable<UseEmblaCarouselType[1]>
-type EmblaEventType = Parameters<EmblaCarouselType["on"]>[0]
-type EmblaEngineType = ReturnType<EmblaCarouselType["internalEngine"]>
-type EmblaScrollBodyType = EmblaEngineType["scrollBody"]
-
 export type LandingNewProductsCarouselItem = {
-  /** Card title (e.g. "Issuance"). Always visible, even on side cards. */
+  /** Card title. Sets the expanded card's width. */
   label: string
   /** Optional mono badge under the title (e.g. "In design with partners"). */
   badge?: string
-  /** Description, revealed only on the centered card. */
+  /** Description, revealed once the tile has expanded. */
   body: string
-  /** Optional decorative visual above the title (chains marquee, console…). */
+  /** 2D idle plate / 3D solid for this use case. */
+  shape: LandingNewUseCaseShapeKind
+  /** Optional decorative visual rendered above the description. */
   visual?: ReactNode
-  /** Optional CTA rendered under the description on the centered card. */
+  /** Optional CTA rendered under the description on the expanded card. */
   cta?: { label: string; href: string; external?: boolean }
 }
 
 type LandingNewProductsCarouselProps = {
   items: readonly LandingNewProductsCarouselItem[]
-  /** Accessible name for the carousel region. */
+  /** Accessible name for the use-case region. */
   ariaLabel: string
   className?: string
-  /** Milliseconds to hold a card before snapping to the next. 0 disables autoplay. */
+  /** Milliseconds to hold an expanded tile before the next. 0 disables autoplay. */
   autoplayDelayMs?: number
+  /**
+   * Attribute on the section's 60px lattice origin (see `LandingNewHeroGrid`).
+   * The cluster is nudged so every tile edge sits on a lattice line.
+   */
+  gridOriginAttr: string
 }
 
 /**
- * Reference geometry (pomelo.la "use cases"): 310×400 slides in a flat track;
- * each card is tweened by its distance `d` (in slides) from the centered snap:
- *   transform: scale(1 - 0.2|d|) translateY(-100px * d)
- *   filter:    blur(clamp((|d| - 1.4) * 2.29, 0, 8)px)
- *   opacity:   1 - 0.32 * max(0, |d| - 0.12)
- * The translate is applied after the scale, so the row bends into an arc
- * (right side rises, left side dips) and cards vanish five slides out.
+ * The first lattice cell is the stage. A tile grows there, showcases, settles
+ * back to 2D, collapses, then the whole row slides one cell left so the next
+ * tile lands on the stage. The row repeats past the unique list so tiles reach
+ * the right edge of the page; the last five fade out. Viewport height is
+ * reserved to the tallest expanded tile so grow/collapse never moves the page.
  */
-const SCALE_PER_SLIDE = 0.2
-const LIFT_PER_SLIDE_RATIO = 100 / 310
-const BLUR_START_SLIDES = 1.4
-const BLUR_PER_SLIDE_PX = 2.29
-const BLUR_MAX_PX = 8
-const OPACITY_FADE_START_SLIDES = 0.12
-const OPACITY_PER_SLIDE = 0.32
+const CELL = HERO_GRID_CELL_PX
+const CONTRACTED_COLS = 1
+const CONTRACTED_ROWS = 1
+const MIN_EXPANDED_COLS = 4
+const MAX_COLS = 8
+const MIN_EXPANDED_ROWS = 4
+const DEFAULT_EXPANDED_ROWS = 5
+const CARD_PAD_X = 24
+const SHAPE_SLOT_PX = CELL
+
+const CONTENT_COLUMN_PX = 1088
+const CONTENT_COLUMN_PAD_PX = 24
+const PLATE_PAD_PX = 8
+const GRID_OFFSET_EPSILON = 0.5
+
 const HOLD_MS = LANDING_SNAP_HOLD_MS
-const SNAP_MS = LANDING_SNAP_MS
-const TWEEN_EVENTS: EmblaEventType[] = ["reInit", "scroll", "slideFocus", "select"]
+const EXPAND_MS = LANDING_SNAP_MS
+const SLIDE_MS = LANDING_SNAP_MS
+const TEXT_FADE_MS = 320
+const TEXT_HIDE_MS = 150
+const FADE_TAIL_ITEMS = 5
+const FADE_TAIL_PX = FADE_TAIL_ITEMS * CELL
+const SNAP_EASE = `cubic-bezier(${LANDING_SNAP_EASE_BEZIER.join(", ")})`
 
-/** One timer for the page — survives Strict Mode remounts and HMR stacks. */
+/** Survives Strict Mode remounts so the cycle does not stack. */
 let autoplayTimerId = 0
+let chainTimerId = 0
 
-/**
- * Time-based ease-in-out scroll body, swapped into Embla's engine for one
- * programmatic move (same hook Embla's AutoScroll plugin uses). Embla keeps
- * driving `render()`, so loop wrapping stays seamless — unlike animating the
- * container with a CSS transition, which visibly rewinds at loop points.
- */
-function createEasedScrollBody(
-  engine: EmblaEngineType,
-  durationMs: number,
-): EmblaScrollBodyType {
-  const { location, previousLocation, offsetLocation, target } = engine
-  let startTime = -1
-  let totalDistance = 0
-  let direction = 0
-  let done = false
-
-  const self: EmblaScrollBodyType = {
-    seek() {
-      const now = performance.now()
-      if (startTime < 0) {
-        startTime = now
-        totalDistance = target.get() - location.get()
-        direction = Math.sign(totalDistance)
-      }
-      previousLocation.set(location)
-      const t = Math.min(1, (now - startTime) / durationMs)
-      // Anchor on `target` so loop wraps (which shift both vectors) stay consistent.
-      location.set(target.get() - totalDistance * (1 - landingSnapEaseInOutCubic(t)))
-      if (t >= 1) {
-        location.set(target)
-        done = true
-      }
-      return self
-    },
-    settled: () => done && Math.abs(target.get() - offsetLocation.get()) < 0.001,
-    duration: () => durationMs,
-    direction: () => direction,
-    velocity: () => 0,
-    useBaseFriction: () => self,
-    useBaseDuration: () => self,
-    useFriction: () => self,
-    useDuration: () => self,
-  }
-  return self
+function clusterInset(viewSize: number) {
+  if (viewSize < CONTENT_COLUMN_PX + 2 * CONTENT_COLUMN_PAD_PX) return CELL
+  return (viewSize - CONTENT_COLUMN_PX) / 2 + CONTENT_COLUMN_PAD_PX - PLATE_PAD_PX
 }
 
-const arrowButtonClassName =
-  "absolute top-1/2 z-20 hidden size-[4.5rem] -translate-y-1/2 items-center justify-center rounded-full border border-border-strong text-foreground opacity-50 transition-opacity duration-300 ease-in-out hover:opacity-100 focus-visible:opacity-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-foreground md:inline-flex lg:size-[5.25rem] [&_svg]:size-6"
+function clamp(value: number, min: number, max: number) {
+  return Math.min(max, Math.max(min, value))
+}
+
+function estimateCols(label: string) {
+  return clamp(
+    Math.ceil((label.length * 13 + 2 * CARD_PAD_X) / CELL),
+    MIN_EXPANDED_COLS,
+    MAX_COLS,
+  )
+}
+
+function sizePx(cells: number) {
+  return cells * CELL + 1
+}
+
+function wrapIndex(index: number, length: number) {
+  return ((index % length) + length) % length
+}
+
+type TileMetrics = {
+  cols: number
+  rows: number
+}
 
 const cardTitleClassName =
-  "text-center font-serif text-[22px] font-medium italic leading-snug tracking-[-0.02em] text-foreground transition-colors duration-500 ease-out sm:text-[24px]"
+  "text-left font-sans text-[26px] font-medium leading-snug tracking-tight text-foreground transition-colors duration-500 ease-out sm:text-[28px]"
 
 const cardBadgeClassName =
-  "mt-2 block text-center font-mono text-[11px] uppercase leading-snug tracking-wide text-muted transition-colors duration-500 ease-out"
+  "mt-2 block text-left font-mono text-[11px] uppercase leading-snug tracking-wide text-muted transition-colors duration-500 ease-out"
 
 const cardBodyClassName =
-  "text-center text-[14px] font-normal leading-[1.5] text-muted transition-colors duration-500 ease-out sm:text-[15px]"
+  "text-left font-sans text-[14px] font-normal leading-[1.5] text-foreground transition-colors duration-500 ease-out sm:text-[15px]"
 
 const cardCtaClassName =
   "inline-flex items-center justify-center rounded-full border border-foreground/25 bg-transparent px-2.5 py-1.5 text-[13px] font-semibold leading-none tracking-[-0.01em] text-foreground transition-[border-color,opacity,color] duration-500 ease-out hover:border-foreground/45 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-foreground"
+
+const cardCopyClassName =
+  "flex w-full flex-col items-start px-6 pb-8 pt-10"
+
+function UseCaseCardCopy({
+  item,
+  cta,
+}: {
+  item: LandingNewProductsCarouselItem
+  cta?: ReactNode
+}) {
+  return (
+    <>
+      <h3 className={`${cardTitleClassName} pb-2`}>
+        {item.label}
+        {item.badge ? (
+          <span className={cardBadgeClassName}>{item.badge}</span>
+        ) : null}
+      </h3>
+      {item.visual ? (
+        <div
+          aria-hidden
+          className="relative mb-5 w-full min-w-0 shrink-0 overflow-hidden"
+        >
+          {item.visual}
+        </div>
+      ) : null}
+      <p className={cardBodyClassName}>{item.body}</p>
+      {cta}
+    </>
+  )
+}
 
 export function LandingNewProductsCarousel({
   items,
   ariaLabel,
   className,
   autoplayDelayMs = HOLD_MS,
+  gridOriginAttr,
 }: LandingNewProductsCarouselProps) {
   const reduceMotion = useReducedMotion() ?? false
   const autoplayEnabled = autoplayDelayMs > 0 && !reduceMotion
-  const defaultBodyRef = useRef<EmblaScrollBodyType | null>(null)
+  const isDark = useMarketingTheme()?.isDark ?? false
+  const count = items.length
 
-  const [emblaRef, emblaApi] = useEmblaCarousel({
-    loop: true,
-    align: "center",
-    skipSnaps: false,
-    duration: 25,
-  })
+  const viewportRef = useRef<HTMLDivElement>(null)
+  const titleRefs = useRef<(HTMLSpanElement | null)[]>([])
+  const copyRefs = useRef<(HTMLDivElement | null)[]>([])
+  const headRef = useRef(0)
+  const expandedRef = useRef(false)
+  const liveRef = useRef(false)
+  const gridOffsetRef = useRef({ x: 0, y: 0 })
 
-  const [selected, setSelected] = useState(0)
-  const innerRefs = useRef<(HTMLDivElement | null)[]>([])
-  const descRefs = useRef<(HTMLDivElement | null)[]>([])
-
-  const tween = useCallback(
-    (api: EmblaCarouselType) => {
-      const engine = api.internalEngine()
-      const progress = api.scrollProgress()
-      const snapList = api.scrollSnapList()
-      const count = snapList.length
-      const slideWidth = api.slideNodes()[0]?.getBoundingClientRect().width ?? 310
-      const lift = slideWidth * LIFT_PER_SLIDE_RATIO
-
-      snapList.forEach((scrollSnap, snapIndex) => {
-        let diff = scrollSnap - progress
-        const slidesInSnap = engine.slideRegistry[snapIndex]
-
-        slidesInSnap.forEach((slideIndex) => {
-          if (engine.options.loop) {
-            engine.slideLooper.loopPoints.forEach((loopItem) => {
-              const target = loopItem.target()
-              if (slideIndex === loopItem.index && target !== 0) {
-                const sign = Math.sign(target)
-                if (sign === -1) diff = scrollSnap - (1 + progress)
-                if (sign === 1) diff = scrollSnap + (1 - progress)
-              }
-            })
-          }
-
-          // `diff` is in scroll-progress units; convert to slide units.
-          const d = diff * count
-          const dist = Math.abs(d)
-          const scale = Math.max(0, 1 - SCALE_PER_SLIDE * dist)
-          const blur = Math.min(
-            BLUR_MAX_PX,
-            Math.max(0, (dist - BLUR_START_SLIDES) * BLUR_PER_SLIDE_PX),
-          )
-          const opacity =
-            scale <= 0
-              ? 0
-              : Math.max(
-                  0,
-                  1 - Math.max(0, dist - OPACITY_FADE_START_SLIDES) * OPACITY_PER_SLIDE,
-                )
-
-          const inner = innerRefs.current[slideIndex]
-          if (inner) {
-            inner.style.transform = `scale(${scale}) translateY(${(-lift * d).toFixed(2)}px)`
-            inner.style.filter = blur > 0.01 ? `blur(${blur.toFixed(2)}px)` : "none"
-            inner.style.opacity = opacity.toFixed(3)
-          }
-          const desc = descRefs.current[slideIndex]
-          if (desc) desc.style.opacity = dist < 0.5 ? "1" : "0"
-        })
-      })
-    },
-    [],
+  const [head, setHead] = useState(0)
+  const [expanded, setExpanded] = useState(false)
+  const [live, setLive] = useState(false)
+  const [slidePx, setSlidePx] = useState(0)
+  const [slideSteps, setSlideSteps] = useState(0)
+  const [sliding, setSliding] = useState(false)
+  const [metrics, setMetrics] = useState<TileMetrics[]>(() =>
+    items.map((item) => ({
+      cols: estimateCols(item.label),
+      rows: DEFAULT_EXPANDED_ROWS,
+    })),
   )
+  const [inset, setInset] = useState(CELL)
+  const [fillSlots, setFillSlots] = useState(count)
+  const [gridOffset, setGridOffset] = useState({ x: 0, y: 0 })
 
-  useEffect(() => {
-    if (!emblaApi) return
-    const onSelect = () => setSelected(emblaApi.selectedScrollSnap())
-    onSelect()
-    tween(emblaApi)
-    emblaApi.on("select", onSelect)
-    TWEEN_EVENTS.forEach((evt) => emblaApi.on(evt, tween))
-    return () => {
-      emblaApi.off("select", onSelect)
-      TWEEN_EVENTS.forEach((evt) => emblaApi.off(evt, tween))
-    }
-  }, [emblaApi, tween])
+  headRef.current = head
+  expandedRef.current = expanded
+  liveRef.current = live
 
-  // Track Embla's own scroll body so we can hand control back after each eased move.
-  useEffect(() => {
-    if (!emblaApi) return
-    const capture = () => {
-      defaultBodyRef.current = emblaApi.internalEngine().scrollBody
+  const clearChain = () => {
+    if (chainTimerId) {
+      window.clearTimeout(chainTimerId)
+      chainTimerId = 0
     }
-    const restore = () => {
-      const engine = emblaApi.internalEngine()
-      if (defaultBodyRef.current && engine.scrollBody !== defaultBodyRef.current) {
-        engine.scrollBody = defaultBodyRef.current
-      }
-    }
-    capture()
-    emblaApi.on("reInit", capture)
-    emblaApi.on("settle", restore)
-    emblaApi.on("pointerDown", restore)
-    return () => {
-      emblaApi.off("reInit", capture)
-      emblaApi.off("settle", restore)
-      emblaApi.off("pointerDown", restore)
-      restore()
-    }
-  }, [emblaApi])
+  }
 
-  const animateMove = useCallback(
-    (action: (api: EmblaCarouselType) => void) => {
-      if (!emblaApi) return
-      if (reduceMotion) {
-        action(emblaApi)
+  const after = (ms: number, fn: () => void) => {
+    clearChain()
+    if (ms <= 0) {
+      fn()
+      return
+    }
+    chainTimerId = window.setTimeout(() => {
+      chainTimerId = 0
+      fn()
+    }, ms)
+  }
+
+  const openStage = useCallback(() => {
+    window.clearTimeout(autoplayTimerId)
+    setLive(false)
+    setExpanded(true)
+    if (reduceMotion) {
+      setLive(true)
+      return
+    }
+    after(EXPAND_MS, () => setLive(true))
+  }, [reduceMotion])
+
+  const rotateTo = useCallback(
+    (nextHead: number) => {
+      const steps = wrapIndex(nextHead - headRef.current, count)
+      if (steps === 0) {
+        openStage()
         return
       }
-      const engine = emblaApi.internalEngine()
-      // `engine.scrollTo` decides start-vs-instant from the original body's duration.
-      defaultBodyRef.current?.useBaseFriction().useBaseDuration()
-      engine.scrollBody = createEasedScrollBody(engine, SNAP_MS)
-      action(emblaApi)
-      engine.animation.start()
+      if (reduceMotion) {
+        setHead(nextHead)
+        setSlidePx(0)
+        setSlideSteps(0)
+        setSliding(false)
+        openStage()
+        return
+      }
+      setSliding(true)
+      setSlideSteps(steps)
+      setSlidePx(-steps * CELL)
+      after(SLIDE_MS, () => {
+        setHead(nextHead)
+        setSlideSteps(0)
+        setSlidePx(0)
+        setSliding(false)
+        openStage()
+      })
     },
-    [emblaApi, reduceMotion],
+    [count, openStage, reduceMotion],
   )
 
-  const animateMoveRef = useRef(animateMove)
-  useEffect(() => {
-    animateMoveRef.current = animateMove
-  }, [animateMove])
-
-  // Every move (manual or automatic) restarts the hold, so a click is never
-  // followed a moment later by an autoplay advance.
-  const armAutoplay = useCallback(() => {
-    const arm = () => {
+  const goTo = useCallback(
+    (nextHead: number) => {
       window.clearTimeout(autoplayTimerId)
-      if (!autoplayEnabled) return
-      autoplayTimerId = window.setTimeout(() => {
-        animateMoveRef.current((api) => api.scrollNext())
-        arm()
-      }, autoplayDelayMs)
-    }
-    arm()
-  }, [autoplayDelayMs, autoplayEnabled])
+      const advance = () => rotateTo(wrapIndex(nextHead, count))
 
-  const go = useCallback(
-    (action: (api: EmblaCarouselType) => void) => {
-      animateMove(action)
-      armAutoplay()
+      if (liveRef.current) {
+        setLive(false)
+        after(reduceMotion ? 0 : USE_CASE_SHAPE_REVERT_MS, () => {
+          setExpanded(false)
+          after(reduceMotion ? 0 : EXPAND_MS, advance)
+        })
+        return
+      }
+      if (expandedRef.current) {
+        setExpanded(false)
+        after(reduceMotion ? 0 : EXPAND_MS, advance)
+        return
+      }
+      advance()
     },
-    [animateMove, armAutoplay],
+    [count, reduceMotion, rotateTo],
   )
 
-  const scrollPrev = useCallback(() => {
-    go((api) => api.scrollPrev(reduceMotion))
-  }, [go, reduceMotion])
-  const scrollNext = useCallback(() => {
-    go((api) => api.scrollNext(reduceMotion))
-  }, [go, reduceMotion])
-  const scrollTo = useCallback(
-    (index: number) => {
-      go((api) => api.scrollTo(index, reduceMotion))
-    },
-    [go, reduceMotion],
-  )
+  const goToRef = useRef(goTo)
+  useEffect(() => {
+    goToRef.current = goTo
+  }, [goTo])
 
   useEffect(() => {
-    if (!emblaApi) return
-    armAutoplay()
-    // Dragging counts as interaction too: restart the hold once the drag settles.
-    emblaApi.on("pointerUp", armAutoplay)
+    if (count === 0) return
+    openStage()
     return () => {
-      emblaApi.off("pointerUp", armAutoplay)
+      clearChain()
       window.clearTimeout(autoplayTimerId)
     }
-  }, [armAutoplay, emblaApi])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [count])
+
+  useEffect(() => {
+    if (!autoplayEnabled || count < 2) return
+    if (!live) return
+
+    window.clearTimeout(autoplayTimerId)
+    autoplayTimerId = window.setTimeout(() => {
+      goToRef.current(headRef.current + 1)
+    }, autoplayDelayMs)
+
+    return () => window.clearTimeout(autoplayTimerId)
+  }, [autoplayEnabled, autoplayDelayMs, live, count])
+
+  useLayoutEffect(() => {
+    const viewport = viewportRef.current
+    if (!viewport) return
+
+    const measure = () => {
+      const nextViewWidth = viewport.getBoundingClientRect().width
+      if (nextViewWidth < 2) return
+      const nextInset = clusterInset(nextViewWidth)
+      setInset((prev) => (Math.abs(prev - nextInset) < 0.5 ? prev : nextInset))
+      const cellsToEdge = Math.ceil((nextViewWidth - nextInset) / CELL) + 1
+      setFillSlots((prev) => {
+        const next = Math.max(count, cellsToEdge)
+        return prev === next ? prev : next
+      })
+      const maxCols = clamp(
+        Math.floor((nextViewWidth - nextInset - CELL) / CELL),
+        MIN_EXPANDED_COLS,
+        MAX_COLS,
+      )
+      const nextCols = items.map((item, i) => {
+        const titleW = titleRefs.current[i]?.getBoundingClientRect().width ?? 0
+        return titleW < 1
+          ? clamp(estimateCols(item.label), MIN_EXPANDED_COLS, maxCols)
+          : clamp(
+              Math.ceil((titleW + 2 * CARD_PAD_X) / CELL),
+              MIN_EXPANDED_COLS,
+              maxCols,
+            )
+      })
+      nextCols.forEach((cols, i) => {
+        const sizer = copyRefs.current[i]
+        if (sizer) sizer.style.width = `${sizePx(cols)}px`
+      })
+      const next = items.map((_, i) => {
+        const copyH = copyRefs.current[i]?.offsetHeight ?? 0
+        const rows = Math.max(
+          MIN_EXPANDED_ROWS,
+          copyH > 0 ? Math.ceil(copyH / CELL) : DEFAULT_EXPANDED_ROWS,
+        )
+        return { cols: nextCols[i]!, rows }
+      })
+      setMetrics((prev) =>
+        prev.length === next.length &&
+        prev.every((m, i) => m.cols === next[i].cols && m.rows === next[i].rows)
+          ? prev
+          : next,
+      )
+    }
+
+    measure()
+    const ro = new ResizeObserver(measure)
+    ro.observe(viewport)
+    const fonts = document.fonts?.ready.then(measure)
+    return () => {
+      ro.disconnect()
+      void fonts
+    }
+  }, [items])
+
+  useLayoutEffect(() => {
+    const viewport = viewportRef.current
+    if (!viewport) return
+
+    const apply = () => {
+      const originEl = document.querySelector(`[${gridOriginAttr}]`)
+      if (!originEl) return
+      const origin = originEl.getBoundingClientRect()
+      const rect = viewport.getBoundingClientRect()
+      if (rect.width < 2) return
+      const applied = gridOffsetRef.current
+      const padLeft = clusterInset(rect.width)
+      const naturalLeft = rect.left + padLeft - origin.left - applied.x
+      const naturalTop = rect.top - origin.top - applied.y
+      const x = Math.floor(naturalLeft / CELL) * CELL - naturalLeft
+      const y = (Math.ceil(naturalTop / CELL) - 1) * CELL - naturalTop
+      if (
+        Math.abs(x - applied.x) < GRID_OFFSET_EPSILON &&
+        Math.abs(y - applied.y) < GRID_OFFSET_EPSILON
+      ) {
+        return
+      }
+      const next = { x: Math.round(x * 100) / 100, y: Math.round(y * 100) / 100 }
+      gridOffsetRef.current = next
+      setGridOffset(next)
+    }
+
+    apply()
+    const ro = new ResizeObserver(apply)
+    ro.observe(viewport)
+    const originEl = document.querySelector(`[${gridOriginAttr}]`)
+    if (originEl) ro.observe(originEl)
+    window.addEventListener("resize", apply)
+    const fonts = document.fonts?.ready.then(apply)
+    return () => {
+      ro.disconnect()
+      window.removeEventListener("resize", apply)
+      void fonts
+    }
+  }, [gridOriginAttr, metrics])
+
+  if (count === 0) return null
+
+  const lineColor = isDark ? HERO_GRID_LINE_DARK : HERO_GRID_LINE_LIGHT
+  const stageRows = metrics.reduce(
+    (max, item) => Math.max(max, item.rows),
+    DEFAULT_EXPANDED_ROWS,
+  )
+  const stageHeight = sizePx(stageRows)
+  const slotCount = fillSlots + slideSteps
+  const slots = Array.from({ length: slotCount }, (_, slot) => ({
+    slot,
+    itemIndex: wrapIndex(head + slot, count),
+    repeat: slot >= count,
+  }))
 
   return (
     <div
+      ref={viewportRef}
       className={["relative w-full min-w-0", className ?? ""].join(" ")}
       role="region"
-      aria-roledescription="carousel"
       aria-label={ariaLabel}
+      style={{
+        height: stageHeight,
+        minHeight: stageHeight,
+        ...(gridOffset.x || gridOffset.y
+          ? { transform: `translate(${gridOffset.x}px, ${gridOffset.y}px)` }
+          : {}),
+      }}
     >
-      <div className="relative">
-        <button
-          type="button"
-          aria-label="Previous"
-          onClick={scrollPrev}
-          className={`${arrowButtonClassName} left-0 lg:left-4`}
-        >
-          <ChevronLeft aria-hidden strokeWidth={1.5} />
-        </button>
-
-        {/* Vertical padding leaves room for the arc (cards lift ~40px beyond the slide box). */}
-        <div ref={emblaRef} className="overflow-hidden py-14">
-          <div className="flex items-center [backface-visibility:hidden] [touch-action:pan-y_pinch-zoom]">
-            {items.map((item, index) => {
-              const isSelected = index === selected
-              return (
-                <div
-                  key={item.label}
-                  role="group"
-                  aria-roledescription="slide"
-                  aria-label={`${index + 1} of ${items.length}: ${item.label}`}
-                  aria-hidden={!isSelected}
-                  onClick={() => {
-                    if (!isSelected) scrollTo(index)
-                  }}
-                  className="min-w-0 shrink-0 grow-0 basis-[min(65vw,310px)] cursor-pointer select-none"
-                  style={{ height: 400 }}
-                >
-                  <div
-                    ref={(el) => {
-                      innerRefs.current[index] = el
-                    }}
-                    className="flex h-full w-full flex-col items-center justify-center overflow-hidden rounded-2xl bg-[color-mix(in_srgb,white_42%,var(--marketing-surface))] px-5 pt-7 pb-8 text-center will-change-transform sm:px-7"
-                    style={{ transformOrigin: "50% 50%" }}
-                  >
-                    {item.visual ? (
-                      <div
-                        aria-hidden
-                        className="relative mb-6 w-full min-w-0 shrink-0 overflow-hidden"
-                      >
-                        {item.visual}
-                      </div>
-                    ) : null}
-                    <h3 className={cardTitleClassName}>
-                      {item.label}
-                      {item.badge ? (
-                        <span className={cardBadgeClassName}>{item.badge}</span>
-                      ) : null}
-                    </h3>
-                    <div
-                      ref={(el) => {
-                        descRefs.current[index] = el
-                      }}
-                      className="mt-3 flex w-full flex-col items-center transition-opacity duration-500 ease-in-out"
-                      style={{ opacity: isSelected ? 1 : 0 }}
-                    >
-                      <p className={cardBodyClassName}>{item.body}</p>
-                      {item.cta ? (
-                        <a
-                          href={item.cta.href}
-                          className={`${cardCtaClassName} mt-5`}
-                          tabIndex={isSelected ? 0 : -1}
-                          onClick={(event) => event.stopPropagation()}
-                          {...(item.cta.external
-                            ? { target: "_blank", rel: "noreferrer noopener" }
-                            : {})}
-                        >
-                          {item.cta.label}
-                        </a>
-                      ) : null}
-                    </div>
-                  </div>
-                </div>
-              )
-            })}
-          </div>
-        </div>
-
-        <button
-          type="button"
-          aria-label="Next"
-          onClick={scrollNext}
-          className={`${arrowButtonClassName} right-0 lg:right-4`}
-        >
-          <ChevronRight aria-hidden strokeWidth={1.5} />
-        </button>
-      </div>
-
       <div
-        role="tablist"
-        aria-label="Slides"
-        className="mt-2 flex shrink-0 items-center justify-center"
+        aria-hidden
+        className="pointer-events-none invisible absolute top-0 left-0"
       >
-        {items.map((item, index) => {
-          const isSelected = index === selected
-          return (
-            <button
-              key={item.label}
-              type="button"
-              role="tab"
-              aria-selected={isSelected}
-              aria-label={`Go to slide ${index + 1}: ${item.label}`}
-              onClick={() => scrollTo(index)}
-              className="flex h-6 cursor-pointer items-center px-[5px] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-foreground"
-            >
-              <span
-                aria-hidden
+        {items.map((item, i) => (
+          <div
+            key={item.label}
+            ref={(node) => {
+              copyRefs.current[i] = node
+            }}
+            className={cardCopyClassName}
+            style={{ width: sizePx(metrics[i]?.cols ?? estimateCols(item.label)) }}
+          >
+            <UseCaseCardCopy
+              item={item}
+              cta={
+                item.cta ? (
+                  <span className={`${cardCtaClassName} mt-5`}>
+                    {item.cta.label}
+                  </span>
+                ) : null
+              }
+            />
+          </div>
+        ))}
+      </div>
+      <div
+        className="overflow-x-clip overflow-y-hidden [mask-image:linear-gradient(to_right,black_0,black_calc(100%-var(--use-case-fade)),transparent_100%)] [-webkit-mask-image:linear-gradient(to_right,black_0,black_calc(100%-var(--use-case-fade)),transparent_100%)]"
+        style={{
+          paddingLeft: inset,
+          height: stageHeight,
+          ["--use-case-fade" as string]: `${FADE_TAIL_PX}px`,
+        }}
+      >
+        <div
+          role="list"
+          className="landing-new-use-case-track flex flex-nowrap items-start content-start"
+          style={{
+            transform: `translate3d(${slidePx}px, 0, 0)`,
+            transition: sliding && !reduceMotion
+              ? `transform ${SLIDE_MS}ms ${SNAP_EASE}`
+              : "none",
+          }}
+        >
+          {slots.map(({ slot, itemIndex, repeat }) => {
+            const item = items[itemIndex]!
+            const isStage = slot === 0
+            const isExpanded = isStage && expanded
+            const isLive = isStage && live && !repeat
+            const { cols, rows } = metrics[itemIndex] ?? {
+              cols: estimateCols(item.label),
+              rows: DEFAULT_EXPANDED_ROWS,
+            }
+            const cardStyle: CSSProperties = {
+              width: sizePx(isExpanded ? cols : CONTRACTED_COLS),
+              height: sizePx(isExpanded ? rows : CONTRACTED_ROWS),
+              marginRight: -1,
+              marginBottom: -1,
+              border: `1px solid ${lineColor}`,
+              transition:
+                reduceMotion || sliding
+                  ? "none"
+                  : `width ${EXPAND_MS}ms ${SNAP_EASE}, height ${EXPAND_MS}ms ${SNAP_EASE}`,
+            }
+            const textStyle: CSSProperties = {
+              opacity: isLive ? 1 : 0,
+              transition: reduceMotion
+                ? "none"
+                : isLive
+                  ? `opacity ${TEXT_FADE_MS}ms ease-out`
+                  : `opacity ${TEXT_HIDE_MS}ms ease-out`,
+            }
+
+            return (
+              <article
+                key={`${item.label}::${slot}`}
+                role="listitem"
+                aria-hidden={repeat || undefined}
                 className={[
-                  "block size-[5px] rounded-full transition-colors duration-300",
-                  isSelected ? "bg-foreground" : "bg-foreground/20",
+                  "landing-new-use-case-card relative shrink-0",
+                  isExpanded ? "z-[2]" : "z-[1]",
                 ].join(" ")}
-              />
-            </button>
-          )
-        })}
+                style={cardStyle}
+              >
+                <button
+                  type="button"
+                  aria-expanded={isExpanded}
+                  aria-label={item.label}
+                  aria-hidden={repeat || undefined}
+                  tabIndex={repeat ? -1 : undefined}
+                  onClick={() => {
+                    if (itemIndex === headRef.current && expandedRef.current) return
+                    goTo(itemIndex)
+                  }}
+                  className="absolute inset-0 overflow-hidden bg-[var(--marketing-surface)] text-left"
+                >
+                  {!repeat ? (
+                    <span
+                      ref={(node) => {
+                        titleRefs.current[itemIndex] = node
+                      }}
+                      aria-hidden
+                      className={`${cardTitleClassName} pointer-events-none invisible absolute top-0 left-0 whitespace-nowrap`}
+                    >
+                      {item.label}
+                    </span>
+                  ) : null}
+
+                  <div
+                    className="pointer-events-none absolute top-0 left-0 overflow-visible"
+                    style={{ width: SHAPE_SLOT_PX, height: SHAPE_SLOT_PX }}
+                  >
+                    <LandingNewUseCaseShape
+                      kind={item.shape}
+                      active={isLive}
+                    />
+                  </div>
+
+                  <div className={cardCopyClassName} style={textStyle}>
+                    <UseCaseCardCopy
+                      item={item}
+                      cta={
+                        item.cta ? (
+                          <a
+                            href={item.cta.href}
+                            className={`${cardCtaClassName} mt-5`}
+                            tabIndex={isLive ? 0 : -1}
+                            onClick={(event) => event.stopPropagation()}
+                            {...(item.cta.external
+                              ? { target: "_blank", rel: "noreferrer noopener" }
+                              : {})}
+                          >
+                            {item.cta.label}
+                          </a>
+                        ) : null
+                      }
+                    />
+                  </div>
+                </button>
+              </article>
+            )
+          })}
+        </div>
       </div>
     </div>
   )

@@ -160,6 +160,7 @@ function RequestReasonStep() {
             onClick={() => {
               if (!canShare) return
               markCreated()
+              showEphemeral("Payment request created", "success")
               close()
             }}
             className={`${CHIP_WRAP} w-full`}

@@ -89,18 +89,21 @@ const nora: Contact = {
 
 export const DEMO_FAVORITES: readonly Contact[] = [sofia, martin, lucia]
 
-/** Incoming payment-request link the Pay scene “opens” (no real URL). */
-export const DEMO_PAY_REQUEST = {
-  amountCents: 74_00,
-  reason: "Friday dinner",
-  creator: sofia,
-} as const
-
-/** Outgoing request the Request scene creates, then shows as a QR. */
+/** Outgoing request the Request scene creates and shares over WhatsApp. */
 export const DEMO_CREATE_REQUEST = {
   amountCents: 33_00,
   reason: "Dinner last night",
   shortCode: "dn8k2x",
+} as const
+
+/**
+ * Incoming payment-request the Pay scene opens — the same link Request
+ * just shared (reason + amount), paid to Sofía.
+ */
+export const DEMO_PAY_REQUEST = {
+  amountCents: DEMO_CREATE_REQUEST.amountCents,
+  reason: DEMO_CREATE_REQUEST.reason,
+  creator: sofia,
 } as const
 
 export const DEMO_RECENT: readonly Contact[] = [diego, nora]

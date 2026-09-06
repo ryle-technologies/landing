@@ -85,7 +85,7 @@ export function LandingHeroRotatingWord({
     if (!node) {
       return
     }
-    const nextWidth = node.offsetWidth
+    const nextWidth = Math.ceil(node.getBoundingClientRect().width)
     if (nextWidth <= 0) {
       return
     }
@@ -114,11 +114,15 @@ export function LandingHeroRotatingWord({
         aria-hidden
         className="invisible absolute whitespace-nowrap"
       >
-        {displayedWord}
+        {Array.from(displayedWord).map((letter, index) => (
+          <span key={`${displayedWord}-${index}`} className="inline-block">
+            {letter}
+          </span>
+        ))}
       </span>
       <motion.span
-        className="inline-flex"
-        style={{ clipPath: "inset(-6px 0px)", width: slotWidth }}
+        className="inline-block"
+        style={{ clipPath: "inset(-0.55em -0.4em)", width: slotWidth }}
       >
         <AnimatePresence
           mode="wait"
@@ -127,7 +131,7 @@ export function LandingHeroRotatingWord({
           {!isExiting && (
             <motion.span
               key={displayedWord}
-              className="flex whitespace-nowrap"
+              className="whitespace-nowrap"
               initial="hidden"
               animate="show"
               exit="exit"
@@ -162,7 +166,7 @@ export function LandingHeroRotatingWord({
       <span
         key={displayedWord}
         aria-hidden
-        className="landing-hero-word-shimmer pointer-events-none absolute right-0 left-0 h-[3px] rounded-full"
+        className="landing-hero-word-shimmer pointer-events-none absolute right-0 left-0 h-[3px] rounded-full !bottom-[0.04em]"
       />
     </span>
   )

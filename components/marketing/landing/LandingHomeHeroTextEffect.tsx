@@ -8,9 +8,6 @@ import { LandingHeroRotatingWord } from "@/components/marketing/landing/LandingH
 import { landingHeroH1ClassName } from "@/lib/landingHeroTypography"
 import { useReducedMotion } from "motion/react"
 
-const heroH1ClassName =
-  `relative text-left text-foreground ${landingHeroH1ClassName}`
-
 /** Tighter stagger + shorter segments than `TextEffect` defaults (~1×). */
 const HERO_TEXT_SPEED_REVEAL = 1.55
 const HERO_TEXT_SPEED_SEGMENT = 1.4
@@ -28,6 +25,8 @@ type LandingHomeHeroTextEffectProps = {
    * cycles through these verbs (x.ai-style letter morph).
    */
   rotatingWords?: readonly string[]
+  /** Overrides the default serif h1 scale (new-landing display type). */
+  className?: string
 }
 
 /**
@@ -38,7 +37,11 @@ export function LandingHomeHeroTextEffect({
   title,
   titleTwoLine,
   rotatingWords,
+  className,
 }: LandingHomeHeroTextEffectProps) {
+  const heroH1ClassName = `relative text-left text-foreground ${
+    className ?? landingHeroH1ClassName
+  }`
   const reduceMotion = useReducedMotion()
   const [wordIndex, setWordIndex] = useState(0)
   const rotatingWord = rotatingWords?.[wordIndex] ?? null

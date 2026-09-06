@@ -5,9 +5,12 @@ import {
 import { LandingFooterMarquee } from "@/components/marketing/landing/LandingFooterMarquee"
 import { LandingNewConsoleSection } from "@/components/marketing/landing-new/LandingNewConsoleSection"
 import { LandingNewFeatureCards } from "@/components/marketing/landing-new/LandingNewFeatureCards"
+import { LandingNewHeroGrid } from "@/components/marketing/landing-new/LandingNewHeroGrid"
+import { LandingNewHeroGridPlate } from "@/components/marketing/landing-new/LandingNewHeroGridPlate"
 import { LandingNewProductsCarousel } from "@/components/marketing/landing-new/LandingNewProductsCarousel"
 import { LandingSuiteProductsReveal } from "@/components/marketing/landing/LandingSuiteProductsReveal"
 import { LandingHomeIssuerPromptRotator } from "@/components/marketing/landing/LandingHomeIssuerPromptRotator"
+import { LandingNewPillarsHeading } from "@/components/marketing/landing-new/LandingNewPillarsHeading"
 import { LandingNewSimpleTiles } from "@/components/marketing/landing-new/LandingNewSimpleTiles"
 import {
   landingHeroPrimaryCtaClassName,
@@ -18,6 +21,7 @@ import {
   landingColumnHorizontalPadClass,
   landingViewportBleedClassName,
 } from "@/lib/landingLayout"
+import { PILLARS_GRID_ORIGIN_ATTR } from "@/lib/landingNewHeroGrid"
 import {
   DOCS_BASE_HREF,
   LANDING_DOCS_CTA_LABEL,
@@ -37,8 +41,10 @@ const NEW_LANDING_ROTATOR_SENTENCES = [
 const LANDING_PILLARS_SECTION_TITLE_LEAD =
   "Digital assets are ready for the enterprise."
 
-const LANDING_PILLARS_SECTION_TITLE_REST =
-  "Ryle gives teams the infrastructure to build, launch, and operate digital assets within your products."
+const LANDING_PILLARS_SECTION_TITLE_PREFIX =
+  "Ryle gives teams the infrastructure to build, launch, and operate digital assets"
+
+const LANDING_PILLARS_SECTION_TITLE_ACCENT = "within your products"
 
 const LANDING_PRE_SECTION_SUBTITLE =
   "One stack. Four modules and two surfaces. Start with the one that unblocks you."
@@ -46,35 +52,43 @@ const LANDING_PRE_SECTION_SUBTITLE =
 const LANDING_USE_CASES = [
   {
     label: "Tokenized assets",
+    shape: "cube" as const,
     body: "Issue and operate tokens for property, funds, inventory or produce — mint, redeem, pause, reconcile.",
   },
   {
     label: "Your own stablecoin",
+    shape: "sphere" as const,
     body: "Launch a unit of value for your product or network, with reserves and controls you keep.",
   },
   {
     label: "Investor payouts",
+    shape: "tetrahedron" as const,
     body: "Pay rents, yields and redemptions to holders without a manual back office.",
   },
   {
     label: "Cross-border payments",
+    shape: "torus" as const,
     body: "Move money between countries in seconds, inside your own product.",
   },
   {
     label: "Supplier and distributor settlement",
+    shape: "hexPrism" as const,
     body: "Pay partners onchain — fast, programmable, without publishing terms.",
   },
   {
     label: "Wallets in your app",
+    shape: "octahedron" as const,
     body: "Let users hold and move value inside the product they already use. No separate app.",
   },
   {
     label: "Loyalty and rewards",
+    shape: "icosahedron" as const,
     body: "Points, community or brand units on the same ledger as the rest of the money.",
   },
   {
     label: "Cards",
     badge: "In design with partners",
+    shape: "slab" as const,
     body: "Let users spend from the asset, under your brand.",
   },
 ] as const
@@ -87,9 +101,6 @@ const MARKETING_CLOSING_SUBTITLE =
 const CLOSING_CTA_LABEL = "Talk to us"
 
 const FOOTER_MARQUEE_WORDS = ["Modular", "Private", "Yours"] as const
-
-const pillarsSectionTitleLeadClassName =
-  "text-muted text-[18px] sm:text-[28px]"
 
 const buildingNewTitleClassName = `relative text-left text-muted transition-colors duration-500 ease-out ${landingHeroTitleClassName}`
 
@@ -107,34 +118,44 @@ export function LandingNewLowerSections() {
         aria-labelledby="landing-new-pillars-heading"
         className="relative z-10 py-16 sm:py-24 md:py-32 min-[1080px]:py-36"
       >
-        <h2
-          id="landing-new-pillars-heading"
-          className={`${buildingNewTitleClassName} mx-auto max-w-[52rem] !text-center`}
+        <div
+          aria-hidden
+          data-pillars-grid-origin
+          className="pointer-events-none absolute inset-y-0 left-1/2 z-0 w-screen max-w-[100vw] -translate-x-1/2 overflow-hidden [mask-image:linear-gradient(to_bottom,transparent_0%,black_16%,black_84%,transparent_100%)] [-webkit-mask-image:linear-gradient(to_bottom,transparent_0%,black_16%,black_84%,transparent_100%)]"
         >
-          <span className={pillarsSectionTitleLeadClassName}>
-            {LANDING_PILLARS_SECTION_TITLE_LEAD}
-          </span>
-          <br />
-          <span className="text-foreground">
-            {LANDING_PILLARS_SECTION_TITLE_REST}
-          </span>
-        </h2>
-        <div className={`${landingViewportBleedClassName} mt-14 sm:mt-20`}>
+          <LandingNewHeroGrid />
+        </div>
+        <div className={`${landingViewportBleedClassName} z-10`}>
+          <div
+            className={`landing-new-feature-column ${landingColumnHorizontalPadClass}`}
+          >
+            <LandingNewHeroGridPlate originAttr={PILLARS_GRID_ORIGIN_ATTR}>
+              <LandingNewPillarsHeading
+                headingId="landing-new-pillars-heading"
+                lead={LANDING_PILLARS_SECTION_TITLE_LEAD}
+                prefix={LANDING_PILLARS_SECTION_TITLE_PREFIX}
+                accent={LANDING_PILLARS_SECTION_TITLE_ACCENT}
+              />
+            </LandingNewHeroGridPlate>
+          </div>
+        </div>
+        <div className={`${landingViewportBleedClassName} z-10 mt-14 sm:mt-20`}>
           <LandingNewProductsCarousel
             ariaLabel="Use cases"
-            className="mx-auto w-full max-w-screen-2xl"
+            className="w-full"
             items={LANDING_USE_CASES}
+            gridOriginAttr={PILLARS_GRID_ORIGIN_ATTR}
           />
         </div>
       </section>
       <div className={landingViewportBleedClassName}>
         <div className={`landing-new-feature-column ${landingColumnHorizontalPadClass}`}>
-          <LandingNewConsoleSection headingId="landing-new-console-heading-top" />
-          <LandingNewFeatureCards />
           <LandingNewConsoleSection
             headingId="landing-new-wallet-heading"
             variant="wallet"
           />
+          <LandingNewFeatureCards />
+          <LandingNewConsoleSection headingId="landing-new-console-heading-top" />
         </div>
       </div>
         <LandingNewSimpleTiles
@@ -203,34 +224,6 @@ export function LandingNewLowerSections() {
               body: "Tokenize land, energy or produce, distribute yields, and give investors a wallet under your brand.",
             },
           ]}
-        />
-        <LandingNewSimpleTiles
-          headingId="landing-new-process-heading"
-          headingLead="Engineers deployed with you,"
-          headingRest="not a ticket queue."
-          tiles={[
-            {
-              label: "Weeks 1–2",
-              title: "Discovery",
-              body: "Pick the first use case with a budget owner. Walk through Console and APIs. Confirm chain, custody and deployment model.",
-            },
-            {
-              label: "Weeks 3–6",
-              title: "Deploy",
-              body: "First module live in your environment. Policies, roles and webhooks wired into the systems you already run.",
-            },
-            {
-              label: "First months",
-              title: "Operate together",
-              body: "Side-by-side operations, hardening, and runbook handover to your team.",
-            },
-            {
-              label: "Next stage",
-              title: "Scale",
-              body: "Add the next module, the next asset, the next market.",
-            },
-          ]}
-          footerLine="Forward-deployed engineering is part of the product — onsite anywhere."
         />
         <LandingHomeNavFadeOutMarker />
         <section

@@ -569,6 +569,7 @@ export function createWalletDemoStore(): WalletDemoStore {
       receiveView: "closed",
       qrScanOpen: false,
       request: { ...INITIAL_REQUEST },
+      feedback: null,
     }),
   closePayRequest: () => set({ payRequestOpen: false }),
   executePayRequest: async () => {

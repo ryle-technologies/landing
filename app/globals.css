@@ -414,6 +414,15 @@ html:has(.marketing-viewport-bleed.dark) body {
   -webkit-font-smoothing: antialiased;
 }
 
+/*
+ * Wallet section phone: drop the device chrome so the 390×844 frame fills
+ * the snapped lattice cell. The cluster outline is the cell stroke.
+ */
+.landing-new-wallet-grid-phone .wallet-demo-shell {
+  border: 0;
+  border-radius: 0;
+}
+
 /* Home column paints the same canvas so the send-sheet peek strip blends in. */
 .wallet-demo-shell .bg-app-gradient {
   background-color: #ffffff;
@@ -421,6 +430,16 @@ html:has(.marketing-viewport-bleed.dark) body {
   background-size: var(--app-canvas-size);
   background-repeat: var(--app-canvas-repeat);
   background-position: var(--app-canvas-position);
+}
+
+/* Use-case tiles: width and height ease when a block expands or contracts. */
+.marketing-viewport-bleed .landing-new-use-case-card {
+  transition-property: width, height !important;
+}
+
+/* Track slides one lattice cell after a tile collapses. */
+.marketing-viewport-bleed .landing-new-use-case-track {
+  transition-property: transform !important;
 }
 
 /*
