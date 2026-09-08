@@ -11,17 +11,13 @@ import {
  * Privacy block: sits in the `LandingNewFeatureCards` grid, spanning two of
  * the three lattice columns. Copy on the left, stippled dot-matrix disc on
  * the right (canvas engine ported from the hinkal.io hero, `lib/hinkalBloom`).
- *
- * The animation tells the privacy story: a counterparty wallet sends a clear
- * amount → it is absorbed into the disc → re-emerges as a blurred `***` →
- * lands as a shielded block at its centre.
+ * Nodes and the transaction overlay are off — the disc is the only visual.
  */
 
 const PRIVACY_CONTENT = {
-  title: "Don\u2019t want your transactions on a public ledger?",
-  titleMuted: "No problem.",
+  title: "Privacy built-in.",
   body:
-    "Public chains show everyone who paid whom, and how much. Ryle shields amounts, balances and counterparties by default \u2014 settlement stays onchain and final, and provable only to the auditors you choose.",
+    "Amounts, balances and counterparties stay private. Still onchain, visible only to the auditors you choose.",
 } as const
 
 const cardTitleClassName =
@@ -109,12 +105,11 @@ export function LandingNewPrivacyCard({ className = "" }: LandingNewPrivacyCardP
   return (
     <article
       aria-labelledby="landing-new-privacy-heading"
-      className={`grid h-full min-w-0 items-center overflow-hidden sm:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)] sm:gap-8 ${className}`}
+      className={`grid h-full min-w-0 items-stretch overflow-hidden sm:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)] sm:gap-8 ${className}`}
     >
-      <div className="flex min-w-0 flex-col justify-center">
+      <div className="flex min-w-0 flex-col justify-start">
         <h3 id="landing-new-privacy-heading" className={cardTitleClassName}>
-          {PRIVACY_CONTENT.title}{" "}
-          <span className="text-muted">{PRIVACY_CONTENT.titleMuted}</span>
+          {PRIVACY_CONTENT.title}
         </h3>
         <p className={cardBodyClassName}>{PRIVACY_CONTENT.body}</p>
       </div>
@@ -126,7 +121,7 @@ export function LandingNewPrivacyCard({ className = "" }: LandingNewPrivacyCardP
       <div className="relative mt-5 min-h-0 min-w-0 overflow-hidden max-sm:aspect-[2/1] sm:mt-0 sm:h-full">
         <canvas
           ref={canvasRef}
-          className="absolute inset-0 block h-full w-full touch-pan-y"
+          className="pointer-events-none absolute inset-0 block h-full w-full"
           aria-hidden
         />
       </div>

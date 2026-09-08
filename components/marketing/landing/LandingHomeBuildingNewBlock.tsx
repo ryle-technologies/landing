@@ -25,6 +25,12 @@ type LandingHomeBuildingNewBlockProps = {
   headingId: string
   /** Contact CTA label (defaults to {@link LANDING_MARKETING_CTA_LABEL}). */
   contactCtaLabel?: string
+  /**
+   * Keep the docs sitemap inside the enclosing column instead of breaking
+   * out to the viewport with its own max-width (new landing: the column is
+   * the lattice).
+   */
+  sitemapInColumn?: boolean
 }
 
 /**
@@ -39,6 +45,7 @@ export function LandingHomeBuildingNewBlock({
   contactCtaClassName,
   headingId,
   contactCtaLabel = LANDING_MARKETING_CTA_LABEL,
+  sitemapInColumn = false,
 }: LandingHomeBuildingNewBlockProps) {
   const hasHeading = Boolean(title.trim())
 
@@ -77,9 +84,15 @@ export function LandingHomeBuildingNewBlock({
           {LANDING_DOCS_CTA_LABEL}
         </a>
       </div>
-      <div className={`${landingViewportBleedClassName} mt-10 sm:mt-11`}>
-        <LandingFooterSitemap />
-      </div>
+      {sitemapInColumn ? (
+        <div className="mt-10 sm:mt-11">
+          <LandingFooterSitemap contentClassName="w-full min-w-0" innerClassName="" />
+        </div>
+      ) : (
+        <div className={`${landingViewportBleedClassName} mt-10 sm:mt-11`}>
+          <LandingFooterSitemap />
+        </div>
+      )}
       <div className="mt-9 flex min-w-0 flex-nowrap items-center justify-between gap-3 text-left sm:mt-11">
         <Link
           href="/"

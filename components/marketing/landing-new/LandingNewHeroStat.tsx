@@ -2,17 +2,14 @@
 
 import { motion, useReducedMotion } from "motion/react"
 import { useEffect, useRef, useState } from "react"
-import { LandingNewHeroGridPlate } from "@/components/marketing/landing-new/LandingNewHeroGridPlate"
+import { LatticePlate } from "@/components/marketing/landing-new/lattice/LatticePlate"
 import { landingNewHeroDisplayClassName } from "@/lib/landingHeroTypography"
-import {
-  landingColumnPadClass,
-  landingViewportBleedClassName,
-} from "@/lib/landingLayout"
 
 /**
  * Giant figure band cloned from the x.ai Colossus module that sits directly
  * under the hero. Same layout and orange rule — tokens swapped onto this
- * page’s theme. The lattice behind it is the shared hero line grid.
+ * page’s theme. Renders inside the hero `LatticeSection`; the plate snaps
+ * itself to the lattice.
  * The figure uses the hero’s owns/creates letter blur plus rainbow underline.
  */
 
@@ -105,27 +102,25 @@ function StatFigure() {
   )
 }
 
-export function LandingNewHeroStat() {
+export function LandingNewHeroStat({ className = "" }: { className?: string }) {
   return (
     <section
       aria-label="2,000,000 USD already passed through our platform"
-      className={`${landingViewportBleedClassName} mt-20 sm:mt-28 md:mt-32`}
+      className={`relative w-full min-w-0 ${className}`}
     >
-      <div className={`${landingColumnPadClass} relative py-16 sm:py-20`}>
-        <LandingNewHeroGridPlate>
-          <div className="flex flex-col items-start gap-8">
-            <p className="m-0">
-              <StatFigure />
+      <LatticePlate>
+        <div className="flex flex-col items-start gap-8">
+          <p className="m-0">
+            <StatFigure />
+          </p>
+          <div className="flex items-center gap-4">
+            <div className="h-px w-12 shrink-0" style={{ background: ACCENT }} />
+            <p className="text-lg font-medium text-foreground/50">
+              USD already passed through our platform
             </p>
-            <div className="flex items-center gap-4">
-              <div className="h-px w-12 shrink-0" style={{ background: ACCENT }} />
-              <p className="text-lg font-medium text-foreground/50">
-                USD already passed through our platform
-              </p>
-            </div>
           </div>
-        </LandingNewHeroGridPlate>
-      </div>
+        </div>
+      </LatticePlate>
     </section>
   )
 }

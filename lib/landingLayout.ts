@@ -6,23 +6,21 @@
  */
 export const landingContentMaxWidthClass = "max-w-5xl"
 
-/**
- * New-landing sections (everything except the hero).
- * Native `max-w-3xl` (48rem → 768px at 16px root).
- */
-export const landingNewContentMaxWidthClass = "max-w-3xl"
-
 /** Footer docs sitemap — narrower than main marketing column width. */
 export const landingFooterSitemapMaxWidthClass = "max-w-4xl"
 
 export const landingColumnHorizontalPadClass =
   "px-6 pl-[max(1.5rem,env(safe-area-inset-left))] pr-[max(1.5rem,env(safe-area-inset-right))]"
 
+/**
+ * New-landing full-width bars (top bar, sticky nav): half-cell gutter.
+ * Section content lives in the lattice column instead — see `lib/landingLattice.ts`.
+ */
+export const landingNewColumnHorizontalPadClass =
+  "px-8 pl-[max(2rem,env(safe-area-inset-left))] pr-[max(2rem,env(safe-area-inset-right))]"
+
 export const landingColumnPadClass =
   `mx-auto w-full min-w-0 ${landingContentMaxWidthClass} ${landingColumnHorizontalPadClass}`
-
-export const landingNewColumnPadClass =
-  `mx-auto w-full min-w-0 ${landingNewContentMaxWidthClass} ${landingColumnHorizontalPadClass}`
 
 /**
  * Break out of {@link landingColumnPadClass} to span the full viewport width

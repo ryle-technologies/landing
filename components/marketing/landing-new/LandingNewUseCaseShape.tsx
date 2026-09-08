@@ -9,6 +9,7 @@ import {
   type ReactNode,
 } from "react"
 import { useReducedMotion } from "motion/react"
+import { LATTICE_CELL_PX as HERO_GRID_CELL_PX } from "@/lib/landingLattice"
 import {
   SHAPE_MOTION,
   faceCentroid,
@@ -26,7 +27,7 @@ import {
 export type { LandingNewUseCaseShapeKind }
 
 /** One lattice cell — 2D plates sit in this box and never grow past it. */
-const SIZE = 60
+const SIZE = HERO_GRID_CELL_PX
 const FOCAL = 3.8
 const SCALE = (SIZE / 2 - 1.4) / SILHOUETTE_EXTENT
 /** Idle plate and 3D solid share this scale so the form does not swell. */

@@ -5,7 +5,7 @@ import { LandingHomeChainsMarquee } from "@/components/marketing/landing/Landing
 import { LandingThemeToggle } from "@/components/marketing/landing/LandingThemeToggle"
 import { LandingHomeHeroFadeUp } from "@/components/marketing/landing/LandingHomeHeroFadeUp"
 import { LandingHomeHeroTextEffect } from "@/components/marketing/landing/LandingHomeHeroTextEffect"
-import { LandingNewHeroGridPlate } from "@/components/marketing/landing-new/LandingNewHeroGridPlate"
+import { LatticePlate } from "@/components/marketing/landing-new/lattice/LatticePlate"
 import { RELEASE_SECTION_HERO } from "@/components/marketing/landing/data"
 import {
   landingColumnHorizontalPadClass,
@@ -43,6 +43,55 @@ type LandingHomeHeroPinContentProps = {
   heroVisual?: ReactNode
   /** Overrides the default serif h1 scale. */
   heroTitleClassName?: string
+  /** Horizontal pad for the full-bleed top bar. */
+  padClassName?: string
+  /** Spacing above the headline plate. */
+  plateClassName?: string
+  /** Spacing above the CTA row. */
+  ctaRowClassName?: string
+  /** Render the wordmark / theme-toggle bar. Off when the page draws its own. */
+  topBar?: boolean
+  /** Wrap the headline in a lattice-snapped paper plate (new landing). */
+  headlinePlate?: boolean
+}
+
+/** Wordmark + theme toggle row shared by the hero and the new-landing lattice header. */
+export function LandingHomeHeroTopBar({
+  className = "",
+  padClassName = landingColumnHorizontalPadClass,
+}: {
+  className?: string
+  padClassName?: string
+}) {
+  return (
+    <div
+      className={[
+        padClassName,
+        "flex items-center justify-between gap-4",
+        className,
+      ].join(" ")}
+    >
+      <Link
+        href="/"
+        aria-label="Ryle — go to home"
+        className={[
+          "relative z-10 inline-flex items-baseline gap-1 self-baseline py-2 sm:gap-1.5 sm:py-2.5",
+          "no-underline transition-opacity duration-500 ease-out hover:opacity-80 focus-visible:rounded-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-foreground",
+        ].join(" ")}
+      >
+        <span
+          aria-hidden
+          className={[landingHeroWordmarkTypeClassName, "text-muted"].join(" ")}
+        >
+          δ
+        </span>
+        <span aria-hidden className={landingHeroWordmarkTypeClassName}>
+          Ryle
+        </span>
+      </Link>
+      <LandingThemeToggle />
+    </div>
+  )
 }
 
 /**
@@ -59,7 +108,13 @@ export function LandingHomeHeroPinContent({
   rotatingWords,
   heroVisual,
   heroTitleClassName,
+  padClassName = landingColumnHorizontalPadClass,
+  plateClassName = "mt-10 sm:mt-14",
+  ctaRowClassName = "mt-10 flex w-full min-w-0 items-start justify-start text-left sm:mt-12",
+  topBar = true,
+  headlinePlate = false,
 }: LandingHomeHeroPinContentProps) {
+  const Plate = headlinePlate ? LatticePlate : "div"
   return (
     <>
       <div
@@ -69,48 +124,23 @@ export function LandingHomeHeroPinContent({
             : "mb-14 w-full min-w-0 sm:mb-16"
         }
       >
-        <div
-          className={[
-            landingViewportBleedClassName,
-            "mb-5 pt-5 sm:mb-6 sm:pt-6",
-          ].join(" ")}
-        >
+        {topBar ? (
           <div
             className={[
-              landingColumnHorizontalPadClass,
-              "flex items-center justify-between gap-4",
+              landingViewportBleedClassName,
+              "mb-5 pt-5 sm:mb-6 sm:pt-6",
             ].join(" ")}
           >
-            <Link
-              href="/"
-              aria-label="Ryle — go to home"
-              className={[
-                "relative z-10 inline-flex items-baseline gap-1 self-baseline py-2 sm:gap-1.5 sm:py-2.5",
-                "no-underline transition-opacity duration-500 ease-out hover:opacity-80 focus-visible:rounded-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-foreground",
-              ].join(" ")}
-            >
-              <span
-                aria-hidden
-                className={[landingHeroWordmarkTypeClassName, "text-muted"].join(
-                  " ",
-                )}
-              >
-                δ
-              </span>
-              <span aria-hidden className={landingHeroWordmarkTypeClassName}>
-                Ryle
-              </span>
-            </Link>
-            <LandingThemeToggle />
+            <LandingHomeHeroTopBar padClassName={padClassName} />
           </div>
-        </div>
+        ) : null}
 
         {eyebrow ? (
           <p className="mb-4 font-mono text-xs uppercase tracking-wide text-muted transition-colors duration-500 ease-out sm:mb-5">
             {eyebrow}
           </p>
         ) : null}
-        <LandingNewHeroGridPlate className="mt-10 sm:mt-14">
+        <Plate className={plateClassName}>
           <LandingHomeHeroTextEffect
             title={heroTitle}
             titleTwoLine={heroTitleTwoLine}
@@ -122,7 +152,7 @@ export function LandingHomeHeroPinContent({
               {subline}
             </p>
           ) : null}
-          <div className="mt-10 flex w-full min-w-0 items-start justify-start text-left sm:mt-12">
+          <div className={ctaRowClassName}>
             <LandingHomeHeroFadeUp
               delay={HERO_CTA_FADE_DELAY_S}
               className="flex shrink-0 flex-col items-start"
@@ -144,7 +174,7 @@ export function LandingHomeHeroPinContent({
               </div>
             </LandingHomeHeroFadeUp>
           </div>
-        </LandingNewHeroGridPlate>
+        </Plate>
       </div>
 
       {heroVisual !== undefined ? (

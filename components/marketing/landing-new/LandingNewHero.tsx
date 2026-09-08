@@ -1,7 +1,10 @@
 import dynamic from "next/dynamic"
-import { LandingHomeHeroPinContent } from "@/components/marketing/landing/LandingHomeHeroPinContent"
-import { LandingNewHeroGrid } from "@/components/marketing/landing-new/LandingNewHeroGrid"
+import {
+  LandingHomeHeroPinContent,
+  LandingHomeHeroTopBar,
+} from "@/components/marketing/landing/LandingHomeHeroPinContent"
 import { LandingNewHeroStat } from "@/components/marketing/landing-new/LandingNewHeroStat"
+import { LatticeSection } from "@/components/marketing/landing-new/lattice/LatticeSection"
 import {
   LandingHomeNavScrollScope,
   LandingHomeStickyNav,
@@ -10,14 +13,9 @@ import {
   landingHeroPrimaryCtaClassName,
   landingNewHeroDisplayClassName,
 } from "@/lib/landingHeroTypography"
-import {
-  landingColumnPadClass,
-  landingNewColumnPadClass,
-  landingViewportBleedClassName,
-} from "@/lib/landingLayout"
-import {
-  LANDING_MARKETING_CONTACT_HREF,
-} from "@/lib/siteNav"
+import { landingNewColumnHorizontalPadClass } from "@/lib/landingLayout"
+import { LATTICE_ROOT_ATTR, LATTICE_SPACE } from "@/lib/landingLattice"
+import { LANDING_MARKETING_CONTACT_HREF } from "@/lib/siteNav"
 
 const LandingNewLowerSections = dynamic(
   () =>
@@ -42,56 +40,58 @@ const HERO_ROTATING_WORDS = [
 const HERO_CTA_LABEL = "Talk to us"
 
 const HERO_SUBLINE =
-  "Issue your own assets, move money instantly, and put payments and cards inside your product — on modular infrastructure that runs in your cloud and stays yours."
+  "Issue your own assets, move money instantly, and put payments and cards inside your product, on modular infrastructure that runs in your cloud and stays yours."
 
+/**
+ * New landing. `<main>` is the lattice root (row 0); every child is a
+ * `LatticeSection`, so section tops stay on 64px lines all the way down.
+ */
 export function LandingNewHero() {
   return (
-    <div className={landingNewColumnPadClass}>
+    <main
+      id="new-landing"
+      aria-label="New landing preview"
+      className="w-full min-w-0 scroll-mt-6"
+      {...{ [LATTICE_ROOT_ATTR]: "" }}
+    >
       <p
         aria-hidden
-        className="pointer-events-none fixed top-4 left-[max(1.5rem,env(safe-area-inset-left))] z-50 font-mono text-[11px] uppercase tracking-wide text-muted/50 sm:text-xs"
+        className="pointer-events-none fixed top-4 left-[max(2rem,env(safe-area-inset-left))] z-50 font-mono text-[11px] uppercase tracking-wide text-muted/50 sm:text-xs"
       >
         Preview · not indexed
       </p>
-      <main
-        id="new-landing"
-        aria-label="New landing preview"
-        className="w-full min-w-0 scroll-mt-6"
-      >
-        <div className="relative">
-          <div
-            aria-hidden
-            data-hero-grid-origin
-            className="pointer-events-none absolute inset-y-0 left-1/2 z-0 w-screen max-w-[100vw] -translate-x-1/2 overflow-hidden [mask-image:linear-gradient(to_bottom,transparent_0%,transparent_10%,black_30%,black_80%,transparent_100%)] [-webkit-mask-image:linear-gradient(to_bottom,transparent_0%,transparent_10%,black_30%,black_80%,transparent_100%)]"
-          >
-            <LandingNewHeroGrid />
-          </div>
-          <div className={`${landingViewportBleedClassName} relative z-10 pb-0`}>
-            <div className={landingColumnPadClass}>
-              <LandingHomeHeroPinContent
-                contactHref={LANDING_MARKETING_CONTACT_HREF}
-                homeHeroCtaClassName={landingHeroPrimaryCtaClassName}
-                heroTitle={HERO_TITLE}
-                heroTitleTwoLine={HERO_TITLE_TWO_LINE}
-                heroTitleClassName={landingNewHeroDisplayClassName}
-                rotatingWords={HERO_ROTATING_WORDS}
-                subline={HERO_SUBLINE}
-                ctaLabel={HERO_CTA_LABEL}
-                heroVisual={null}
-              />
-            </div>
-          </div>
-          <div className="relative z-10">
-            <LandingNewHeroStat />
-          </div>
+      {/* One lattice row: the top bar is full-width like the sticky nav it hands off to. */}
+      <LandingHomeHeroTopBar
+        className="relative z-10 h-16"
+        padClassName={landingNewColumnHorizontalPadClass}
+      />
+      <LatticeSection as="div" grid gridMask="hero" pad={false} className="pb-16 md:pb-32">
+        <LandingHomeHeroPinContent
+          contactHref={LANDING_MARKETING_CONTACT_HREF}
+          homeHeroCtaClassName={landingHeroPrimaryCtaClassName}
+          heroTitle={HERO_TITLE}
+          heroTitleTwoLine={HERO_TITLE_TWO_LINE}
+          heroTitleClassName={landingNewHeroDisplayClassName}
+          rotatingWords={HERO_ROTATING_WORDS}
+          subline={HERO_SUBLINE}
+          ctaLabel={HERO_CTA_LABEL}
+          heroVisual={null}
+          topBar={false}
+          headlinePlate
+          plateClassName="mt-16"
+          ctaRowClassName="mt-8 flex w-full min-w-0 items-start justify-start text-left sm:mt-16"
+        />
+        <LandingNewHeroStat className={LATTICE_SPACE.block} />
+      </LatticeSection>
+      <LandingHomeNavScrollScope>
+        <div className="relative z-20">
+          <LandingHomeStickyNav
+            padClassName={landingNewColumnHorizontalPadClass}
+            sentinelInFlow={false}
+          />
+          <LandingNewLowerSections />
         </div>
-        <LandingHomeNavScrollScope>
-          <div className="relative z-20">
-            <LandingHomeStickyNav />
-            <LandingNewLowerSections />
-          </div>
-        </LandingHomeNavScrollScope>
-      </main>
-    </div>
+      </LandingHomeNavScrollScope>
+    </main>
   )
 }

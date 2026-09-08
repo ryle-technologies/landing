@@ -6,7 +6,7 @@ const NEW_LANDING_TITLE =
   "Ryle · Financial infrastructure for the digital economy";
 
 const NEW_LANDING_DESCRIPTION =
-  "Ryle gives companies a modular stack to issue assets, move money, and run payments and cards onchain — private by design, deployed in your cloud, yours to own.";
+  "Ryle gives companies a modular stack to issue assets, move money, and run payments and cards onchain. Private by design, deployed in your cloud, yours to own.";
 
 export const metadata: Metadata = {
   ...buildRootMetadata(),

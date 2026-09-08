@@ -10,7 +10,7 @@ const HERO_TEXT_SPEED_SEGMENT = 1.4
 const HERO_WORD_STAGGER_S = 0.05 / HERO_TEXT_SPEED_REVEAL
 
 const leadClassName =
-  "font-serif text-[18px] font-normal italic leading-snug tracking-[-0.03em] text-muted sm:text-[28px]"
+  "block font-serif text-[18px] font-normal italic leading-snug tracking-[-0.03em] text-muted sm:text-[28px]"
 
 const restClassName = `relative text-left transition-colors duration-500 ease-out ${landingNewLargeDisplayClassName}`
 
@@ -62,7 +62,7 @@ export function LandingNewPillarsHeading({
       ref={headingRef}
       id={headingId}
       aria-label={fullTitle}
-      className="relative text-left"
+      className="relative flex flex-col gap-8 text-left sm:gap-16"
     >
       <span
         aria-hidden
@@ -72,7 +72,6 @@ export function LandingNewPillarsHeading({
       >
         {lead}
       </span>
-      <br />
       <span aria-hidden className={restClassName}>
         {reduceMotion ? (
           <>

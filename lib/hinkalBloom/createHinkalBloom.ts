@@ -9,12 +9,11 @@ import { NODE_LOGOS } from "@/lib/hinkalBloom/nodeLogos"
  * What it does:
  * - Renders the dot-matrix bloom from {@link BLOOM_GRID} with pre-rendered
  *   sprites, a radial vignette and top/bottom fades (cached to a static layer).
- * - Repels cells away from the pointer (eased, following).
- * - Places six wallet-logo "nodes" (3 per side). Hovering one (or the first
- *   auto-fire after `autoDelay`) plays a transaction: amount pill → flies along a
- *   bézier arc with a dashed trail → absorbed into a cream wallet block on the
- *   bloom → blurred `***` pill → flies to a seat on a hidden ellipse → cyan
- *   shield block → drain → fade.
+ * - Repels cells away from a wandering auto-hover (or the pointer if
+ *   `CFG.repelAuto` is off).
+ * - Optional (`CFG.showNodes`): six wallet-logo nodes and a transaction play
+ *   (amount pill → trail → wallet/shield blocks). Off on the landing card so
+ *   only the globe remains.
  */
 
 /**
@@ -114,14 +113,27 @@ const CFG = {
   /** Fraction of empty lattice squares left undrawn (stable per cell). */
   gridSkip: 0.3,
   repel: true,
-  repelRadius: 90,
-  repelPush: 18,
+  /** Wander a lens around the disc instead of following the pointer. */
+  repelAuto: true,
+  /** Hold at each wander target, seconds `[min, max]`. */
+  repelAutoHold: [0.55, 1.65],
+  /** Chance, when a hold ends, to lift the lens off the disc. */
+  repelAutoLeave: 0.22,
+  /** Seconds the lens stays off when it lifts, `[min, max]`. */
+  repelAutoAway: [0.35, 0.8],
+  /** Fraction of the disc radius the wander stays inside. */
+  repelAutoReach: 0.72,
+  repelRadius: 140,
+  repelPush: 28,
   repelEase: 0.18,
-  repelFollow: 0.1,
+  /** Slower than a real pointer so the auto wander reads as a hand. */
+  repelFollow: 0.22,
   fadeBottom: 1.4,
   fadeTop: 1.2,
   fadeTopMin: 0.55,
   fadeVignette: 0.35,
+  /** Where the disc rim starts fading (0–1 of radius). Lower = softer edge. */
+  featherInner: 0.72,
   /** Radial vignette centre/scale in shape-bbox units. Centred, gentle falloff. */
   vignetteCx: 0.5,
   vignetteCy: 0.5,
@@ -130,7 +142,7 @@ const CFG = {
   /** Max horizontal distance from a wallet node to the shape edge, ref px. */
   nodeReach: 250,
   /** Fraction of the stage's shorter side the grid spans. */
-  logoScale: 1.12,
+  logoScale: 1.52,
   blockScale: 2.15,
   amountBlur: 3.2,
   tipInset: 2.4,
@@ -141,6 +153,8 @@ const CFG = {
   nodeInset: [16, 0, 8],
   nodeRest: 0,
   nodeClear: 10,
+  /** Wallet-logo nodes and the transaction overlay (pills, trails, blocks). */
+  showNodes: false,
   autoDelay: 1.5,
   tNodeWake: 0.4,
   wiggleDeg: 2.2,
@@ -322,11 +336,13 @@ export function createHinkalBloom(
   const COLS = BLOOM_GRID.cols
   const ROWS = BLOOM_GRID.rows
 
-  const logoImgs = NODE_LOGOS.map((L) => {
-    const im = new Image()
-    im.src = "data:image/svg+xml;charset=utf-8," + encodeURIComponent(L.svg)
-    return im
-  })
+  const logoImgs = CFG.showNodes
+    ? NODE_LOGOS.map((L) => {
+        const im = new Image()
+        im.src = "data:image/svg+xml;charset=utf-8," + encodeURIComponent(L.svg)
+        return im
+      })
+    : []
 
   let W = 0
   let H = 0
@@ -353,6 +369,10 @@ export function createHinkalBloom(
   let repY = 0
   let repAmt = 0
   let repSeen = false
+  let wanderTx = 0
+  let wanderTy = 0
+  let wanderHold = 0
+  let wanderOn = true
   let visBB = { i0: 0, i1: 0, j0: 0, j1: 0 }
   let outerCells: Cell[] = []
   const txs: Tx[] = []
@@ -617,19 +637,29 @@ export function createHinkalBloom(
     g.clip()
   }
 
-  /** Soften the last ~12% of the circle so the mask doesn't cut cells as a hard edge. */
+  /** Soften the rim so the mask doesn't cut cells as a hard edge. */
   function featherDisc(g: CanvasRenderingContext2D) {
     const r = discRadius()
     const cx = W / 2
     const cy = CY()
     g.save()
     g.globalCompositeOperation = "destination-in"
-    const grd = g.createRadialGradient(cx, cy, r * 0.86, cx, cy, r)
+    const grd = g.createRadialGradient(cx, cy, r * CFG.featherInner, cx, cy, r)
     grd.addColorStop(0, "#fff")
     grd.addColorStop(1, "rgba(255,255,255,0)")
     g.fillStyle = grd
     g.fillRect(0, 0, W, H)
     g.restore()
+  }
+
+  /** Fade a drawn point by distance from the disc centre (matches `featherDisc`). */
+  function discFadeAt(x: number, y: number) {
+    const r = discRadius()
+    const d = Math.hypot(x - W / 2, y - CY())
+    const inner = r * CFG.featherInner
+    if (d <= inner) return 1
+    if (d >= r) return 0
+    return smooth(1 - (d - inner) / (r - inner))
   }
 
   /** Empty lattice squares (same size as `B`) filling the stage around the disc. */
@@ -670,9 +700,48 @@ export function createHinkalBloom(
     OY = CY() - ((visBB.j0 + visBB.j1) / 2 + 0.5) * P
     layoutNodes()
     makeSprites()
+    if (CFG.repelAuto && !repSeen) seedWander(true)
+  }
+
+  function randRange(span: readonly [number, number]) {
+    return span[0] + Math.random() * (span[1] - span[0])
+  }
+
+  /** Random point inside the disc, biased toward the centre. */
+  function wanderInside(): Pt {
+    const r = discRadius() * CFG.repelAutoReach
+    const a = Math.random() * Math.PI * 2
+    const d = Math.sqrt(Math.random()) * r
+    return [W / 2 + Math.cos(a) * d, CY() + Math.sin(a) * d]
+  }
+
+  function pickWanderTarget() {
+    const [x, y] = wanderInside()
+    wanderTx = x
+    wanderTy = y
+    mouseX = x
+    mouseY = y
+    wanderOn = true
+    mouseIn = true
+    wanderHold = randRange(CFG.repelAutoHold)
+  }
+
+  function seedWander(snap: boolean) {
+    if (!P || !W) return
+    pickWanderTarget()
+    if (snap) {
+      repX = wanderTx
+      repY = wanderTy
+      repAmt = 1
+      repSeen = true
+    }
   }
 
   function layoutNodes() {
+    if (!CFG.showNodes) {
+      nodes = []
+      return
+    }
     const S = CFG.nodeSize * K
     const half = S / 2
     const lEdge = OX + visBB.i0 * P
@@ -907,6 +976,18 @@ export function createHinkalBloom(
   function step(dt: number) {
     T += dt
     if (CFG.repel) {
+      if (CFG.repelAuto && P && W) {
+        wanderHold -= dt
+        if (wanderHold <= 0) {
+          if (wanderOn && Math.random() < CFG.repelAutoLeave) {
+            wanderOn = false
+            mouseIn = false
+            wanderHold = randRange(CFG.repelAutoAway)
+          } else {
+            pickWanderTarget()
+          }
+        }
+      }
       const target = mouseIn ? 1 : 0
       const d = dt / Math.max(0.001, CFG.repelEase)
       repAmt = target > repAmt ? Math.min(target, repAmt + d) : Math.max(target, repAmt - d)
@@ -949,6 +1030,8 @@ export function createHinkalBloom(
     return null
   }
 
+  const listenPointer = CFG.showNodes || (CFG.repel && !CFG.repelAuto)
+
   const onPointerMove = (e: PointerEvent) => {
     const b = cv.getBoundingClientRect()
     const mx = e.clientX - b.left
@@ -956,7 +1039,7 @@ export function createHinkalBloom(
     const hit = pickNode(mx, my)
     for (const n of nodes) n.hot = n === hit
     if (hit) fire(hit)
-    if (CFG.repel && P) {
+    if (CFG.repel && !CFG.repelAuto && P) {
       const pad = CFG.repelRadius * K
       mouseX = mx
       mouseY = my
@@ -974,11 +1057,11 @@ export function createHinkalBloom(
   }
   const onPointerLeave = () => {
     for (const n of nodes) n.hot = false
-    mouseIn = false
+    if (!CFG.repelAuto) mouseIn = false
   }
 
   function drawNodes() {
-    if (!nodes.length || !sprites) return
+    if (!CFG.showNodes || !nodes.length || !sprites) return
     const NS = CFG.nodeSize * K
     for (const n of nodes) {
       if (n.wake <= 0.002) continue
@@ -1029,7 +1112,10 @@ export function createHinkalBloom(
           oy = -push * f
         }
       }
-      ctx!.globalAlpha = clamp(c.type === "/" ? c.lv * 0.55 : c.lv * 1.12, 0, 1) * cellFade(c)
+      ctx!.globalAlpha =
+        clamp(c.type === "/" ? c.lv * 0.55 : c.lv * 1.12, 0, 1) *
+        cellFade(c) *
+        discFadeAt(p[0] + ox, p[1] + oy)
       if (ctx!.globalAlpha < 0.004) continue
       ctx!.drawImage(spr, p[0] + ox - sz / 2, p[1] + oy - sz / 2, sz, sz)
     }
@@ -1045,6 +1131,7 @@ export function createHinkalBloom(
       if (CFG.background) drawGrid(ctx!)
       drawPattern()
       ctx!.restore()
+      featherDisc(ctx!)
     } else if (statik) {
       ctx!.setTransform(1, 0, 0, 1, 0, 0)
       ctx!.drawImage(statik, 0, 0)
@@ -1346,8 +1433,10 @@ export function createHinkalBloom(
   resize()
   const ro = new ResizeObserver(resize)
   ro.observe(host)
-  cv.addEventListener("pointermove", onPointerMove)
-  cv.addEventListener("pointerleave", onPointerLeave)
+  if (listenPointer) {
+    cv.addEventListener("pointermove", onPointerMove)
+    cv.addEventListener("pointerleave", onPointerLeave)
+  }
   if (document.fonts) {
     // Ensure the mono face is actually fetched (it may not be used by any DOM
     // text yet), then re-rasterise sprites with it.
@@ -1376,8 +1465,10 @@ export function createHinkalBloom(
       stop()
       ro.disconnect()
       io?.disconnect()
-      cv.removeEventListener("pointermove", onPointerMove)
-      cv.removeEventListener("pointerleave", onPointerLeave)
+      if (listenPointer) {
+        cv.removeEventListener("pointermove", onPointerMove)
+        cv.removeEventListener("pointerleave", onPointerLeave)
+      }
     },
     setPalette(palette) {
       PAL = { ...PAL, ...palette }

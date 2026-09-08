@@ -147,14 +147,31 @@ select,
 }
 
 /**
- * Feature + console column on the new landing. Plain CSS so the cap cannot
- * be dropped if Tailwind never emits an arbitrary `max-w-[…]` utility.
- * 68rem → 1088px at a 16px root.
+ * ─── New-landing lattice column ─────────────────────────────────────────────
+ * Content column for every `LatticeSection` (see `lib/landingLattice.ts`).
+ * Always a whole number of 64px cells and centred, so its left edge is a
+ * lattice line and anything sized in cells inside it lands on the grid.
+ * Caps at 16 cells (1024px); keeps at least a 16px gutter (32px at the cap).
  */
-.landing-new-feature-column {
-  width: 100%;
-  max-width: 68rem;
+.landing-lattice-column {
+  width: calc(100% - 4rem);
+  max-width: 64rem;
   margin-inline: auto;
+}
+
+@supports (width: round(down, 10px, 4px)) {
+  .landing-lattice-column {
+    width: min(64rem, round(down, 100% - 2rem, 4rem));
+  }
+}
+
+/* 1px lattice line — same values as LATTICE_LINE_LIGHT / _DARK for the canvas. */
+.marketing-viewport-bleed {
+  --lattice-line: rgba(232, 228, 223, 0.88);
+}
+
+.marketing-viewport-bleed.dark {
+  --lattice-line: rgba(58, 55, 51, 0.92);
 }
 
 .marketing-viewport-bleed {
@@ -435,6 +452,28 @@ html:has(.marketing-viewport-bleed.dark) body {
 /* Use-case tiles: width and height ease when a block expands or contracts. */
 .marketing-viewport-bleed .landing-new-use-case-card {
   transition-property: width, height !important;
+  transition-duration: 420ms !important;
+  transition-timing-function: cubic-bezier(0.65, 0, 0.35, 1) !important;
+}
+
+/* Idle tiles: a slight hover tint. */
+.marketing-viewport-bleed .landing-new-use-case-card-idle {
+  transition-property: background-color !important;
+  transition-duration: 160ms !important;
+  transition-timing-function: ease-out !important;
+}
+
+/* 2D mark eases to the copy's left inset when the tile expands. */
+.marketing-viewport-bleed .landing-new-use-case-shape-slot {
+  transition-property: left !important;
+  transition-duration: 420ms !important;
+  transition-timing-function: cubic-bezier(0.65, 0, 0.35, 1) !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .marketing-viewport-bleed .landing-new-use-case-shape-slot {
+    transition: none !important;
+  }
 }
 
 /* Track slides one lattice cell after a tile collapses. */
@@ -589,6 +628,29 @@ html:has(.marketing-viewport-bleed.dark) body {
   .wallet-demo-shell .qr-shimmer-overlay::after {
     animation: none;
   }
+}
+
+/*
+ * Remittances console embed — HeroUI light tokens from the ryle-app
+ * remittances page, scoped so marketing dark mode cannot recolour the product UI.
+ */
+.landing-remittances-dashboard {
+  --rem-bg: oklch(0.985 0.002 286);
+  --rem-card: oklch(1 0 0);
+  --rem-fg: oklch(0.21 0.006 286);
+  --rem-muted: oklch(0.556 0.014 286);
+  --rem-border: oklch(0.92 0.004 286);
+  --rem-secondary: oklch(0.96 0.003 286);
+  --accent: oklch(0.21 0.006 286);
+  --accent-foreground: oklch(0.985 0 0);
+  --chart-1: oklch(0.646 0.16 250);
+  --chart-2: oklch(0.72 0.13 70);
+  --chart-3: oklch(0.6 0.12 165);
+  --chart-4: oklch(0.7 0.13 40);
+  --success: oklch(0.55 0.16 150);
+  --warning: oklch(0.75 0.15 75);
+  --danger: oklch(0.577 0.215 27);
+  color: var(--rem-fg);
 }
 
 /* Inside the phone: subtle tap-circle cursor like the product's desktop preview. */

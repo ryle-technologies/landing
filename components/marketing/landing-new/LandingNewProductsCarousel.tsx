@@ -10,17 +10,20 @@ import {
   type ReactNode,
 } from "react"
 import { useReducedMotion } from "motion/react"
-import { useMarketingTheme } from "@/components/marketing/MarketingThemeProvider"
 import {
   LandingNewUseCaseShape,
   USE_CASE_SHAPE_REVERT_MS,
 } from "@/components/marketing/landing-new/LandingNewUseCaseShape"
+import {
+  LandingNewUseCaseTitleReveal,
+  useCaseTitleRevealMs,
+} from "@/components/marketing/landing-new/LandingNewUseCaseTitleReveal"
 import type { LandingNewUseCaseShapeKind } from "@/lib/landingNewUseCaseSolids"
 import {
-  HERO_GRID_CELL_PX,
-  HERO_GRID_LINE_DARK,
-  HERO_GRID_LINE_LIGHT,
-} from "@/lib/landingNewHeroGrid"
+  LATTICE_CELL_PX,
+  LATTICE_COLUMN_ATTR,
+  latticeCellStrokeClassName,
+} from "@/lib/landingLattice"
 import {
   LANDING_SNAP_EASE_BEZIER,
   LANDING_SNAP_HOLD_MS,
@@ -49,34 +52,30 @@ type LandingNewProductsCarouselProps = {
   className?: string
   /** Milliseconds to hold an expanded tile before the next. 0 disables autoplay. */
   autoplayDelayMs?: number
-  /**
-   * Attribute on the section's 60px lattice origin (see `LandingNewHeroGrid`).
-   * The cluster is nudged so every tile edge sits on a lattice line.
-   */
-  gridOriginAttr: string
+  /** Keep idle 2D plates — skip the 3D sketch when a tile is live. */
+  flatShapes?: boolean
 }
 
 /**
  * The first lattice cell is the stage. A tile grows there, showcases, settles
  * back to 2D, collapses, then the whole row slides one cell left so the next
- * tile lands on the stage. The row repeats past the unique list so tiles reach
- * the right edge of the page; the last five fade out. Viewport height is
- * reserved to the tallest expanded tile so grow/collapse never moves the page.
+ * tile lands on the stage. The row repeats both ways so tiles reach the page
+ * edges; the right five fade out, and a shorter fade covers the left. Viewport
+ * height is reserved to the tallest expanded tile so grow/collapse never moves
+ * the page.
+ *
+ * Render it full-bleed inside a `LatticeSection` column: the stage's left
+ * edge is the column's left edge, so every tile edge is a lattice line.
  */
-const CELL = HERO_GRID_CELL_PX
+const CELL = LATTICE_CELL_PX
 const CONTRACTED_COLS = 1
 const CONTRACTED_ROWS = 1
 const MIN_EXPANDED_COLS = 4
 const MAX_COLS = 8
 const MIN_EXPANDED_ROWS = 4
 const DEFAULT_EXPANDED_ROWS = 5
-const CARD_PAD_X = 24
+const CARD_PAD_X = 32
 const SHAPE_SLOT_PX = CELL
-
-const CONTENT_COLUMN_PX = 1088
-const CONTENT_COLUMN_PAD_PX = 24
-const PLATE_PAD_PX = 8
-const GRID_OFFSET_EPSILON = 0.5
 
 const HOLD_MS = LANDING_SNAP_HOLD_MS
 const EXPAND_MS = LANDING_SNAP_MS
@@ -85,15 +84,16 @@ const TEXT_FADE_MS = 320
 const TEXT_HIDE_MS = 150
 const FADE_TAIL_ITEMS = 5
 const FADE_TAIL_PX = FADE_TAIL_ITEMS * CELL
+const FADE_LEAD_ITEMS = 2
+const FADE_LEAD_PX = FADE_LEAD_ITEMS * CELL
 const SNAP_EASE = `cubic-bezier(${LANDING_SNAP_EASE_BEZIER.join(", ")})`
 
-/** Survives Strict Mode remounts so the cycle does not stack. */
-let autoplayTimerId = 0
-let chainTimerId = 0
-
-function clusterInset(viewSize: number) {
-  if (viewSize < CONTENT_COLUMN_PX + 2 * CONTENT_COLUMN_PAD_PX) return CELL
-  return (viewSize - CONTENT_COLUMN_PX) / 2 + CONTENT_COLUMN_PAD_PX - PLATE_PAD_PX
+/** Left padding that puts the stage on the enclosing lattice column's left edge. */
+function columnInset(viewport: HTMLElement) {
+  const column = viewport.closest(`[${LATTICE_COLUMN_ATTR}]`)
+  if (!column) return CELL
+  const inset = column.getBoundingClientRect().left - viewport.getBoundingClientRect().left
+  return inset > 0 ? inset : CELL
 }
 
 function clamp(value: number, min: number, max: number) {
@@ -102,14 +102,14 @@ function clamp(value: number, min: number, max: number) {
 
 function estimateCols(label: string) {
   return clamp(
-    Math.ceil((label.length * 13 + 2 * CARD_PAD_X) / CELL),
+    Math.ceil((label.length * 12 + 2 * CARD_PAD_X) / CELL),
     MIN_EXPANDED_COLS,
     MAX_COLS,
   )
 }
 
 function sizePx(cells: number) {
-  return cells * CELL + 1
+  return cells * CELL
 }
 
 function wrapIndex(index: number, length: number) {
@@ -122,7 +122,7 @@ type TileMetrics = {
 }
 
 const cardTitleClassName =
-  "text-left font-sans text-[26px] font-medium leading-snug tracking-tight text-foreground transition-colors duration-500 ease-out sm:text-[28px]"
+  "text-left font-sans text-[20px] font-medium leading-snug tracking-tight text-foreground transition-colors duration-500 ease-out sm:text-[22px]"
 
 const cardBadgeClassName =
   "mt-2 block text-left font-mono text-[11px] uppercase leading-snug tracking-wide text-muted transition-colors duration-500 ease-out"
@@ -134,33 +134,41 @@ const cardCtaClassName =
   "inline-flex items-center justify-center rounded-full border border-foreground/25 bg-transparent px-2.5 py-1.5 text-[13px] font-semibold leading-none tracking-[-0.01em] text-foreground transition-[border-color,opacity,color] duration-500 ease-out hover:border-foreground/45 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-foreground"
 
 const cardCopyClassName =
-  "flex w-full flex-col items-start px-6 pb-8 pt-10"
+  "flex w-full flex-col items-start px-8 pb-8 pt-16"
 
 function UseCaseCardCopy({
   item,
   cta,
+  title,
+  restStyle,
 }: {
   item: LandingNewProductsCarouselItem
   cta?: ReactNode
+  title?: ReactNode
+  restStyle?: CSSProperties
 }) {
   return (
     <>
-      <h3 className={`${cardTitleClassName} pb-2`}>
-        {item.label}
+      <h3 aria-hidden className={`${cardTitleClassName} pb-2`}>
+        {title ?? item.label}
         {item.badge ? (
-          <span className={cardBadgeClassName}>{item.badge}</span>
+          <span className={cardBadgeClassName} style={restStyle}>
+            {item.badge}
+          </span>
         ) : null}
       </h3>
-      {item.visual ? (
-        <div
-          aria-hidden
-          className="relative mb-5 w-full min-w-0 shrink-0 overflow-hidden"
-        >
-          {item.visual}
-        </div>
-      ) : null}
-      <p className={cardBodyClassName}>{item.body}</p>
-      {cta}
+      <div style={restStyle}>
+        {item.visual ? (
+          <div
+            aria-hidden
+            className="relative mb-5 w-full min-w-0 shrink-0 overflow-hidden"
+          >
+            {item.visual}
+          </div>
+        ) : null}
+        <p className={cardBodyClassName}>{item.body}</p>
+        {cta}
+      </div>
     </>
   )
 }
@@ -170,11 +178,10 @@ export function LandingNewProductsCarousel({
   ariaLabel,
   className,
   autoplayDelayMs = HOLD_MS,
-  gridOriginAttr,
+  flatShapes = false,
 }: LandingNewProductsCarouselProps) {
   const reduceMotion = useReducedMotion() ?? false
   const autoplayEnabled = autoplayDelayMs > 0 && !reduceMotion
-  const isDark = useMarketingTheme()?.isDark ?? false
   const count = items.length
 
   const viewportRef = useRef<HTMLDivElement>(null)
@@ -183,7 +190,9 @@ export function LandingNewProductsCarousel({
   const headRef = useRef(0)
   const expandedRef = useRef(false)
   const liveRef = useRef(false)
-  const gridOffsetRef = useRef({ x: 0, y: 0 })
+  const pendingGrowRef = useRef(false)
+  const autoplayTimerId = useRef(0)
+  const chainTimerId = useRef(0)
 
   const [head, setHead] = useState(0)
   const [expanded, setExpanded] = useState(false)
@@ -199,16 +208,16 @@ export function LandingNewProductsCarousel({
   )
   const [inset, setInset] = useState(CELL)
   const [fillSlots, setFillSlots] = useState(count)
-  const [gridOffset, setGridOffset] = useState({ x: 0, y: 0 })
+  const [leadSlots, setLeadSlots] = useState(2)
 
   headRef.current = head
   expandedRef.current = expanded
   liveRef.current = live
 
   const clearChain = () => {
-    if (chainTimerId) {
-      window.clearTimeout(chainTimerId)
-      chainTimerId = 0
+    if (chainTimerId.current) {
+      window.clearTimeout(chainTimerId.current)
+      chainTimerId.current = 0
     }
   }
 
@@ -218,22 +227,35 @@ export function LandingNewProductsCarousel({
       fn()
       return
     }
-    chainTimerId = window.setTimeout(() => {
-      chainTimerId = 0
+    chainTimerId.current = window.setTimeout(() => {
+      chainTimerId.current = 0
       fn()
     }, ms)
   }
 
   const openStage = useCallback(() => {
-    window.clearTimeout(autoplayTimerId)
+    window.clearTimeout(autoplayTimerId.current)
     setLive(false)
-    setExpanded(true)
     if (reduceMotion) {
+      pendingGrowRef.current = false
+      setExpanded(true)
       setLive(true)
       return
     }
-    after(EXPAND_MS, () => setLive(true))
+    pendingGrowRef.current = true
+    setExpanded(false)
   }, [reduceMotion])
+
+  useLayoutEffect(() => {
+    if (!pendingGrowRef.current || reduceMotion) return
+    const frame = window.requestAnimationFrame(() => {
+      if (!pendingGrowRef.current) return
+      pendingGrowRef.current = false
+      setExpanded(true)
+      after(EXPAND_MS, () => setLive(true))
+    })
+    return () => window.cancelAnimationFrame(frame)
+  })
 
   const rotateTo = useCallback(
     (nextHead: number) => {
@@ -266,15 +288,24 @@ export function LandingNewProductsCarousel({
 
   const goTo = useCallback(
     (nextHead: number) => {
-      window.clearTimeout(autoplayTimerId)
+      window.clearTimeout(autoplayTimerId.current)
       const advance = () => rotateTo(wrapIndex(nextHead, count))
 
       if (liveRef.current) {
         setLive(false)
-        after(reduceMotion ? 0 : USE_CASE_SHAPE_REVERT_MS, () => {
-          setExpanded(false)
-          after(reduceMotion ? 0 : EXPAND_MS, advance)
-        })
+        const titleExitMs = useCaseTitleRevealMs(
+          items[headRef.current]?.label ?? "",
+        )
+        const revertMs = flatShapes ? titleExitMs : Math.max(USE_CASE_SHAPE_REVERT_MS, titleExitMs)
+        after(
+          reduceMotion
+            ? 0
+            : revertMs,
+          () => {
+            setExpanded(false)
+            after(reduceMotion ? 0 : EXPAND_MS, advance)
+          },
+        )
         return
       }
       if (expandedRef.current) {
@@ -284,7 +315,7 @@ export function LandingNewProductsCarousel({
       }
       advance()
     },
-    [count, reduceMotion, rotateTo],
+    [count, flatShapes, items, reduceMotion, rotateTo],
   )
 
   const goToRef = useRef(goTo)
@@ -297,7 +328,7 @@ export function LandingNewProductsCarousel({
     openStage()
     return () => {
       clearChain()
-      window.clearTimeout(autoplayTimerId)
+      window.clearTimeout(autoplayTimerId.current)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [count])
@@ -306,12 +337,12 @@ export function LandingNewProductsCarousel({
     if (!autoplayEnabled || count < 2) return
     if (!live) return
 
-    window.clearTimeout(autoplayTimerId)
-    autoplayTimerId = window.setTimeout(() => {
+    window.clearTimeout(autoplayTimerId.current)
+    autoplayTimerId.current = window.setTimeout(() => {
       goToRef.current(headRef.current + 1)
     }, autoplayDelayMs)
 
-    return () => window.clearTimeout(autoplayTimerId)
+    return () => window.clearTimeout(autoplayTimerId.current)
   }, [autoplayEnabled, autoplayDelayMs, live, count])
 
   useLayoutEffect(() => {
@@ -321,8 +352,10 @@ export function LandingNewProductsCarousel({
     const measure = () => {
       const nextViewWidth = viewport.getBoundingClientRect().width
       if (nextViewWidth < 2) return
-      const nextInset = clusterInset(nextViewWidth)
+      const nextInset = columnInset(viewport)
       setInset((prev) => (Math.abs(prev - nextInset) < 0.5 ? prev : nextInset))
+      const nextLead = Math.max(1, Math.floor(nextInset / CELL))
+      setLeadSlots((prev) => (prev === nextLead ? prev : nextLead))
       const cellsToEdge = Math.ceil((nextViewWidth - nextInset) / CELL) + 1
       setFillSlots((prev) => {
         const next = Math.max(count, cellsToEdge)
@@ -366,68 +399,31 @@ export function LandingNewProductsCarousel({
     measure()
     const ro = new ResizeObserver(measure)
     ro.observe(viewport)
+    const column = viewport.closest(`[${LATTICE_COLUMN_ATTR}]`)
+    if (column) ro.observe(column)
+    window.addEventListener("resize", measure)
     const fonts = document.fonts?.ready.then(measure)
     return () => {
       ro.disconnect()
+      window.removeEventListener("resize", measure)
       void fonts
     }
-  }, [items])
-
-  useLayoutEffect(() => {
-    const viewport = viewportRef.current
-    if (!viewport) return
-
-    const apply = () => {
-      const originEl = document.querySelector(`[${gridOriginAttr}]`)
-      if (!originEl) return
-      const origin = originEl.getBoundingClientRect()
-      const rect = viewport.getBoundingClientRect()
-      if (rect.width < 2) return
-      const applied = gridOffsetRef.current
-      const padLeft = clusterInset(rect.width)
-      const naturalLeft = rect.left + padLeft - origin.left - applied.x
-      const naturalTop = rect.top - origin.top - applied.y
-      const x = Math.floor(naturalLeft / CELL) * CELL - naturalLeft
-      const y = (Math.ceil(naturalTop / CELL) - 1) * CELL - naturalTop
-      if (
-        Math.abs(x - applied.x) < GRID_OFFSET_EPSILON &&
-        Math.abs(y - applied.y) < GRID_OFFSET_EPSILON
-      ) {
-        return
-      }
-      const next = { x: Math.round(x * 100) / 100, y: Math.round(y * 100) / 100 }
-      gridOffsetRef.current = next
-      setGridOffset(next)
-    }
-
-    apply()
-    const ro = new ResizeObserver(apply)
-    ro.observe(viewport)
-    const originEl = document.querySelector(`[${gridOriginAttr}]`)
-    if (originEl) ro.observe(originEl)
-    window.addEventListener("resize", apply)
-    const fonts = document.fonts?.ready.then(apply)
-    return () => {
-      ro.disconnect()
-      window.removeEventListener("resize", apply)
-      void fonts
-    }
-  }, [gridOriginAttr, metrics])
+  }, [items, count])
 
   if (count === 0) return null
 
-  const lineColor = isDark ? HERO_GRID_LINE_DARK : HERO_GRID_LINE_LIGHT
   const stageRows = metrics.reduce(
     (max, item) => Math.max(max, item.rows),
     DEFAULT_EXPANDED_ROWS,
   )
   const stageHeight = sizePx(stageRows)
-  const slotCount = fillSlots + slideSteps
+  const slotCount = leadSlots + fillSlots + slideSteps
   const slots = Array.from({ length: slotCount }, (_, slot) => ({
     slot,
-    itemIndex: wrapIndex(head + slot, count),
-    repeat: slot >= count,
+    itemIndex: wrapIndex(head + (slot - leadSlots), count),
+    repeat: slot < leadSlots || slot >= leadSlots + count,
   }))
+  const fadeLeadPx = Math.min(FADE_LEAD_PX, Math.max(0, inset - CELL))
 
   return (
     <div
@@ -435,17 +431,15 @@ export function LandingNewProductsCarousel({
       className={["relative w-full min-w-0", className ?? ""].join(" ")}
       role="region"
       aria-label={ariaLabel}
-      style={{
-        height: stageHeight,
-        minHeight: stageHeight,
-        ...(gridOffset.x || gridOffset.y
-          ? { transform: `translate(${gridOffset.x}px, ${gridOffset.y}px)` }
-          : {}),
-      }}
+      style={{ height: stageHeight, minHeight: stageHeight }}
     >
+      {/*
+       * Copy-height probe. `h-0 overflow-hidden` keeps the stacked copies from
+       * adding thousands of pixels of scrollable overflow below the page.
+       */}
       <div
         aria-hidden
-        className="pointer-events-none invisible absolute top-0 left-0"
+        className="pointer-events-none invisible absolute top-0 left-0 h-0 overflow-hidden"
       >
         {items.map((item, i) => (
           <div
@@ -470,18 +464,19 @@ export function LandingNewProductsCarousel({
         ))}
       </div>
       <div
-        className="overflow-x-clip overflow-y-hidden [mask-image:linear-gradient(to_right,black_0,black_calc(100%-var(--use-case-fade)),transparent_100%)] [-webkit-mask-image:linear-gradient(to_right,black_0,black_calc(100%-var(--use-case-fade)),transparent_100%)]"
+        className="overflow-x-clip overflow-y-hidden [mask-image:linear-gradient(to_right,transparent_0,transparent_32px,black_var(--use-case-fade-lead),black_calc(100%-var(--use-case-fade)),transparent_100%)] [-webkit-mask-image:linear-gradient(to_right,transparent_0,transparent_32px,black_var(--use-case-fade-lead),black_calc(100%-var(--use-case-fade)),transparent_100%)]"
         style={{
           paddingLeft: inset,
           height: stageHeight,
           ["--use-case-fade" as string]: `${FADE_TAIL_PX}px`,
+          ["--use-case-fade-lead" as string]: `${fadeLeadPx}px`,
         }}
       >
         <div
           role="list"
           className="landing-new-use-case-track flex flex-nowrap items-start content-start"
           style={{
-            transform: `translate3d(${slidePx}px, 0, 0)`,
+            transform: `translate3d(${slidePx - leadSlots * CELL}px, 0, 0)`,
             transition: sliding && !reduceMotion
               ? `transform ${SLIDE_MS}ms ${SNAP_EASE}`
               : "none",
@@ -489,9 +484,9 @@ export function LandingNewProductsCarousel({
         >
           {slots.map(({ slot, itemIndex, repeat }) => {
             const item = items[itemIndex]!
-            const isStage = slot === 0
+            const isStage = slot === leadSlots
             const isExpanded = isStage && expanded
-            const isLive = isStage && live && !repeat
+            const isLive = isStage && live
             const { cols, rows } = metrics[itemIndex] ?? {
               cols: estimateCols(item.label),
               rows: DEFAULT_EXPANDED_ROWS,
@@ -499,13 +494,9 @@ export function LandingNewProductsCarousel({
             const cardStyle: CSSProperties = {
               width: sizePx(isExpanded ? cols : CONTRACTED_COLS),
               height: sizePx(isExpanded ? rows : CONTRACTED_ROWS),
-              marginRight: -1,
-              marginBottom: -1,
-              border: `1px solid ${lineColor}`,
-              transition:
-                reduceMotion || sliding
-                  ? "none"
-                  : `width ${EXPAND_MS}ms ${SNAP_EASE}, height ${EXPAND_MS}ms ${SNAP_EASE}`,
+              transition: reduceMotion
+                ? "none"
+                : `height ${EXPAND_MS}ms ${SNAP_EASE}`,
             }
             const textStyle: CSSProperties = {
               opacity: isLive ? 1 : 0,
@@ -527,6 +518,11 @@ export function LandingNewProductsCarousel({
                 ].join(" ")}
                 style={cardStyle}
               >
+                {/* Stroke above the paper button so tiles read as lattice cells. */}
+                <div
+                  aria-hidden
+                  className={`pointer-events-none absolute inset-0 z-10 ${latticeCellStrokeClassName}`}
+                />
                 <button
                   type="button"
                   aria-expanded={isExpanded}
@@ -537,7 +533,12 @@ export function LandingNewProductsCarousel({
                     if (itemIndex === headRef.current && expandedRef.current) return
                     goTo(itemIndex)
                   }}
-                  className="absolute inset-0 overflow-hidden bg-[var(--marketing-surface)] text-left"
+                  className={[
+                    "absolute inset-0 overflow-hidden bg-[var(--marketing-surface)] text-left",
+                    isExpanded
+                      ? ""
+                      : "landing-new-use-case-card-idle hover:bg-[color-mix(in_srgb,var(--foreground)_6%,var(--marketing-surface))]",
+                  ].join(" ")}
                 >
                   {!repeat ? (
                     <span
@@ -552,18 +553,30 @@ export function LandingNewProductsCarousel({
                   ) : null}
 
                   <div
-                    className="pointer-events-none absolute top-0 left-0 overflow-visible"
-                    style={{ width: SHAPE_SLOT_PX, height: SHAPE_SLOT_PX }}
+                    className="landing-new-use-case-shape-slot pointer-events-none absolute overflow-visible"
+                    style={{
+                      top: 0,
+                      left: 0,
+                      width: SHAPE_SLOT_PX,
+                      height: SHAPE_SLOT_PX,
+                    }}
                   >
                     <LandingNewUseCaseShape
                       kind={item.shape}
-                      active={isLive}
+                      active={isLive && !flatShapes}
                     />
                   </div>
 
-                  <div className={cardCopyClassName} style={textStyle}>
+                  <div className={cardCopyClassName}>
                     <UseCaseCardCopy
                       item={item}
+                      title={
+                        <LandingNewUseCaseTitleReveal
+                          label={item.label}
+                          active={isLive}
+                        />
+                      }
+                      restStyle={textStyle}
                       cta={
                         item.cta ? (
                           <a
