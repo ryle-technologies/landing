@@ -21,7 +21,6 @@ export const CARDS_FUNDING_MIX = {
   fiatShare: 45,
   stablecoinShare: 55,
   avgSpread: "0.36%",
-  fallbackShare: "5.8%",
 } as const
 
 export const CARDS_SETTLEMENT = {
@@ -108,8 +107,8 @@ export type AssetActivity = {
 }
 
 const TREASURY_ADDRESS = "0xfb1000000000000000000000000000000000c001"
-const DEPLOYER_LABEL = "Andes Logistics SA"
-const TOKEN_ADMIN_LABEL = "Banco Regional del Este"
+const DEPLOYER_LABEL = "Acme Corp"
+const TOKEN_ADMIN_LABEL = "Meridian Bank Inc"
 
 /** `1000000000 aUSDP` → `1B aUSDP`. Leaves non-numeric values (`No limit`) alone. */
 function formatCompactTokenAmount(value: string): string {
@@ -250,23 +249,20 @@ function liveAssetConfig({
         {
           id: "minter",
           title: "Minter",
-          description: `Default — same as token admin (${TOKEN_ADMIN_LABEL})`,
+          description: "Meridian Bank Minter Account",
           icon: "user",
-          kind: "placeholder",
         },
         {
           id: "pauser",
           title: "Pauser",
-          description: `Default — same as token admin (${TOKEN_ADMIN_LABEL})`,
+          description: "Meridian Bank Pauser Account",
           icon: "user",
-          kind: "placeholder",
         },
         {
           id: "allowlistManager",
           title: "Allowlist manager",
-          description: `Default — same as token admin (${TOKEN_ADMIN_LABEL})`,
+          description: "Meridian Bank Allowlist Account",
           icon: "user",
-          kind: "placeholder",
         },
       ],
     },
@@ -304,7 +300,7 @@ function liveAssetConfig({
     },
     {
       id: "limits",
-      title: "Limits & economics",
+      title: "Limits",
       rows: [
         { id: "cap", title: "Supply cap", description: formatCompactTokenAmount(cap), icon: "dollar" },
         {
@@ -319,6 +315,12 @@ function liveAssetConfig({
           description: dailyRedeem,
           icon: "dollar",
         },
+      ],
+    },
+    {
+      id: "economics",
+      title: "Economics",
+      rows: [
         { id: "feeBps", title: "Fee", description: fee, icon: "dollar" },
         { id: "chain", title: "Chain", description: "Base", icon: "globe" },
       ],

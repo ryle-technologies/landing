@@ -89,7 +89,8 @@ import {
 const FEATURE_CARD_COLS = 5
 const FEATURE_ROW_MIN_COLS = 3 * FEATURE_CARD_COLS
 const LIMITS_COLS = 4
-const FUNDING_COLS = 7
+const FUNDING_COLS = 6
+const ROLES_COLS = FUNDING_COLS - 1
 const TRANSFERS_COLS = 4
 const BREAKDOWN_COLS = 4
 
@@ -102,6 +103,9 @@ const KPI_MIN_ROWS = 3
 const RAIL_MIN_ROWS = 6
 const WIDGET_MIN_ROWS = 6
 const CHART_MIN_ROWS = 5
+const TRANSFERS_ROWS = 4
+const SPEND_ROWS = 4
+const TITLE_ROWS = 6
 
 function splitAcross(cols: number, parts: number) {
   const base = Math.floor(cols / parts)
@@ -178,14 +182,14 @@ const BREAKDOWN_LEAKAGE = [
     label: "Fees",
     amount: VALUE_SPLIT.fees.amount,
     sharePct: VALUE_SPLIT.fees.sharePct,
-    color: "var(--chart-1)",
+    tone: 1,
   },
   {
     key: "spread",
     label: "FX spread",
     amount: VALUE_SPLIT.spread.amount,
     sharePct: VALUE_SPLIT.spread.sharePct,
-    color: "var(--chart-2)",
+    tone: 2,
   },
 ] as const
 
@@ -231,7 +235,7 @@ const CONFIG_ICON: Record<AssetConfigIcon, LucideIcon> = {
 }
 
 const CONFIG_CHIP: Record<ConfigChipTone, string> = {
-  live: "bg-emerald-500/15 text-emerald-700",
+  live: "bg-[#1E4B9E]/15 text-[#1E4B9E]",
   paused: "bg-amber-500/15 text-amber-800",
   draft: "bg-[var(--rem-secondary)] text-[var(--rem-muted)]",
   default: "bg-[var(--rem-secondary)] text-[var(--rem-fg)]",
@@ -243,16 +247,52 @@ function truncateAddress(value: string) {
   return `${trimmed.slice(0, 6)}…${trimmed.slice(-4)}`
 }
 
+type ChartTone = 1 | 2 | 3 | 4
+
+function chartGradient(tone: ChartTone = 1, axis: "x" | "y" = "x") {
+  const dir = axis === "x" ? "to right" : "to top"
+  return `linear-gradient(${dir}, var(--chart-${tone}-from), var(--chart-${tone}))`
+}
+
+function GradientBar({
+  widthPct,
+  tone = 1,
+  animated = false,
+  className = "h-2",
+}: {
+  widthPct: number
+  tone?: ChartTone
+  animated?: boolean
+  className?: string
+}) {
+  const fillStyle = { backgroundImage: chartGradient(tone) }
+  return (
+    <div className={`w-full overflow-hidden bg-[var(--rem-secondary)] ${className}`}>
+      {animated ? (
+        <motion.span
+          animate={{ width: `${widthPct}%` }}
+          className="block h-full"
+          initial={false}
+          style={fillStyle}
+          transition={{ type: "spring", stiffness: 180, damping: 26 }}
+        />
+      ) : (
+        <span className="block h-full" style={{ ...fillStyle, width: `${widthPct}%` }} />
+      )}
+    </div>
+  )
+}
+
 function ProgressTrack({
   value,
   max = 100,
-  color = "var(--accent)",
+  tone = 1,
   label,
   className = "h-2",
 }: {
   value: number
   max?: number
-  color?: string
+  tone?: ChartTone
   label?: string
   className?: string
 }) {
@@ -263,12 +303,12 @@ function ProgressTrack({
       aria-valuemax={max}
       aria-valuemin={0}
       aria-valuenow={value}
-      className={`w-full overflow-hidden rounded-full bg-[var(--rem-secondary)] ${className}`}
+      className={`w-full overflow-hidden bg-[var(--rem-secondary)] ${className}`}
       role="progressbar"
     >
       <span
-        className="block h-full rounded-full"
-        style={{ width: `${pct}%`, backgroundColor: color }}
+        className="block h-full"
+        style={{ width: `${pct}%`, backgroundImage: chartGradient(tone) }}
       />
     </div>
   )
@@ -282,7 +322,7 @@ function invertTrend(trend: "up" | "down" | "neutral") {
 
 function sparklineStroke(trend: "up" | "down" | "neutral") {
   if (trend === "down") return "var(--danger)"
-  if (trend === "up") return "var(--chart-3)"
+  if (trend === "up") return "var(--chart-1)"
   return "var(--muted)"
 }
 
@@ -423,6 +463,14 @@ function KpiTile({
 /** One lattice cell. Rows are a hard 64px from the card origin so dividers sit on the grid. */
 const LATTICE_ROW_MIN = "min-w-0 px-4"
 
+function latticeOffsetY(el: HTMLElement, root: Element) {
+  const cell = (el.closest("[data-cloud-shift]") as HTMLElement | null) ?? el
+  const transform = getComputedStyle(cell).transform
+  const shiftY =
+    transform && transform !== "none" ? new DOMMatrixReadOnly(transform).m42 : 0
+  return cell.getBoundingClientRect().top - shiftY - root.getBoundingClientRect().top
+}
+
 function useLatticeRowLead(ref: { current: HTMLElement | null }) {
   const [lead, setLead] = useState(LATTICE_CELL_PX)
 
@@ -433,9 +481,7 @@ function useLatticeRowLead(ref: { current: HTMLElement | null }) {
 
     const apply = () => {
       const offset =
-        (((el.getBoundingClientRect().top - root.getBoundingClientRect().top) %
-          LATTICE_CELL_PX) +
-          LATTICE_CELL_PX) %
+        ((latticeOffsetY(el, root) % LATTICE_CELL_PX) + LATTICE_CELL_PX) %
         LATTICE_CELL_PX
       const next =
         offset < 0.75 || offset > LATTICE_CELL_PX - 0.75
@@ -479,7 +525,10 @@ function LatticeListCard({
       className={`grid min-h-0 min-w-0 content-start overflow-hidden rounded-2xl bg-[var(--rem-card)] shadow-[inset_0_0_0_1px_var(--rem-border)] ${
         flush ? "h-full" : ""
       }`}
-      style={{ gridTemplateRows: `${lead}px`, gridAutoRows: LATTICE_CELL_PX }}
+      style={{
+        gridTemplateRows: title ? `${lead}px` : `${LATTICE_CELL_PX}px`,
+        gridAutoRows: LATTICE_CELL_PX,
+      }}
     >
       {title ? (
         <header className={`flex items-center justify-between gap-3 ${LATTICE_ROW_MIN}`}>
@@ -568,6 +617,31 @@ function Widget({
   )
 }
 
+function useChartBox() {
+  const ref = useRef<HTMLDivElement>(null)
+  const [size, setSize] = useState({ width: 520, height: 200 })
+
+  useLayoutEffect(() => {
+    const el = ref.current
+    if (!el) return
+    const apply = () => {
+      const next = { width: el.clientWidth, height: el.clientHeight }
+      if (next.width < 8 || next.height < 8) return
+      setSize((prev) =>
+        Math.abs(prev.width - next.width) < 0.5 && Math.abs(prev.height - next.height) < 0.5
+          ? prev
+          : next,
+      )
+    }
+    apply()
+    const observer = new ResizeObserver(apply)
+    observer.observe(el)
+    return () => observer.disconnect()
+  }, [])
+
+  return { ref, ...size }
+}
+
 function DualLineChart({
   series,
   aKey,
@@ -575,7 +649,6 @@ function DualLineChart({
   aColor = "var(--chart-1)",
   bColor = "var(--chart-3)",
   formatY,
-  height = 200,
 }: {
   series: readonly Record<string, string | number>[]
   aKey: string
@@ -583,12 +656,11 @@ function DualLineChart({
   aColor?: string
   bColor?: string
   formatY: (value: number) => string
-  height?: number
 }) {
-  const width = 520
-  const pad = { top: 8, right: 8, bottom: 28, left: 48 }
-  const innerW = width - pad.left - pad.right
-  const innerH = height - pad.top - pad.bottom
+  const { ref, width, height } = useChartBox()
+  const pad = { top: 8, right: 10, bottom: 28, left: 44 }
+  const innerW = Math.max(width - pad.left - pad.right, 1)
+  const innerH = Math.max(height - pad.top - pad.bottom, 1)
   const values = series.flatMap((point) => [
     Number(point[aKey] ?? 0),
     Number(point[bKey] ?? 0),
@@ -607,10 +679,12 @@ function DualLineChart({
     )
 
   return (
+    <div ref={ref} className="h-full min-h-0 w-full">
     <svg
-      className="h-full min-h-0 w-full"
-      preserveAspectRatio="none"
+      className="block"
+      height={height}
       viewBox={`0 0 ${width} ${height}`}
+      width={width}
     >
       {[0, 0.5, 1].map((t) => {
         const y = pad.top + innerH * (1 - t)
@@ -662,11 +736,12 @@ function DualLineChart({
             x={xAt(index)}
             y={height - 8}
           >
-            {String(point.month)}
+            {String(point.month).replace(" '26", "")}
           </text>
         ) : null,
       )}
     </svg>
+    </div>
   )
 }
 
@@ -682,8 +757,11 @@ function BarChart({
         {series.map((point) => (
           <div key={point.month} className="relative h-full min-w-0 flex-1">
             <span
-              className="absolute bottom-0 left-1/2 w-4 -translate-x-1/2 rounded-full bg-[var(--accent)]"
-              style={{ height: `${(point.transfers / max) * 100}%` }}
+              className="absolute bottom-0 left-1/2 w-4 -translate-x-1/2"
+              style={{
+                height: `${(point.transfers / max) * 100}%`,
+                backgroundImage: chartGradient(1, "y"),
+              }}
             />
           </div>
         ))}
@@ -786,7 +864,7 @@ function RailFlow() {
 function FundingMixWidget() {
   return (
     <LatticeListCard flush title="Funding mix at authorization">
-      <LatticeListRow grow={2}>
+      <LatticeListRow grow={2} lined={false}>
         <div className="flex items-start justify-between gap-4">
           <div className="flex min-w-0 flex-col gap-1">
             <div className="flex items-center gap-2">
@@ -818,31 +896,31 @@ function FundingMixWidget() {
           aria-valuemax={100}
           aria-valuemin={0}
           aria-valuenow={CARDS_FUNDING_MIX.fiatShare}
-          className="flex h-2 w-full overflow-hidden rounded-full bg-[var(--marketing-surface)]"
+          className="flex h-2 w-full overflow-hidden bg-[var(--marketing-surface)]"
           role="progressbar"
         >
           <span
-            className="h-full shrink-0 bg-[var(--chart-1)]"
-            style={{ width: `${CARDS_FUNDING_MIX.fiatShare}%` }}
+            className="h-full shrink-0"
+            style={{
+              width: `${CARDS_FUNDING_MIX.fiatShare}%`,
+              backgroundImage: chartGradient(1),
+            }}
           />
           <span
-            className="h-full shrink-0 bg-[var(--chart-3)]"
-            style={{ width: `${CARDS_FUNDING_MIX.stablecoinShare}%` }}
+            className="h-full shrink-0"
+            style={{
+              width: `${CARDS_FUNDING_MIX.stablecoinShare}%`,
+              backgroundImage: chartGradient(3),
+            }}
           />
         </div>
       </LatticeListRow>
       <LatticeListRow>
-        <div className="grid grid-cols-1 gap-x-3 gap-y-1 sm:grid-cols-3">
+        <div className="grid grid-cols-1 gap-x-3 gap-y-1 sm:grid-cols-2">
           <div className="flex flex-col gap-0.5">
             <span className="text-xs text-[var(--rem-muted)]">Avg. conversion spread</span>
             <span className="text-sm font-medium tabular-nums text-[var(--rem-fg)]">
               {CARDS_FUNDING_MIX.avgSpread}
-            </span>
-          </div>
-          <div className="flex flex-col gap-0.5">
-            <span className="text-xs text-[var(--rem-muted)]">Fallback authorizations</span>
-            <span className="text-sm font-medium tabular-nums text-[var(--rem-fg)]">
-              {CARDS_FUNDING_MIX.fallbackShare}
             </span>
           </div>
           <div className="flex flex-col gap-0.5">
@@ -868,7 +946,6 @@ function SettlementWidget() {
         <div className="flex flex-col gap-2 border-t border-[var(--rem-border)] pt-4">
           <span className="text-xs text-[var(--rem-muted)]">USDC collateral</span>
           <ProgressTrack
-            color="var(--accent)"
             label={`${CARDS_SETTLEMENT.committedPct}% of posted collateral committed`}
             value={CARDS_SETTLEMENT.committedPct}
           />
@@ -893,14 +970,10 @@ function RemittancesBreakdownWidget({ flush = false }: { flush?: boolean }) {
       flush={flush}
       title="Remittances breakdown"
     >
-      <LatticeListRow>
+      <LatticeListRow lined={false}>
         <span className="text-2xl font-semibold tabular-nums text-[var(--rem-fg)]">
           {formatPercent(VALUE_SPLIT.delivered.sharePct)}
         </span>
-        <p className="text-xs text-[var(--rem-muted)]">
-          The other {formatPercent(VALUE_SPLIT.fees.sharePct + VALUE_SPLIT.spread.sharePct)}{" "}
-          is fee and FX takeaway
-        </p>
       </LatticeListRow>
       {BREAKDOWN_LEAKAGE.map((segment) => (
         <LatticeListRow key={segment.key} lined={false}>
@@ -915,30 +988,22 @@ function RemittancesBreakdownWidget({ flush = false }: { flush?: boolean }) {
               </span>
             </span>
           </div>
-          <div className="h-2 w-full overflow-hidden rounded-full bg-[var(--rem-secondary)]">
-            <motion.span
-              animate={{
-                width: `${
-                  LARGEST_LEAKAGE > 0 ? (segment.sharePct / LARGEST_LEAKAGE) * 100 : 0
-                }%`,
-              }}
-              className="block h-full rounded-full"
-              initial={false}
-              style={{ backgroundColor: segment.color }}
-              transition={{ type: "spring", stiffness: 180, damping: 26 }}
-            />
-          </div>
+          <GradientBar
+            animated
+            tone={segment.tone}
+            widthPct={LARGEST_LEAKAGE > 0 ? (segment.sharePct / LARGEST_LEAKAGE) * 100 : 0}
+          />
         </LatticeListRow>
       ))}
     </LatticeListCard>
   )
 }
 
-const TRANSFER_MONTH_BARS = TRANSFER_COUNTS.slice(-10)
+const TRANSFER_MONTH_BARS = TRANSFER_COUNTS.slice(-8)
 
 function TransfersMonthWidget({ flush = false }: { flush?: boolean }) {
   return (
-    <Widget description="Last 10 months" flush={flush} title="Transfers per month">
+    <Widget description="Last 8 months" flush={flush} title="Transfers per month">
       <BarChart series={TRANSFER_MONTH_BARS} />
     </Widget>
   )
@@ -950,7 +1015,6 @@ function TransfersKpi() {
       badge={null}
       caption="Every leg settled end to end"
       chart={false}
-      hero
       series={TRANSFER_COUNTS.map((point) => point.transfers)}
       title="Transfers settled"
       value={KPIS.transfers30Day}
@@ -958,7 +1022,7 @@ function TransfersKpi() {
   )
 }
 
-const MASONRY_CONFIG_IDS = new Set(["limits"])
+const MASONRY_CONFIG_IDS = new Set(["limits", "economics"])
 const MASONRY_WALLET_IDS = new Set(["wallet-custody"])
 
 const cloudKickerClassName =
@@ -1083,30 +1147,34 @@ function remittanceCompare() {
 function AssetSupplyWidget() {
   const asset = LIVE_ASSETS[0]
   return (
-    <Widget flush title={asset.name}>
-      <div className="flex h-full min-h-0 flex-col gap-4">
-        <div className="flex flex-wrap items-baseline gap-x-2 gap-y-1">
-          <span className="text-2xl font-semibold tracking-tight tabular-nums text-[var(--rem-fg)]">
+    <LatticeListCard flush title={asset.name}>
+      <LatticeListRow lined={false}>
+        <div className="flex flex-wrap items-baseline gap-x-2">
+          <span className="text-2xl font-semibold leading-none tracking-tight tabular-nums text-[var(--rem-fg)]">
             {asset.supply}
           </span>
-          <span className="text-sm font-medium text-[var(--rem-muted)]">{asset.symbol}</span>
+          <span className="text-sm font-medium leading-none text-[var(--rem-muted)]">
+            {asset.symbol}
+          </span>
         </div>
-        <div className="flex flex-col gap-2 border-t border-[var(--rem-border)] pt-4">
-          <div className="flex items-baseline justify-between gap-3">
+      </LatticeListRow>
+      <LatticeListRow lined={false}>
+        <div className="grid grid-cols-2 gap-x-3">
+          <div className="flex flex-col gap-0.5">
             <span className="text-xs text-[var(--rem-muted)]">Holders</span>
             <span className="text-sm font-medium tabular-nums text-[var(--rem-fg)]">
               {asset.holders}
             </span>
           </div>
-          <div className="flex items-baseline justify-between gap-3">
+          <div className="flex flex-col gap-0.5">
             <span className="text-xs text-[var(--rem-muted)]">24h volume</span>
             <span className="text-sm font-medium tabular-nums text-[var(--rem-fg)]">
               {asset.volume24h}
             </span>
           </div>
         </div>
-      </div>
-    </Widget>
+      </LatticeListRow>
+    </LatticeListCard>
   )
 }
 
@@ -1150,39 +1218,48 @@ const BALANCES_ROWS = 2 + WALLET_ASSET_MIX.length
 const BREAKDOWN_ROWS = 2 + BREAKDOWN_LEAKAGE.length
 const CORRIDOR_ROWS = 1 + CORRIDOR_MIX.length
 const COST_COMPARE_ROWS = 2 + COST_BENCHMARKS.length
+const LIMITS_ROWS = configCount(SEED_ASSET_CONFIG, "limits")
+const ECONOMICS_ROWS = configCount(SEED_ASSET_CONFIG, "economics")
+const FEATURES_ROWS = configCount(WALLET_CONFIG_SECTIONS, "wallet-features")
+const ACCESS_ROWS = configCount(WALLET_CONFIG_SECTIONS, "wallet-access")
+const SPLIT_PACKS = new Set<CloudActionChip>(["Assets", "Wallets", "Remittances"])
 
 /**
- * Per-pack spans for slots 2–7. List cards are one cell per header/item so
+ * Per-pack spans for slots 2–8. List cards are one cell per header/item so
  * adding a row grows the cell; mix/chart widgets keep a leftover cell.
+ * Slot 8 is the split companion (fee / access) and is omitted for Cards/Payments.
  */
 const CLOUD_PACK_ITEM_ROWS: Record<
   CloudActionChip,
-  readonly [number, number, number, number, number, number]
+  readonly [number, number, number, number, number, number, number]
 > = {
   Assets: [
     configCount(SEED_ASSET_CONFIG, "status"),
     configCount(SEED_ASSET_CONFIG, "roles"),
-    configCount(SEED_ASSET_CONFIG, "limits"),
+    LIMITS_ROWS,
     configCount(SEED_ASSET_CONFIG, "behavior"),
     CHART_MIN_ROWS,
-    CHART_MIN_ROWS,
+    CHART_MIN_ROWS - 2,
+    ECONOMICS_ROWS,
   ],
   Wallets: [
-    configCount(WALLET_CONFIG_SECTIONS, "wallet-features"),
+    FEATURES_ROWS,
     FLOW_MIX_ROWS,
     configCount(WALLET_CONFIG_SECTIONS, "wallet-assets"),
     configCount(WALLET_CONFIG_SECTIONS, "wallet-limits"),
     BALANCES_ROWS,
-    CHART_MIN_ROWS,
+    TRANSFERS_ROWS,
+    ACCESS_ROWS,
   ],
-  Cards: [3, 4, 3, 3, 5, CHART_MIN_ROWS],
+  Cards: [3, 4, 3, 3, 3, TRANSFERS_ROWS, 0],
   Remittances: [
     configCount(WALLET_CONFIG_SECTIONS, "wallet-custody"),
     FUNDING_MIX_ROWS,
-    configCount(SEED_ASSET_CONFIG, "limits"),
+    LIMITS_ROWS,
     BREAKDOWN_ROWS,
     BALANCES_ROWS,
-    CHART_MIN_ROWS,
+    TRANSFERS_ROWS,
+    ECONOMICS_ROWS,
   ],
   Payments: [
     CORRIDOR_ROWS,
@@ -1190,7 +1267,8 @@ const CLOUD_PACK_ITEM_ROWS: Record<
     3,
     BREAKDOWN_ROWS,
     CHART_MIN_ROWS,
-    CHART_MIN_ROWS,
+    TRANSFERS_ROWS,
+    0,
   ],
 }
 
@@ -1207,9 +1285,9 @@ function CloudSideSlot({
       className={MORPH_CELL}
       colStart={frame.sideStart}
       cols={frame.side}
-      minRows={3}
-      rowStart={frame.stacked ? undefined : 2}
-      rows={frame.stacked ? "auto" : 3}
+      minRows={SPEND_ROWS}
+      rowStart={frame.stacked ? undefined : 1}
+      rows={frame.stacked ? "auto" : SPEND_ROWS}
       shiftIndex={0}
     >
       <CloudMorphCard index={0}>{children}</CloudMorphCard>
@@ -1228,10 +1306,8 @@ function CloudKpiSlot({
     <LatticeCell
       bodyClassName={MORPH_BODY}
       className={MORPH_CELL}
-      colStart={frame.stacked ? undefined : (frame.sideStart ?? 1) + 1}
       cols={frame.stacked ? frame.cols : TRANSFERS_COLS}
       minRows={2}
-      rowStart={frame.stacked ? undefined : 5}
       rows={frame.stacked ? "auto" : 2}
       shiftIndex={1}
     >
@@ -1267,46 +1343,41 @@ function CloudItemCell({
   )
 }
 
+function SentVsDeliveredChart({ flush = false }: { flush?: boolean }) {
+  return (
+    <Widget
+      description="Monthly EUR-equivalent volume, last 12 months"
+      flush={flush}
+      legend={
+        <div className="flex items-center gap-3 text-xs text-[var(--rem-muted)]">
+          <span className="flex items-center gap-1.5">
+            <span className="size-2 rounded-full bg-[var(--chart-1)]" />
+            Sent
+          </span>
+          <span className="flex items-center gap-1.5">
+            <span className="size-2 rounded-full bg-[var(--chart-3)]" />
+            Delivered
+          </span>
+        </div>
+      }
+      title="Sent vs delivered"
+    >
+      <DualLineChart
+        aKey="sent"
+        bKey="delivered"
+        formatY={(value) => formatCompactMoney(value * 1000, "EUR")}
+        series={VOLUME_TREND}
+      />
+    </Widget>
+  )
+}
+
 function CloudSideBody({ product }: { product: CloudActionChip }) {
-  if (product === "Assets") return <AssetSupplyWidget />
-  if (product === "Wallets") {
-    return (
-      <Widget flush title="Balances held">
-        <div className="flex h-full min-h-0 flex-col justify-between gap-3">
-          <span className="text-2xl font-semibold tracking-tight tabular-nums text-[var(--rem-fg)]">
-            {WALLET_BALANCES.totalLabel}
-          </span>
-          <div className="flex flex-col gap-2 border-t border-[var(--rem-border)] pt-3">
-            <div className="flex items-baseline justify-between gap-3">
-              <span className="text-xs text-[var(--rem-muted)]">Open risk cases</span>
-              <span className="text-sm font-medium tabular-nums text-[var(--rem-fg)]">
-                {WALLET_BALANCES.openRiskCases}
-              </span>
-            </div>
-            <div className="flex items-baseline justify-between gap-3">
-              <span className="text-xs text-[var(--rem-muted)]">Travel rule backlog</span>
-              <span className="text-sm font-medium tabular-nums text-[var(--rem-fg)]">
-                {WALLET_BALANCES.travelRuleBacklog}
-              </span>
-            </div>
-          </div>
-        </div>
-      </Widget>
-    )
-  }
-  if (product === "Payments") {
-    return (
-      <Widget flush title="Median delivery">
-        <div className="flex h-full min-h-0 flex-col justify-between gap-3">
-          <span className="text-2xl font-semibold tracking-tight tabular-nums text-[var(--rem-fg)]">
-            {KPIS.medianDelivery}
-          </span>
-          <p className="text-xs text-[var(--rem-muted)]">Average of last 1000 transactions</p>
-        </div>
-      </Widget>
-    )
-  }
-  return <SettlementWidget />
+  if (product === "Assets") return <AssetActivityWidget />
+  if (product === "Wallets") return <WalletFlowMixWidget flush />
+  if (product === "Cards") return <SpendChart flush />
+  if (product === "Payments") return <TransfersMonthWidget flush />
+  return <SentVsDeliveredChart flush />
 }
 
 function CloudKpiBody({ product }: { product: CloudActionChip }) {
@@ -1372,7 +1443,7 @@ function CloudItemBody({
   slot,
 }: {
   product: CloudActionChip
-  slot: 2 | 3 | 4 | 5 | 6 | 7
+  slot: 2 | 3 | 4 | 5 | 6 | 7 | 8
 }) {
   const asset = LIVE_ASSETS[0]
   const { extraPerBase, largestCorridor, worstCost } = remittanceCompare()
@@ -1380,12 +1451,10 @@ function CloudItemBody({
 
   if (slot === 2) {
     if (product === "Assets") {
-      const status = asset.config.find((section) => section.id === "status")
-      return status ? <AssetConfigSectionBlock hideTitle section={status} /> : null
+      return <CloudConfigSection id="status" sections={asset.config} />
     }
     if (product === "Wallets") {
-      const features = WALLET_CONFIG_SECTIONS.find((section) => section.id === "wallet-features")
-      return features ? <AssetConfigSectionBlock hideTitle section={features} /> : null
+      return <CloudConfigSection id="wallet-features" sections={WALLET_CONFIG_SECTIONS} />
     }
     if (product === "Cards") {
       return (
@@ -1400,14 +1469,12 @@ function CloudItemBody({
     if (product === "Payments") {
       return <CorridorMixWidget flush largestCorridor={largestCorridor} />
     }
-    const custody = WALLET_CONFIG_SECTIONS.find((section) => section.id === "wallet-custody")
-    return custody ? <AssetConfigSectionBlock hideTitle section={custody} /> : null
+    return <CloudConfigSection id="wallet-custody" sections={WALLET_CONFIG_SECTIONS} />
   }
 
   if (slot === 3) {
     if (product === "Assets") {
-      const roles = asset.config.find((section) => section.id === "roles")
-      return roles ? <AssetConfigSectionBlock hideTitle section={roles} /> : null
+      return <CloudConfigSection id="roles" sections={asset.config} />
     }
     if (product === "Wallets") return <WalletFlowMixWidget flush />
     if (product === "Payments") {
@@ -1439,21 +1506,17 @@ function CloudItemBody({
       )
     }
     if (product === "Wallets") {
-      const walletAssets = WALLET_CONFIG_SECTIONS.find((section) => section.id === "wallet-assets")
-      return walletAssets ? <AssetConfigSectionBlock hideTitle section={walletAssets} /> : null
+      return <CloudConfigSection id="wallet-assets" sections={WALLET_CONFIG_SECTIONS} />
     }
-    const limits = asset.config.find((section) => section.id === "limits")
-    return limits ? <AssetConfigSectionBlock hideTitle section={limits} /> : null
+    return <CloudConfigSection id="limits" sections={asset.config} />
   }
 
   if (slot === 5) {
     if (product === "Assets") {
-      const behavior = asset.config.find((section) => section.id === "behavior")
-      return behavior ? <AssetConfigSectionBlock hideTitle section={behavior} /> : null
+      return <CloudConfigSection id="behavior" sections={asset.config} />
     }
     if (product === "Wallets") {
-      const walletLimits = WALLET_CONFIG_SECTIONS.find((section) => section.id === "wallet-limits")
-      return walletLimits ? <AssetConfigSectionBlock hideTitle section={walletLimits} /> : null
+      return <CloudConfigSection id="wallet-limits" sections={WALLET_CONFIG_SECTIONS} />
     }
     if (product === "Cards") {
       return (
@@ -1475,39 +1538,19 @@ function CloudItemBody({
 
   if (slot === 6) {
     if (product === "Assets") return <AssetActivityWidget />
-    if (product === "Cards") return <SpendChart flush />
-    if (product === "Payments") {
-      return (
-        <Widget
-          description="Monthly EUR-equivalent volume, last 12 months"
-          flush
-          legend={
-            <div className="flex items-center gap-3 text-xs text-[var(--rem-muted)]">
-              <span className="flex items-center gap-1.5">
-                <span className="size-2 rounded-full bg-[var(--chart-1)]" />
-                Sent
-              </span>
-              <span className="flex items-center gap-1.5">
-                <span className="size-2 rounded-full bg-[var(--chart-3)]" />
-                Delivered
-              </span>
-            </div>
-          }
-          title="Sent vs delivered"
-        >
-          <DualLineChart
-            aKey="sent"
-            bKey="delivered"
-            formatY={(value) => formatCompactMoney(value * 1000, "EUR")}
-            series={VOLUME_TREND}
-          />
-        </Widget>
-      )
-    }
+    if (product === "Cards") return <SettlementWidget />
+    if (product === "Payments") return <SentVsDeliveredChart flush />
     return <WalletBalancesWidget flush />
   }
 
-  if (product === "Assets") return <SpendChart flush />
+  if (slot === 8) {
+    if (product === "Wallets") {
+      return <CloudConfigSection id="wallet-access" sections={WALLET_CONFIG_SECTIONS} />
+    }
+    return <CloudConfigSection id="economics" sections={asset.config} />
+  }
+
+  if (product === "Assets") return <AssetSupplyWidget />
   return <TransfersMonthWidget flush />
 }
 
@@ -1533,7 +1576,7 @@ function CloudPack({
         <CloudItemBody product={visuals[2]} slot={2} />
       </CloudItemCell>
       <CloudItemCell
-        cols={stacked ? cols : FUNDING_COLS}
+        cols={stacked ? cols : visuals[3] === "Assets" ? ROLES_COLS : FUNDING_COLS}
         index={3}
         minRows={rowsFor(3)}
         stacked={stacked}
@@ -1560,13 +1603,23 @@ function CloudPack({
         <CloudItemBody product={visuals[6]} slot={6} />
       </CloudItemCell>
       <CloudItemCell
-        cols={stacked ? cols : FUNDING_COLS}
+        cols={stacked ? cols : FEATURE_CARD_COLS}
         index={7}
         minRows={rowsFor(7)}
         stacked={stacked}
       >
         <CloudItemBody product={visuals[7]} slot={7} />
       </CloudItemCell>
+      {SPLIT_PACKS.has(visuals[8]) ? (
+        <CloudItemCell
+          cols={stacked ? cols : LIMITS_COLS}
+          index={8}
+          minRows={rowsFor(8)}
+          stacked={stacked}
+        >
+          <CloudItemBody product={visuals[8]} slot={8} />
+        </CloudItemCell>
+      ) : null}
     </>
   )
 }
@@ -1580,10 +1633,18 @@ function CloudWidgetCells() {
   const frame: CloudPackFrame = { stacked, cols, side, sideStart }
 
   return (
-    <CloudMorphRoot product={product}>
+    <CloudMorphRoot immediate={[0]} product={product}>
       {(visuals) => (
         <>
-          <LatticeCell cols={titleCols} minRows={6} paper={false} stroke={false}>
+          <LatticeCell
+            colStart={stacked ? undefined : 1}
+            cols={titleCols}
+            minRows={TITLE_ROWS}
+            paper={false}
+            rowStart={stacked ? undefined : 1}
+            rows={stacked ? "auto" : TITLE_ROWS}
+            stroke={false}
+          >
             <CloudTitle product={product} onProductChange={setProduct} />
           </LatticeCell>
           <CloudPack frame={frame} visuals={visuals} />
@@ -1599,6 +1660,17 @@ function CloudWidgetGrid() {
       <CloudWidgetCells />
     </LatticeGrid>
   )
+}
+
+function CloudConfigSection({
+  id,
+  sections,
+}: {
+  id: string
+  sections: readonly AssetConfigSection[]
+}) {
+  const section = sections.find((item) => item.id === id)
+  return section ? <AssetConfigSectionBlock hideTitle section={section} /> : null
 }
 
 function AssetConfigSectionBlock({
@@ -1631,7 +1703,7 @@ function AssetConfigSectionBlock({
               </span>
             )}
             <div className="min-w-0 flex-1">
-              <p className="text-sm font-medium leading-none text-[var(--rem-fg)]">
+              <p className="truncate text-sm font-medium leading-none text-[var(--rem-fg)]">
                 {row.title}
               </p>
               {hideDescription ? null : row.kind === "address" ? (
@@ -1650,7 +1722,7 @@ function AssetConfigSectionBlock({
             </div>
             {row.kind === "chip" && row.chip ? (
               <span
-                className={`inline-flex shrink-0 items-center rounded-md px-2 py-0.5 text-xs font-semibold ${CONFIG_CHIP[row.chip.tone]}`}
+                className={`inline-flex shrink-0 items-center whitespace-nowrap rounded-md px-2 py-0.5 text-xs font-semibold ${CONFIG_CHIP[row.chip.tone]}`}
               >
                 {row.chip.label}
               </span>
@@ -1737,7 +1809,11 @@ function AssetsCells({
       {asset.config
         .filter((section) => !MASONRY_CONFIG_IDS.has(section.id))
         .map((section) => (
-          <LatticeCell key={section.id} cols={tile} minRows={1 + section.rows.length}>
+          <LatticeCell
+            key={section.id}
+            cols={section.id === "roles" && !stacked ? Math.max(1, tile - 1) : tile}
+            minRows={1 + section.rows.length}
+          >
             <AssetConfigSectionBlock section={section} />
           </LatticeCell>
         ))}
@@ -1804,25 +1880,25 @@ function WalletFlowMixWidget({ flush = false }: { flush?: boolean }) {
         </div>
         <div
           aria-label={`Send ${mix.sendShare} percent, receive ${mix.receiveShare} percent, swap ${mix.convertShare} percent`}
-          className="flex h-2 w-full overflow-hidden rounded-full bg-[var(--rem-secondary)]"
+          className="flex h-2 w-full overflow-hidden bg-[var(--rem-secondary)]"
           role="img"
         >
           <span
-            className="h-full shrink-0 bg-[var(--chart-1)]"
-            style={{ width: `${mix.sendShare}%` }}
+            className="h-full shrink-0"
+            style={{ width: `${mix.sendShare}%`, backgroundImage: chartGradient(1) }}
           />
           <span
-            className="h-full shrink-0 bg-[var(--chart-3)]"
-            style={{ width: `${mix.receiveShare}%` }}
+            className="h-full shrink-0"
+            style={{ width: `${mix.receiveShare}%`, backgroundImage: chartGradient(3) }}
           />
           <span
-            className="h-full shrink-0 bg-[var(--chart-4)]"
-            style={{ width: `${mix.convertShare}%` }}
+            className="h-full shrink-0"
+            style={{ width: `${mix.convertShare}%`, backgroundImage: chartGradient(4) }}
           />
         </div>
       </LatticeListRow>
       <LatticeListRow>
-        <div className="grid grid-cols-1 gap-x-3 gap-y-1 sm:grid-cols-3">
+        <div className="grid grid-cols-1 gap-x-3 gap-y-1 sm:grid-cols-2">
           <div className="flex flex-col gap-0.5">
             <span className="text-xs text-[var(--rem-muted)]">Avg. send size</span>
             <span className="text-sm font-medium tabular-nums text-[var(--rem-fg)]">
@@ -1835,12 +1911,6 @@ function WalletFlowMixWidget({ flush = false }: { flush?: boolean }) {
               {mix.avgConvertSize}
             </span>
           </div>
-          <div className="flex flex-col gap-0.5">
-            <span className="text-xs text-[var(--rem-muted)]">Travel rule pending</span>
-            <span className="text-sm font-medium tabular-nums text-[var(--rem-fg)]">
-              {mix.travelRulePendingShare}
-            </span>
-          </div>
         </div>
       </LatticeListRow>
     </LatticeListCard>
@@ -1850,20 +1920,19 @@ function WalletFlowMixWidget({ flush = false }: { flush?: boolean }) {
 function WalletBalancesWidget({ flush = false }: { flush?: boolean }) {
   const largest = Math.max(...WALLET_ASSET_MIX.map((entry) => entry.valueUsd))
   return (
-    <LatticeListCard
-      description="Across all wallets"
-      flush={flush}
-      title="Balances held"
-    >
-      <LatticeListRow>
-        <span className="text-2xl font-semibold tracking-tight tabular-nums text-[var(--rem-fg)]">
+    <LatticeListCard flush={flush} title="Balances held across all wallets">
+      <LatticeListRow lined={false}>
+        <span className="text-[2rem] font-semibold leading-none tracking-tight tabular-nums text-[var(--rem-fg)]">
           {WALLET_BALANCES.totalLabel}
         </span>
       </LatticeListRow>
       {WALLET_ASSET_MIX.map((entry) => (
         <LatticeListRow key={entry.asset} lined={false}>
-          <div className="flex items-baseline justify-between gap-3">
-            <span className="text-sm text-[var(--rem-fg)]">{entry.asset}</span>
+          <div className="flex items-center justify-between gap-3">
+            <span className="flex min-w-0 items-center gap-2">
+              <LandingNewWalletAssetMark className="size-3.5" name={entry.asset} />
+              <span className="text-sm text-[var(--rem-fg)]">{entry.asset}</span>
+            </span>
             <span className="flex shrink-0 items-baseline gap-2">
               <span className="text-sm font-medium tabular-nums text-[var(--rem-fg)]">
                 {formatCompactMoney(entry.valueUsd, "USD")}
@@ -1873,15 +1942,10 @@ function WalletBalancesWidget({ flush = false }: { flush?: boolean }) {
               </span>
             </span>
           </div>
-          <div className="h-2 w-full overflow-hidden rounded-full bg-[var(--rem-secondary)]">
-            <span
-              className="block h-full rounded-full"
-              style={{
-                width: `${largest > 0 ? (entry.valueUsd / largest) * 100 : 0}%`,
-                backgroundColor: entry.color,
-              }}
-            />
-          </div>
+          <GradientBar
+            tone={entry.tone}
+            widthPct={largest > 0 ? (entry.valueUsd / largest) * 100 : 0}
+          />
         </LatticeListRow>
       ))}
     </LatticeListCard>
@@ -1959,18 +2023,10 @@ function CorridorMixWidget({
               </span>
             </span>
           </div>
-          <div className="h-2 w-full overflow-hidden rounded-full bg-[var(--rem-secondary)]">
-            <motion.span
-              animate={{
-                width: `${
-                  largestCorridor > 0 ? (entry.volume / largestCorridor) * 100 : 0
-                }%`,
-              }}
-              className="block h-full rounded-full bg-[var(--accent)]"
-              initial={false}
-              transition={{ type: "spring", stiffness: 180, damping: 26 }}
-            />
-          </div>
+          <GradientBar
+            animated
+            widthPct={largestCorridor > 0 ? (entry.volume / largestCorridor) * 100 : 0}
+          />
         </LatticeListRow>
       ))}
     </LatticeListCard>
@@ -1998,28 +2054,20 @@ function CostCompareWidget({
                   : "text-[var(--rem-muted)]"
               }`}
             >
-              {benchmark.channel}
+              {benchmark.channel}{" "}
+              <span className="font-normal text-[var(--rem-muted)]">
+                ({benchmark.settlement.toLowerCase()})
+              </span>
             </span>
             <span className="text-sm font-medium tabular-nums text-[var(--rem-fg)]">
               {formatPercent(benchmark.costPct)}
             </span>
           </div>
-          <div className="h-2 w-full overflow-hidden rounded-full bg-[var(--rem-secondary)]">
-            <motion.span
-              animate={{
-                width: `${worstCost > 0 ? (benchmark.costPct / worstCost) * 100 : 0}%`,
-              }}
-              className="block h-full rounded-full"
-              initial={false}
-              style={{
-                backgroundColor: benchmark.isRail ? "var(--accent)" : "var(--rem-muted)",
-              }}
-              transition={{ type: "spring", stiffness: 180, damping: 26 }}
-            />
-          </div>
-          <span className="text-xs text-[var(--rem-muted)]">
-            Settles in {benchmark.settlement.toLowerCase()}
-          </span>
+          <GradientBar
+            animated
+            tone={benchmark.isRail ? 1 : 4}
+            widthPct={worstCost > 0 ? (benchmark.costPct / worstCost) * 100 : 0}
+          />
         </LatticeListRow>
       ))}
       <LatticeListRow>
@@ -2062,11 +2110,12 @@ function RemittancesTrioRow({
 
 function RemittancesPairRow() {
   const { cols, stacked } = useLatticeGrid()
-  const [a, b] = stacked ? [cols, cols] : splitAcross(cols, 2)
+  const transferCols = stacked ? cols : TRANSFERS_COLS
+  const chartCols = stacked ? cols : cols - TRANSFERS_COLS
 
   return (
     <>
-      <LatticeCell cols={a} minRows={CHART_MIN_ROWS}>
+      <LatticeCell cols={chartCols} minRows={CHART_MIN_ROWS}>
         <Widget
           description="Monthly EUR-equivalent volume, last 12 months"
           legend={
@@ -2091,7 +2140,7 @@ function RemittancesPairRow() {
           />
         </Widget>
       </LatticeCell>
-      <LatticeCell cols={b} minRows={CHART_MIN_ROWS}>
+      <LatticeCell cols={transferCols} minRows={TRANSFERS_ROWS}>
         <TransfersMonthWidget />
       </LatticeCell>
     </>
@@ -2188,12 +2237,5 @@ function RemittancesOverview() {
  * full-bleed lattice (tracks still start on a column line).
  */
 export function LandingNewRemittancesDashboard() {
-  return (
-    <>
-      <CloudWidgetGrid />
-      <RemittancesOverview />
-      <AssetsBand />
-      <WalletsBand />
-    </>
-  )
+  return <CloudWidgetGrid />
 }

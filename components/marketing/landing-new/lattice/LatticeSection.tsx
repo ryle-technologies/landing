@@ -12,6 +12,7 @@ import {
   LATTICE_COLUMN_ATTR,
   LATTICE_SPACE,
   ceilToLattice,
+  cellsPx,
   latticeColumnClassName,
 } from "@/lib/landingLattice"
 
@@ -27,6 +28,9 @@ export const LATTICE_GRID_MASKS = {
   hero: "linear-gradient(to bottom, transparent 0%, transparent 6%, black 22%, black 84%, transparent 100%)",
 } as const
 
+/** Last six cells of the Cloud masonry — covers a full bottom row of cards. */
+const CONTENT_FADE_BOTTOM_PX = cellsPx(6)
+
 type LatticeGridMask = keyof typeof LATTICE_GRID_MASKS | `linear-gradient(${string}`
 
 type LatticeSectionProps = {
@@ -39,6 +43,8 @@ type LatticeSectionProps = {
   /** Paint the lattice canvas behind the section. `false` for plain sections. */
   grid?: boolean
   gridMask?: LatticeGridMask
+  /** Wash the bottom of the section so cards and lattice dissolve into the page. */
+  contentFade?: "bottom"
   /** Apply {@link LATTICE_SPACE.sectionY}. Turn off to set your own cell-multiple padding. */
   pad?: boolean
   /** Round the section's height up to whole cells so the next section starts on a line. */
@@ -60,6 +66,7 @@ export function LatticeSection({
   columnClassName = "",
   grid = true,
   gridMask = "solid",
+  contentFade,
   pad = true,
   snap = true,
   ...aria
@@ -130,6 +137,17 @@ export function LatticeSection({
       >
         {children}
       </div>
+      {contentFade === "bottom" ? (
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-x-0 bottom-0 z-40"
+          style={{
+            height: CONTENT_FADE_BOTTOM_PX,
+            background:
+              "linear-gradient(to bottom, transparent, var(--marketing-surface))",
+          }}
+        />
+      ) : null}
       {snap && fill > 0 ? <div aria-hidden style={{ height: fill }} /> : null}
     </Tag>
   )

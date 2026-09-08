@@ -15,7 +15,6 @@ export const WALLET_FLOW_MIX = {
   convertShare: 18,
   avgSendSize: "$528",
   avgConvertSize: "$412",
-  travelRulePendingShare: "2.4%",
 } as const
 
 export const WALLET_BALANCES = {
@@ -26,10 +25,10 @@ export const WALLET_BALANCES = {
 } as const
 
 export const WALLET_ASSET_MIX = [
-  { asset: "USDC", valueUsd: 30_900_000, sharePct: 44.1, color: "var(--chart-1)" },
-  { asset: "EURC", valueUsd: 30_100_000, sharePct: 42.9, color: "var(--chart-3)" },
-  { asset: "ETH", valueUsd: 5_600_000, sharePct: 8.0, color: "var(--chart-2)" },
-  { asset: "BTC", valueUsd: 3_500_000, sharePct: 5.0, color: "var(--chart-4)" },
+  { asset: "USDC", valueUsd: 30_900_000, sharePct: 44.1, tone: 1 },
+  { asset: "BTC", valueUsd: 18_400_000, sharePct: 26.2, tone: 2 },
+  { asset: "EURC", valueUsd: 14_200_000, sharePct: 20.3, tone: 3 },
+  { asset: "ETH", valueUsd: 6_600_000, sharePct: 9.4, tone: 4 },
 ] as const
 
 export const WALLET_PRODUCT_NAME = "Nubi Pay Wallet"
@@ -71,6 +70,12 @@ export const WALLET_CONFIG_SECTIONS: readonly AssetConfigSection[] = [
         kind: "chip",
         chip: { tone: "live", label: "On" },
       },
+    ],
+  },
+  {
+    id: "wallet-access",
+    title: "Access",
+    rows: [
       {
         id: "off-ramp",
         title: "Off-ramp",

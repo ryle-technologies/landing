@@ -12,6 +12,7 @@ export function LandingNewRemittancesSection() {
       columnClassName="landing-remittances-dashboard"
       grid
       gridMask="fadeBoth"
+      contentFade="bottom"
     >
       <LandingNewRemittancesDashboard />
     </LatticeSection>

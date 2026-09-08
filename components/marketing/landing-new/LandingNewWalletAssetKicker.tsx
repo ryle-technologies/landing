@@ -53,7 +53,9 @@ type LandingNewWalletAssetKickerProps = {
 export function LandingNewWalletAssetKicker({
   className = "",
 }: LandingNewWalletAssetKickerProps) {
-  const reduceMotion = useReducedMotion() ?? false
+  const reduceMotionPref = useReducedMotion()
+  const [hasMounted, setHasMounted] = useState(false)
+  const reduceMotion = hasMounted && reduceMotionPref === true
   const [index, setIndex] = useState(0)
   const name = ASSET_NAMES[index]
   const trackRef = useRef<HTMLSpanElement>(null)
@@ -73,6 +75,10 @@ export function LandingNewWalletAssetKicker({
   }, [])
 
   useLayoutEffect(() => {
+    setHasMounted(true)
+  }, [])
+
+  useLayoutEffect(() => {
     apply(0)
   }, [apply])
 
@@ -89,17 +95,6 @@ export function LandingNewWalletAssetKicker({
     startDelayMs: LANDING_FEATURE_INTERVAL_MS,
     onIndexChange: setIndex,
   })
-
-  if (reduceMotion) {
-    return (
-      <p className={className} aria-live="polite">
-        <span className={assetRowClassName}>
-          <LandingNewWalletAssetMark name={name} />
-          <span>{name}</span>
-        </span>
-      </p>
-    )
-  }
 
   return (
     <p className={className}>

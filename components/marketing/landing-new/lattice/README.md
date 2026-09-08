@@ -39,6 +39,7 @@ column, and adds a spacer so its total height is a cell multiple.
 | --- | --- | --- |
 | `grid` | `true` | Paint the lattice canvas. |
 | `gridMask` | `"solid"` | `solid` · `fadeTop` · `fadeBottom` · `fadeBoth` · `hero` · or a `linear-gradient(...)` string. |
+| `contentFade` | — | `bottom` washes the last six cells so cards and lattice dissolve into the page. |
 | `pad` | `true` | Applies `LATTICE_SPACE.sectionY` (`py-16 md:py-32`). Set `false` and pass your own cell-multiple padding via `className`. |
 | `snap` | `true` | Round height up to whole cells. |
 | `as` | `"section"` | `section` · `div` · `header` · `footer`. |

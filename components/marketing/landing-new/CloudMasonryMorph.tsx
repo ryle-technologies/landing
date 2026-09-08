@@ -36,11 +36,11 @@ const EMPTY_HANDOFF = new Map<number, MiniPose>()
 
 /** Where the 64×64 block sits in the cell. Rotates so cards do not always pin top-left. */
 const ANCHOR_SETS: readonly (readonly CloudAnchor[])[] = [
-  ["t", "r", "bl", "l", "br", "b", "tl", "tr"],
-  ["br", "l", "t", "b", "tr", "r", "bl", "tl"],
-  ["l", "br", "r", "tl", "t", "bl", "tr", "b"],
-  ["tr", "b", "tl", "r", "l", "t", "br", "bl"],
-  ["b", "tl", "r", "br", "t", "l", "tr", "bl"],
+  ["t", "r", "bl", "l", "br", "b", "tl", "tr", "l"],
+  ["br", "l", "t", "b", "tr", "r", "bl", "tl", "br"],
+  ["l", "br", "r", "tl", "t", "bl", "tr", "b", "t"],
+  ["tr", "b", "tl", "r", "l", "t", "br", "bl", "r"],
+  ["b", "tl", "r", "br", "t", "l", "tr", "bl", "tl"],
 ]
 
 function anchorMap(list: readonly CloudAnchor[]) {
@@ -129,16 +129,17 @@ function placeBox(
 
 /** One or two cards at a time so the masonry breathes without a full collapse. */
 const AMBIENT_GROUPS: readonly (readonly number[])[] = [
-  [0, 5],
-  [2],
+  [5, 2],
   [1, 6],
   [3, 7],
   [4],
-  [0, 2],
+  [8],
+  [2],
   [1, 5],
   [7],
   [3],
   [6, 4],
+  [8, 5],
 ]
 
 const AMBIENT_GAPS_MS = [2800, 3600, 2400, 4200, 3000] as const
@@ -146,21 +147,44 @@ const AMBIENT_HOLD_S = 0.18
 const AMBIENT_FIRST_MS = 2200
 const SHIFT_MS = 420
 const SHIFT_EASE = "cubic-bezier(0.22, 1, 0.36, 1)"
+const SHIFT_AXIS_EPS = 1
 const CLOUD_SHIFT_ATTR = "data-cloud-shift"
-const PACK_INDICES = [0, 1, 2, 3, 4, 5, 6, 7] as const
+let shiftTimer = 0
+const PACK_INDICES = [0, 1, 2, 3, 4, 5, 6, 7, 8] as const
 
 type MorphKind = "idle" | "ambient"
 type MorphMode = "idle" | "out" | "in"
 
-const SLOT_COUNT = 8
+const SLOT_COUNT = 9
 
 function fillSlots<T>(value: T): T[] {
   return Array.from({ length: SLOT_COUNT }, () => value)
 }
 
-function nextGroup<T>(step: number, visuals: readonly T[], target: T) {
-  const stale = PACK_INDICES.filter((index) => visuals[index] !== target)
-  const authored = AMBIENT_GROUPS[step % AMBIENT_GROUPS.length]
+function morphMounted() {
+  const set = new Set<number>()
+  if (typeof document === "undefined") return set
+  for (const box of document.querySelectorAll<HTMLElement>("[data-cloud-morph]")) {
+    const index = Number(box.dataset.cloudMorph)
+    if (Number.isFinite(index)) set.add(index)
+  }
+  return set
+}
+
+function nextGroup<T>(
+  step: number,
+  visuals: readonly T[],
+  target: T,
+  skip: ReadonlySet<number>,
+  present: ReadonlySet<number>,
+) {
+  const stale: readonly number[] = PACK_INDICES.filter(
+    (index) => !skip.has(index) && visuals[index] !== target,
+  )
+  const authored = AMBIENT_GROUPS[step % AMBIENT_GROUPS.length].filter(
+    (index) =>
+      !skip.has(index) && (present.has(index) || stale.includes(index)),
+  )
   if (stale.length === 0) return authored
   const overlap = authored.filter((index) => stale.includes(index))
   if (overlap.length > 0) return overlap
@@ -201,6 +225,18 @@ function wait(ms: number) {
   })
 }
 
+/**
+ * Sleep up to `ms`, returning early once `shouldStop()` is true. Always yields
+ * to the event loop at least once: a caller looping on this while `shouldStop`
+ * stays true must never turn into a microtask spin that freezes the page.
+ */
+async function waitInterruptible(ms: number, shouldStop: () => boolean) {
+  const end = performance.now() + ms
+  do {
+    await wait(Math.max(0, Math.min(100, end - performance.now())))
+  } while (!shouldStop() && performance.now() < end)
+}
+
 function waveWait(baseMs: number, wave: readonly number[]) {
   return baseMs + Math.max(0, wave.length - 1) * WAVE_STAGGER_MS + 40
 }
@@ -224,7 +260,8 @@ function playNeighborShift(
   first: ReadonlyMap<number, MiniPose>,
   skip: ReadonlySet<number>,
 ) {
-  const movers: HTMLElement[] = []
+  window.clearTimeout(shiftTimer)
+  const movers: { node: HTMLElement; dx: number; dy: number }[] = []
   for (const node of document.querySelectorAll<HTMLElement>(`[${CLOUD_SHIFT_ATTR}]`)) {
     const index = Number(node.getAttribute(CLOUD_SHIFT_ATTR))
     node.style.transition = "none"
@@ -235,17 +272,36 @@ function playNeighborShift(
     const last = node.getBoundingClientRect()
     const dx = prev.x - last.left
     const dy = prev.y - last.top
-    if (Math.abs(dx) < 1 && Math.abs(dy) < 1) continue
+    if (Math.abs(dx) < SHIFT_AXIS_EPS && Math.abs(dy) < SHIFT_AXIS_EPS) continue
     node.style.transform = `translate(${dx}px, ${dy}px)`
-    movers.push(node)
+    movers.push({ node, dx, dy })
   }
   if (movers.length === 0) return
+
+  const slide = (transform: (mover: (typeof movers)[number]) => string) => {
+    for (const mover of movers) {
+      mover.node.style.transition = `transform ${SHIFT_MS}ms ${SHIFT_EASE}`
+      mover.node.style.transform = transform(mover)
+    }
+  }
+
   requestAnimationFrame(() => {
     requestAnimationFrame(() => {
-      for (const node of movers) {
-        node.style.transition = `transform ${SHIFT_MS}ms ${SHIFT_EASE}`
-        node.style.transform = "none"
-      }
+      // Horizontal first, then vertical — never a diagonal jump.
+      const bent = movers.filter(
+        ({ dx, dy }) => Math.abs(dx) >= SHIFT_AXIS_EPS && Math.abs(dy) >= SHIFT_AXIS_EPS,
+      )
+      slide(({ dx, dy }) =>
+        Math.abs(dx) >= SHIFT_AXIS_EPS && Math.abs(dy) >= SHIFT_AXIS_EPS
+          ? `translate(0px, ${dy}px)`
+          : "none",
+      )
+      if (bent.length === 0) return
+      shiftTimer = window.setTimeout(() => {
+        for (const { node } of bent) {
+          node.style.transform = "none"
+        }
+      }, SHIFT_MS)
     })
   })
 }
@@ -264,9 +320,15 @@ function sectionInView() {
  */
 export function CloudMorphRoot<T>({
   product,
+  pin,
+  immediate,
   children,
 }: {
   product: T
+  /** Slots that keep the same content — collapsing them just replays the same card. */
+  pin?: readonly number[]
+  /** Slots that morph as soon as `product` changes, instead of waiting for ambient. */
+  immediate?: readonly number[]
   children: (visuals: readonly T[]) => ReactNode
 }) {
   const [visuals, setVisuals] = useState<T[]>(() => fillSlots(product))
@@ -283,11 +345,42 @@ export function CloudMorphRoot<T>({
   visualsRef.current = visuals
   const productRef = useRef(product)
   productRef.current = product
+  const skipRef = useRef<ReadonlySet<number>>(EMPTY_NUMBERS)
+  skipRef.current = pin && pin.length > 0 ? new Set(pin) : EMPTY_NUMBERS
+  const immediateRef = useRef<ReadonlySet<number>>(EMPTY_NUMBERS)
+  immediateRef.current =
+    immediate && immediate.length > 0 ? new Set(immediate) : EMPTY_NUMBERS
+  const pendingImmediateRef = useRef(false)
+  const skipFirstProductRef = useRef(true)
   const generationRef = useRef(0)
   const ambientRef = useRef(0)
   const firstRectsRef = useRef<ReadonlyMap<number, MiniPose>>(EMPTY_HANDOFF)
   const participatingRef = useRef<ReadonlySet<number>>(EMPTY_NUMBERS)
   participatingRef.current = participating
+
+  useEffect(() => {
+    const skip = skipRef.current
+    if (skip.size === 0) return
+    setVisuals((prev) => {
+      let changed = false
+      const next = [...prev]
+      for (const index of skip) {
+        if (next[index] !== product) {
+          next[index] = product
+          changed = true
+        }
+      }
+      return changed ? next : prev
+    })
+  }, [product])
+
+  useEffect(() => {
+    if (skipFirstProductRef.current) {
+      skipFirstProductRef.current = false
+      return
+    }
+    pendingImmediateRef.current = true
+  }, [product])
 
   useEffect(() => {
     let cancelled = false
@@ -321,17 +414,20 @@ export function CloudMorphRoot<T>({
     }
 
     const playCycle = async (indices: readonly number[]) => {
+      const live = indices.filter((index) => !skipRef.current.has(index))
+      if (live.length === 0) return
       const generation = generationRef.current
       generationRef.current = generation + 1
       const pins = anchorMap(ANCHOR_SETS[generation % ANCHOR_SETS.length])
 
       setKind("ambient")
-      setParticipating(new Set(indices))
+      setParticipating(new Set(live))
       setMode("out")
       setAnchors(pins)
       setHandoff(EMPTY_HANDOFF)
       setDone(EMPTY_NUMBERS)
-      await playWaves([indices], OUT_ITEM_MS)
+      const outgoing = live.filter((index) => morphMounted().has(index))
+      if (outgoing.length > 0) await playWaves([outgoing], OUT_ITEM_MS)
       if (cancelled) return
       await wait(AMBIENT_HOLD_S * 1000)
       if (cancelled) return
@@ -340,7 +436,7 @@ export function CloudMorphRoot<T>({
       setHandoff(readHandoff())
       setVisuals((prev) => {
         const next = [...prev]
-        for (const index of indices) next[index] = target
+        for (const index of live) next[index] = target
         return next
       })
       setLayoutEpoch((epoch) => epoch + 1)
@@ -350,25 +446,53 @@ export function CloudMorphRoot<T>({
       setStaggerMs(EMPTY_STAGGER)
       await wait(16)
       if (cancelled) return
-      await playWaves([indices], IN_ITEM_MS)
+      const incoming = live.filter((index) => morphMounted().has(index))
+      if (incoming.length > 0) await playWaves([incoming], IN_ITEM_MS)
       if (cancelled) return
       reset()
     }
 
+    const stopWait = () => cancelled || pendingImmediateRef.current
+
+    const takeImmediate = () => {
+      if (!pendingImmediateRef.current) return []
+      pendingImmediateRef.current = false
+      return [...immediateRef.current].filter((index) => !skipRef.current.has(index))
+    }
+
     const loop = async () => {
-      await wait(AMBIENT_FIRST_MS)
+      await waitInterruptible(AMBIENT_FIRST_MS, stopWait)
       while (!cancelled) {
         if (!sectionInView()) {
+          // Off-screen there is nothing to play, so a pending immediate must
+          // not cut this sleep short — it is consumed once the section is back
+          // in view. Interrupting here spun the loop and froze the page.
           await wait(800)
+          continue
+        }
+        const eager = takeImmediate()
+        if (eager.length > 0) {
+          await playCycle(eager)
+          if (cancelled) return
           continue
         }
         const step = ambientRef.current
         ambientRef.current += 1
-        const group = nextGroup(step, visualsRef.current, productRef.current)
+        const group = nextGroup(
+          step,
+          visualsRef.current,
+          productRef.current,
+          skipRef.current,
+          morphMounted(),
+        )
+        if (group.length === 0) {
+          await waitInterruptible(800, stopWait)
+          continue
+        }
         await playCycle(group)
         if (cancelled) return
         const gap = AMBIENT_GAPS_MS[step % AMBIENT_GAPS_MS.length]
-        await wait(gap)
+        await waitInterruptible(gap, stopWait)
       }
     }
 

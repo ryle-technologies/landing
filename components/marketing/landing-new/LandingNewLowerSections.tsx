@@ -5,9 +5,9 @@ import {
 import { LandingFooterMarquee } from "@/components/marketing/landing/LandingFooterMarquee"
 import { LandingNewConsoleSection } from "@/components/marketing/landing-new/LandingNewConsoleSection"
 import { LandingNewFeatureCards } from "@/components/marketing/landing-new/LandingNewFeatureCards"
-import { LandingNewProductOverviewCards } from "@/components/marketing/landing-new/LandingNewProductOverviewCards"
 import { LandingNewRemittancesSection } from "@/components/marketing/landing-new/LandingNewRemittancesSection"
 import { LandingNewProductsCarousel } from "@/components/marketing/landing-new/LandingNewProductsCarousel"
+import { LandingNewPossibilitiesMarquee } from "@/components/marketing/landing-new/LandingNewPossibilitiesMarquee"
 import { LandingNewPillarsHeading } from "@/components/marketing/landing-new/LandingNewPillarsHeading"
 import { LatticePlate } from "@/components/marketing/landing-new/lattice/LatticePlate"
 import { LatticeSection } from "@/components/marketing/landing-new/lattice/LatticeSection"
@@ -17,9 +17,11 @@ import {
 } from "@/lib/landingHeroTypography"
 import { landingViewportBleedClassName } from "@/lib/landingLayout"
 import { LATTICE_SPACE } from "@/lib/landingLattice"
-
-const LANDING_PILLARS_SECTION_TITLE_LEAD =
-  "Digital assets are ready for the enterprise."
+import type { LandingNewUseCaseShapeKind } from "@/lib/landingNewUseCaseSolids"
+import {
+  LANDING_PRODUCT_OVERVIEW_CARDS,
+  type LandingProductOverviewId,
+} from "@/lib/landingProductOverview"
 
 const LANDING_PILLARS_SECTION_TITLE_PREFIX =
   "Ryle gives teams the infrastructure to build, launch, and operate digital assets"
@@ -70,7 +72,23 @@ const LANDING_USE_CASES = [
   },
 ] as const
 
-const LANDING_POSSIBILITIES = [
+const PRODUCT_SHAPES: Record<LandingProductOverviewId, LandingNewUseCaseShapeKind> = {
+  cards: "torus",
+  remittances: "sphere",
+  wallet: "cube",
+  assets: "hexPrism",
+  custody: "octahedron",
+  proofs: "icosahedron",
+}
+
+const LANDING_PRODUCT_POSSIBILITIES = LANDING_PRODUCT_OVERVIEW_CARDS.map((card) => ({
+  label: card.title,
+  badge: "Product",
+  shape: PRODUCT_SHAPES[card.id],
+  body: card.description,
+}))
+
+const LANDING_POSSIBILITIES_REST = [
   {
     label: "Contracts you already issued",
     badge: "Tokenization platforms",
@@ -344,22 +362,18 @@ export function LandingNewLowerSections() {
         <LatticePlate>
           <LandingNewPillarsHeading
             headingId="landing-new-pillars-heading"
-            lead={LANDING_PILLARS_SECTION_TITLE_LEAD}
             prefix={LANDING_PILLARS_SECTION_TITLE_PREFIX}
             accent={LANDING_PILLARS_SECTION_TITLE_ACCENT}
           />
         </LatticePlate>
-        <div className={`${landingViewportBleedClassName} ${LATTICE_SPACE.block}`}>
-          <LandingNewProductsCarousel
-            ariaLabel="Use cases"
-            className="w-full"
-            items={LANDING_USE_CASES}
-          />
-        </div>
+        <LandingNewProductsCarousel
+          ariaLabel="Use cases"
+          className={`w-full ${LATTICE_SPACE.block}`}
+          items={LANDING_USE_CASES}
+        />
       </LatticeSection>
       <LandingNewConsoleSection headingId="landing-new-wallet-heading" />
       <LandingNewFeatureCards />
-      <LandingNewProductOverviewCards />
       <LandingNewRemittancesSection />
       <LatticeSection
         aria-labelledby="landing-new-possibilities-heading"
@@ -375,11 +389,11 @@ export function LandingNewLowerSections() {
           />
         </LatticePlate>
         <div className={`${landingViewportBleedClassName} ${LATTICE_SPACE.block}`}>
-          <LandingNewProductsCarousel
+          <LandingNewPossibilitiesMarquee
             ariaLabel="What you can build"
             className="w-full"
-            items={LANDING_POSSIBILITIES}
-            flatShapes
+            leadItems={LANDING_PRODUCT_POSSIBILITIES}
+            items={LANDING_POSSIBILITIES_REST}
           />
         </div>
       </LatticeSection>

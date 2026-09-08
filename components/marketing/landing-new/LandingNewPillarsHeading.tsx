@@ -2,21 +2,23 @@
 
 import { useEffect, useRef, useState } from "react"
 import { TextEffect } from "@/components/core/text-effect"
-import { landingNewLargeDisplayClassName } from "@/lib/landingHeroTypography"
 import { useReducedMotion } from "motion/react"
 
 const HERO_TEXT_SPEED_REVEAL = 1.55
 const HERO_TEXT_SPEED_SEGMENT = 1.4
 const HERO_WORD_STAGGER_S = 0.05 / HERO_TEXT_SPEED_REVEAL
 
+const pillarsDisplayClassName =
+  "font-sans text-[clamp(40px,8.2vw,80px)] leading-none tracking-tighter text-foreground"
+
 const leadClassName =
   "block font-serif text-[18px] font-normal italic leading-snug tracking-[-0.03em] text-muted sm:text-[28px]"
 
-const restClassName = `relative text-left transition-colors duration-500 ease-out ${landingNewLargeDisplayClassName}`
+const restClassName = `relative text-left transition-colors duration-500 ease-out ${pillarsDisplayClassName}`
 
 type LandingNewPillarsHeadingProps = {
   headingId: string
-  lead: string
+  lead?: string
   prefix: string
   accent: string
 }
@@ -31,12 +33,18 @@ export function LandingNewPillarsHeading({
   prefix,
   accent,
 }: LandingNewPillarsHeadingProps) {
-  const reduceMotion = useReducedMotion()
+  const reduceMotionPref = useReducedMotion()
   const headingRef = useRef<HTMLHeadingElement>(null)
   const [inView, setInView] = useState(false)
+  const [hasMounted, setHasMounted] = useState(false)
+  const reduceMotion = hasMounted && reduceMotionPref === true
   const enterDelay =
     prefix.trim().split(/\s+/).filter(Boolean).length * HERO_WORD_STAGGER_S
-  const fullTitle = `${lead} ${prefix} ${accent}.`
+  const fullTitle = [lead, prefix, `${accent}.`].filter(Boolean).join(" ")
+
+  useEffect(() => {
+    setHasMounted(true)
+  }, [])
 
   useEffect(() => {
     const node = headingRef.current
@@ -62,16 +70,18 @@ export function LandingNewPillarsHeading({
       ref={headingRef}
       id={headingId}
       aria-label={fullTitle}
-      className="relative flex flex-col gap-8 text-left sm:gap-16"
+      className={`relative flex flex-col text-left ${lead ? "gap-8 sm:gap-16" : ""}`}
     >
-      <span
-        aria-hidden
-        className={`${leadClassName} transition-opacity duration-500 ease-out ${
-          inView || reduceMotion ? "opacity-100" : "opacity-0"
-        }`}
-      >
-        {lead}
-      </span>
+      {lead ? (
+        <span
+          aria-hidden
+          className={`${leadClassName} transition-opacity duration-500 ease-out ${
+            inView || reduceMotion ? "opacity-100" : "opacity-0"
+          }`}
+        >
+          {lead}
+        </span>
+      ) : null}
       <span aria-hidden className={restClassName}>
         {reduceMotion ? (
           <>

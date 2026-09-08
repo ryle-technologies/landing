@@ -403,6 +403,35 @@ function drawProgress(age: number, frozen: boolean) {
   }
 }
 
+/** Static 2D plate — no clock, motion preference, or generated ids. */
+export function LandingNewUseCaseIdlePlate({
+  kind,
+  className,
+}: {
+  kind: LandingNewUseCaseShapeKind
+  className?: string
+}) {
+  const silhouette = getUseCaseSilhouette(kind)
+  return (
+    <svg
+      aria-hidden
+      viewBox={`0 0 ${SIZE} ${SIZE}`}
+      width={SIZE}
+      height={SIZE}
+      className={["pointer-events-none block text-foreground", className ?? ""].join(" ")}
+      overflow="visible"
+    >
+      <SilhouetteMark
+        silhouette={silhouette}
+        heat={0}
+        time={0}
+        live={false}
+        scale={PLATE_SCALE}
+      />
+    </svg>
+  )
+}
+
 /**
  * Idle tiles keep the 2D plate. Once the card is live the solid sketches
  * out of that plate; when live ends it settles back to 2D before collapse.
