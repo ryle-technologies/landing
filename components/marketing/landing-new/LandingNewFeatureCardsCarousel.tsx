@@ -31,7 +31,7 @@ const MOBILE_MQ = "(max-width: 767px)"
 const FADE_TAIL_PX = cellsPx(1)
 
 const viewportClassName =
-  "touch-pan-x overflow-x-auto overflow-y-hidden overscroll-x-contain [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden [mask-image:linear-gradient(to_right,black_0,black_calc(100%-var(--feature-fade-tail)),transparent_100%)] [-webkit-mask-image:linear-gradient(to_right,black_0,black_calc(100%-var(--feature-fade-tail)),transparent_100%)]"
+  "relative touch-pan-y overflow-clip [mask-image:linear-gradient(to_right,black_0,black_calc(100%-var(--feature-fade-tail)),transparent_100%)] [-webkit-mask-image:linear-gradient(to_right,black_0,black_calc(100%-var(--feature-fade-tail)),transparent_100%)]"
 
 const masonryChromeClassName =
   "rounded-2xl bg-[var(--surface)] shadow-[inset_0_0_0_1px_var(--border)]"
@@ -77,10 +77,10 @@ function clampOffset(offset: number, max: number) {
 }
 
 /**
- * Native overflow for finger-drag / wheel. Autoplay eases one card at a time
- * and pauses for as long as the row is being scrolled by the user.
+ * Chevrons and autoplay only. The track is translated so the viewport is never
+ * a horizontally scrollable region — finger pans stay with the page.
  */
-function useAutoSnapScroll({
+function useAutoSnapTrack({
   enabled,
   itemCount,
   holdMs,
@@ -91,39 +91,36 @@ function useAutoSnapScroll({
   holdMs: number
   snapMs: number
 }) {
-  const viewportRef = useRef<HTMLDivElement>(null)
+  const trackRef = useRef<HTMLDivElement>(null)
   const seekRef = useRef<(index: number) => void>(() => {})
+  const indexRef = useRef(0)
   const [index, setIndex] = useState(0)
 
   useEffect(() => {
-    const viewport = viewportRef.current
-    if (!viewport || itemCount < 1) return
+    const track = trackRef.current
+    if (!track || itemCount < 1) return
 
     let timeoutId = 0
     let rafId = 0
-    let scrollEndId = 0
-    let offset = viewport.scrollLeft
-    let paused = false
-    let programmatic = false
+    let offset = 0
+    let animating = false
 
     const stepPx = () => {
-      const slide = viewport.querySelector("[data-feature-slide]") as HTMLElement | null
+      const slide = track.querySelector("[data-feature-slide]") as HTMLElement | null
       return slide?.getBoundingClientRect().width ?? 0
     }
     const maxPx = () => Math.max(0, stepPx() * Math.max(0, itemCount - 1))
 
     const report = (next: number) => {
-      setIndex(indexFromOffset(next, stepPx(), itemCount))
+      const nextIndex = indexFromOffset(next, stepPx(), itemCount)
+      indexRef.current = nextIndex
+      setIndex(nextIndex)
     }
 
     const apply = (next: number) => {
-      programmatic = true
       offset = next
-      viewport.scrollLeft = next
+      track.style.transform = `translate3d(${-next}px, 0, 0)`
       report(next)
-      requestAnimationFrame(() => {
-        programmatic = false
-      })
     }
 
     const arm = (delay: number) => {
@@ -133,18 +130,14 @@ function useAutoSnapScroll({
     }
 
     const animateFromTo = (start: number, target: number, onDone: () => void) => {
+      animating = true
       const t0 = performance.now()
       const tick = (now: number) => {
-        if (paused) {
-          offset = viewport.scrollLeft
-          report(offset)
-          onDone()
-          return
-        }
         const t = Math.min(1, (now - t0) / snapMs)
         apply(start + (target - start) * landingSnapEaseInOutCubic(t))
         if (t >= 1) {
           apply(target)
+          animating = false
           onDone()
           return
         }
@@ -154,7 +147,7 @@ function useAutoSnapScroll({
     }
 
     const snap = () => {
-      if (paused || !enabled) {
+      if (!enabled) {
         arm(holdMs)
         return
       }
@@ -164,50 +157,22 @@ function useAutoSnapScroll({
         arm(50)
         return
       }
-      offset = clampOffset(viewport.scrollLeft, max)
+      offset = clampOffset(offset, max)
       let target = offset + step
       if (target > max + 1) target = 0
       animateFromTo(offset, target, () => arm(holdMs))
-    }
-
-    const pause = () => {
-      if (programmatic) return
-      paused = true
-      cancelAnimationFrame(rafId)
-      window.clearTimeout(timeoutId)
-      offset = viewport.scrollLeft
-    }
-
-    const resume = () => {
-      window.clearTimeout(scrollEndId)
-      scrollEndId = window.setTimeout(() => {
-        paused = false
-        offset = viewport.scrollLeft
-        report(offset)
-        arm(holdMs)
-      }, 140)
-    }
-
-    const onScroll = () => {
-      if (programmatic) return
-      paused = true
-      window.clearTimeout(timeoutId)
-      offset = viewport.scrollLeft
-      report(offset)
-      resume()
     }
 
     seekRef.current = (targetIndex) => {
       const step = stepPx()
       const max = maxPx()
       if (step < 1 || itemCount < 1) return
-      paused = false
       cancelAnimationFrame(rafId)
       window.clearTimeout(timeoutId)
-      window.clearTimeout(scrollEndId)
+      animating = false
 
       const dest = clampOffset(targetIndex * step, max)
-      offset = clampOffset(viewport.scrollLeft, max)
+      offset = clampOffset(offset, max)
       if (Math.abs(dest - offset) < 1) {
         apply(dest)
         arm(holdMs)
@@ -216,29 +181,23 @@ function useAutoSnapScroll({
       animateFromTo(offset, dest, () => arm(holdMs))
     }
 
-    report(offset)
+    const step = stepPx()
+    apply(step > 0 ? clampOffset(indexRef.current * step, maxPx()) : 0)
     arm(holdMs)
 
-    viewport.addEventListener("pointerdown", pause)
-    viewport.addEventListener("touchstart", pause, { passive: true })
-    viewport.addEventListener("wheel", pause, { passive: true })
-    viewport.addEventListener("scroll", onScroll, { passive: true })
-    viewport.addEventListener("pointerup", resume)
-    viewport.addEventListener("pointercancel", resume)
-    viewport.addEventListener("touchend", resume)
+    const observer = new ResizeObserver(() => {
+      if (animating) return
+      const nextStep = stepPx()
+      if (nextStep < 1) return
+      apply(clampOffset(indexRef.current * nextStep, maxPx()))
+    })
+    observer.observe(track)
 
     return () => {
       window.clearTimeout(timeoutId)
-      window.clearTimeout(scrollEndId)
       cancelAnimationFrame(rafId)
+      observer.disconnect()
       seekRef.current = () => {}
-      viewport.removeEventListener("pointerdown", pause)
-      viewport.removeEventListener("touchstart", pause)
-      viewport.removeEventListener("wheel", pause)
-      viewport.removeEventListener("scroll", onScroll)
-      viewport.removeEventListener("pointerup", resume)
-      viewport.removeEventListener("pointercancel", resume)
-      viewport.removeEventListener("touchend", resume)
     }
   }, [enabled, holdMs, itemCount, snapMs])
 
@@ -246,7 +205,7 @@ function useAutoSnapScroll({
     seekRef.current(next)
   }, [])
 
-  return { viewportRef, index, seekToIndex }
+  return { trackRef, index, seekToIndex }
 }
 
 function FeatureCarouselChevrons({
@@ -300,7 +259,7 @@ function FeatureCarouselSlide({
     <div
       data-feature-slide
       role="listitem"
-      className="relative shrink-0 bg-[var(--marketing-surface)]"
+      className="relative shrink-0 touch-pan-y bg-[var(--marketing-surface)]"
       style={{ width, height }}
     >
       <div className="flex h-full min-h-0 min-w-0 flex-col">{children}</div>
@@ -330,13 +289,12 @@ export function LandingNewFeatureCardsCarousel({
   className = "",
 }: LandingNewFeatureCardsCarouselProps) {
   const rootRef = useRef<HTMLDivElement>(null)
-  const measureRef = useRef<HTMLDivElement>(null)
   const reduceMotion = useReducedMotion() ?? false
   const [inset, setInset] = useState(LATTICE_CELL_PX)
   const [cols, setCols] = useState(cardCols)
   const [inView, setInView] = useState(false)
   const [rows, setRows] = useState(minRows)
-  const { viewportRef, index, seekToIndex } = useAutoSnapScroll({
+  const { trackRef, index, seekToIndex } = useAutoSnapTrack({
     enabled: inView && !reduceMotion && items.length > 1,
     itemCount: items.length,
     holdMs: LANDING_CONSOLE_HOLD_MS,
@@ -372,7 +330,7 @@ export function LandingNewFeatureCardsCarousel({
   }, [])
 
   useLayoutEffect(() => {
-    const list = measureRef.current
+    const list = trackRef.current
     if (!list) return
 
     const apply = () => {
@@ -431,20 +389,22 @@ export function LandingNewFeatureCardsCarousel({
         />
       </div>
       <div
-        ref={viewportRef}
         className={viewportClassName}
         role="region"
         aria-label="Platform features"
-        tabIndex={0}
         style={{
           height,
           paddingLeft: inset,
           paddingRight: inset,
-          WebkitOverflowScrolling: "touch",
           ["--feature-fade-tail" as string]: `${FADE_TAIL_PX}px`,
         }}
       >
-        <div ref={measureRef} role="list" className="flex h-full w-max flex-nowrap">
+        <div
+          ref={trackRef}
+          role="list"
+          className="absolute top-0 flex h-full touch-pan-y"
+          style={{ left: inset }}
+        >
           {items.map((item, slideIndex) => (
             <FeatureCarouselSlide
               key={slideIndex}

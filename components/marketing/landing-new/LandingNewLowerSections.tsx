@@ -173,9 +173,9 @@ const LANDING_POSSIBILITIES_TITLE_PREFIX = "Your product, at the speed of"
 
 const LANDING_POSSIBILITIES_TITLE_ACCENT = "the internet"
 
-/** Hero face, stepped under 120px so the line wraps once in a 16-cell column. */
+/** Hero face. Floor stays under ~50px so a 5-cell mobile column wraps to 3 lines; 104px max so it still fills the 16-cell column. */
 const LANDING_POSSIBILITIES_TITLE_CLASS =
-  "font-sans text-[clamp(64px,12vw,104px)] leading-none tracking-tighter text-foreground"
+  "font-sans text-[clamp(44px,12vw,104px)] leading-none tracking-tighter text-foreground"
 
 const LANDING_POSSIBILITIES_CTA_LABEL = "Talk to us"
 
