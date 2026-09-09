@@ -84,7 +84,7 @@ function CtaUnderline({ active }: { active: boolean }) {
   const right = useMotionValue(0)
   const clipPath = useTransform(
     [left, right],
-    ([leftEdge, rightEdge]) =>
+    ([leftEdge, rightEdge]: number[]) =>
       `inset(0 ${100 - rightEdge}% 0 ${leftEdge}%)`,
   )
 

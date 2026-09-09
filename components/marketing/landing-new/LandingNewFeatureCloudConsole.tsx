@@ -16,7 +16,7 @@ const TERMINAL_STYLE_LIGHT = {
   "--terminal-white": "#1c1814",
   "--terminal-green": "#3d7a3a",
   "--terminal-teal": "#1a7f79",
-} as const
+} as CSSProperties
 
 const TERMINAL_STYLE_DARK = {
   "--terminal-editor-bg": "transparent",
@@ -26,7 +26,7 @@ const TERMINAL_STYLE_DARK = {
   "--terminal-white": "#f5f2ee",
   "--terminal-green": "#6fbf6a",
   "--terminal-teal": "#4db8b0",
-} as const
+} as CSSProperties
 
 const MONO: CSSProperties = {
   fontFamily:

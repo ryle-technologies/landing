@@ -32,7 +32,7 @@ const TERMINAL_STYLE_LIGHT = {
   "--terminal-diff-delete-fg": "#c23b4e",
   "--terminal-diff-delete-bg": "#f6e2e4",
   "--terminal-panel": "rgba(28,24,20,0.045)",
-} as const
+} as CSSProperties
 
 const TERMINAL_STYLE_DARK = {
   "--terminal-editor-bg": "transparent",
@@ -54,7 +54,7 @@ const TERMINAL_STYLE_DARK = {
   "--terminal-diff-delete-fg": "#e87a86",
   "--terminal-diff-delete-bg": "#3a1c20",
   "--terminal-panel": "rgba(245,242,238,0.06)",
-} as const
+} as CSSProperties
 
 const MONO: CSSProperties = {
   fontFamily:
