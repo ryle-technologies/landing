@@ -76,18 +76,31 @@ import {
   LatticeGrid,
   useLatticeGrid,
 } from "@/components/marketing/landing-new/lattice/LatticeGrid"
+import { packDenseRows, type LatticePackPiece } from "@/components/marketing/landing-new/lattice/latticePack"
 import { LatticePlate } from "@/components/marketing/landing-new/lattice/LatticePlate"
-import { landingNewLargeDisplayClassName } from "@/lib/landingHeroTypography"
+import { useLatticeHeightLock } from "@/components/marketing/landing-new/lattice/useLatticeHeightLock"
 import { landingViewportBleedClassName } from "@/lib/landingLayout"
 import {
   LATTICE_CELL_PX,
   LATTICE_COLUMN_ATTR,
+  LATTICE_COLUMN_MAX_COLS,
   LATTICE_SPACE,
+  floorCells,
 } from "@/lib/landingLattice"
 
-/** Same 5-cell cards as Ready for enterprises. */
+/** Same 5-cell cards as Ready for companies. */
 const FEATURE_CARD_COLS = 5
-const FEATURE_ROW_MIN_COLS = 3 * FEATURE_CARD_COLS
+/**
+ * Smallest column that still has neighbors: 5-cell hero on an 11-cell
+ * tablet. Below that the pack is a phone preview, not a stack of the
+ * desktop masonry. Title sits beside the hero only when 8+ cells remain
+ * (the nowrap display line); on 11-cell tablet it spans the row and the
+ * masonry starts underneath.
+ */
+const CLOUD_MASONRY_MIN_COLS = FEATURE_CARD_COLS + 6
+const CLOUD_TITLE_BESIDE_MIN_COLS = FEATURE_CARD_COLS + 8
+/** Two-up preview needs room for a 2-cell tile beside a neighbor. */
+const CLOUD_PAIR_MIN_COLS = 4
 const LIMITS_COLS = 4
 const FUNDING_COLS = 6
 const ROLES_COLS = FUNDING_COLS - 1
@@ -106,11 +119,81 @@ const CHART_MIN_ROWS = 5
 const TRANSFERS_ROWS = 4
 const SPEND_ROWS = 4
 const TITLE_ROWS = 6
+/** Room for the larger mobile display line + chip row in preview. */
+const PREVIEW_TITLE_ROWS = 5
+const PREVIEW_WIDE_ROWS = 3
+const PREVIEW_NARROW_COLS = 2
+const KPI_ROWS = 2
+
+type CloudSlotSize = { cols: number; rows: number }
 
 function splitAcross(cols: number, parts: number) {
   const base = Math.floor(cols / parts)
   const rem = cols % parts
   return Array.from({ length: parts }, (_, i) => base + (i < rem ? 1 : 0))
+}
+
+/** Compact KPI tiles stay 2 cells; charts and lists take leftover, never a forced 50/50. */
+function cloudPreviewIsNarrow(slot: number, product: CloudActionChip) {
+  return slot === 1
+}
+
+function cloudPreviewWant(slot: number, product: CloudActionChip): CloudSlotSize {
+  if (cloudPreviewIsNarrow(slot, product)) {
+    return { cols: PREVIEW_NARROW_COLS, rows: KPI_ROWS }
+  }
+  if (slot === 3) {
+    return {
+      cols:
+        product === "Assets"
+          ? ROLES_COLS
+          : product === "Remittances"
+            ? BREAKDOWN_COLS
+            : product === "Cards"
+              ? FEATURE_CARD_COLS
+              : FUNDING_COLS,
+      rows: PREVIEW_WIDE_ROWS,
+    }
+  }
+  if (slot === 2 && product === "Assets") {
+    return { cols: FEATURE_CARD_COLS, rows: ECONOMICS_ROWS }
+  }
+  return { cols: FEATURE_CARD_COLS, rows: PREVIEW_WIDE_ROWS }
+}
+
+function fitPreviewPair(avail: number, a: CloudSlotSize, b: CloudSlotSize) {
+  const room = Math.max(1, avail)
+  const floor = Math.min(PREVIEW_NARROW_COLS, Math.max(1, Math.floor(room / 2)))
+  let ac = Math.min(Math.max(floor, a.cols), room - floor)
+  let bc = Math.min(Math.max(floor, b.cols), room - floor)
+  while (ac + bc > room) {
+    if (ac > floor && (ac > bc || (ac === bc && a.cols <= b.cols))) ac -= 1
+    else if (bc > floor) bc -= 1
+    else ac -= 1
+  }
+  let extra = room - ac - bc
+  while (extra > 0) {
+    const aNeed = a.cols - ac
+    const bNeed = b.cols - bc
+    if (aNeed <= 0 && bNeed <= 0) break
+    if (aNeed >= bNeed) ac += 1
+    else bc += 1
+    extra -= 1
+  }
+  return [
+    { cols: ac, rows: a.rows },
+    { cols: bc, rows: b.rows },
+  ] as const
+}
+
+function cloudPreviewSlots(
+  cols: number,
+  visuals: readonly CloudActionChip[],
+): readonly [CloudSlotSize, CloudSlotSize, CloudSlotSize, CloudSlotSize] {
+  const wants = [0, 1, 2, 3].map((slot) => cloudPreviewWant(slot, visuals[slot]))
+  const [side, kpi] = fitPreviewPair(cols, wants[0], wants[1])
+  const [next, last] = fitPreviewPair(cols, wants[2], wants[3])
+  return [side, kpi, next, last]
 }
 
 function DashboardGrid({
@@ -398,9 +481,10 @@ function KpiTile({
   badge,
   chart = true,
   hero = false,
+  compact = false,
 }: {
   title: string
-  caption: string
+  caption?: string
   value: string
   series: readonly number[]
   lowerIsBetter?: boolean
@@ -408,6 +492,7 @@ function KpiTile({
   chart?: boolean
   /** Larger figure than the standard KPI tiles (e.g. Collected fees). */
   hero?: boolean
+  compact?: boolean
 }) {
   const derived = trendFromSeries(series)
   const trend = lowerIsBetter ? invertTrend(derived.trend) : derived.trend
@@ -416,7 +501,11 @@ function KpiTile({
     trend === "down" ? CHIP.warning : trend === "up" ? CHIP.success : CHIP.api
 
   return (
-    <article className="flex h-full min-h-0 min-w-0 flex-col overflow-hidden rounded-2xl border border-[var(--rem-border)] bg-[var(--rem-card)] p-4">
+    <article
+      className={`flex h-full min-h-0 min-w-0 flex-col overflow-hidden rounded-2xl border border-[var(--rem-border)] bg-[var(--rem-card)] ${
+        compact ? "p-3" : "p-4"
+      }`}
+    >
       <div className={hero ? "shrink-0" : "flex flex-col gap-0.5"}>
         <h3
           className={`font-medium text-[var(--rem-fg)] ${
@@ -425,13 +514,15 @@ function KpiTile({
         >
           {title}
         </h3>
-        <p
-          className={`text-[var(--rem-muted)] ${
-            hero ? "mt-1 truncate text-xs leading-none" : "text-xs"
-          }`}
-        >
-          {caption}
-        </p>
+        {caption ? (
+          <p
+            className={`truncate text-[var(--rem-muted)] ${
+              hero ? "mt-1 text-xs leading-none" : "text-xs"
+            }`}
+          >
+            {caption}
+          </p>
+        ) : null}
       </div>
       <div
         className={`flex items-end justify-between gap-4 ${
@@ -440,7 +531,7 @@ function KpiTile({
       >
         <span
           className={`truncate font-semibold tracking-tight tabular-nums text-[var(--rem-fg)] ${
-            hero ? "text-[2rem] leading-none" : "text-2xl"
+            hero && !compact ? "text-[2rem] leading-none" : "text-2xl"
           }`}
         >
           {value}
@@ -506,6 +597,7 @@ function LatticeListCard({
   legend,
   label,
   flush = false,
+  fit = false,
   children,
 }: {
   title?: string
@@ -513,6 +605,8 @@ function LatticeListCard({
   legend?: ReactNode
   label?: string
   flush?: boolean
+  /** Shrink-wrap height instead of filling the parent cell. */
+  fit?: boolean
   children: ReactNode
 }) {
   const ref = useRef<HTMLElement>(null)
@@ -523,7 +617,7 @@ function LatticeListCard({
       ref={ref}
       aria-label={label}
       className={`grid min-h-0 min-w-0 content-start overflow-hidden rounded-2xl bg-[var(--rem-card)] shadow-[inset_0_0_0_1px_var(--rem-border)] ${
-        flush ? "h-full" : ""
+        flush && !fit ? "h-full" : ""
       }`}
       style={{
         gridTemplateRows: title ? `${lead}px` : `${LATTICE_CELL_PX}px`,
@@ -586,6 +680,7 @@ function Widget({
   contentClassName = "",
   fill = true,
   flush = false,
+  compact = false,
 }: {
   title: string
   description?: string
@@ -596,23 +691,27 @@ function Widget({
   fill?: boolean
   /** Fill the lattice cell. Radius and card border stay on. */
   flush?: boolean
+  /** Drop the caption and legend so the chart fits a 3-row phone cell. */
+  compact?: boolean
 }) {
   return (
     <section
-      className={`flex min-w-0 flex-col rounded-2xl border border-[var(--rem-border)] bg-[var(--rem-card)] p-4 ${
-        flush || fill ? "h-full" : "h-auto"
-      } ${className}`}
+      className={`flex min-w-0 flex-col rounded-2xl border border-[var(--rem-border)] bg-[var(--rem-card)] ${
+        compact ? "p-3" : "p-4"
+      } ${flush || fill ? "h-full" : "h-auto"} ${className}`}
     >
-      <header className="flex flex-wrap items-start justify-between gap-3">
+      <header className="flex flex-wrap items-start justify-between gap-2">
         <div className="min-w-0">
           <h3 className="text-sm font-semibold text-[var(--rem-fg)]">{title}</h3>
-          {description ? (
+          {compact || !description ? null : (
             <p className="mt-0.5 text-xs text-[var(--rem-muted)]">{description}</p>
-          ) : null}
+          )}
         </div>
-        {legend}
+        {compact ? null : legend}
       </header>
-      <div className={`mt-3 min-h-0 flex-1 ${contentClassName}`}>{children}</div>
+      <div className={`min-h-0 flex-1 ${compact ? "mt-2" : "mt-3"} ${contentClassName}`}>
+        {children}
+      </div>
     </section>
   )
 }
@@ -869,7 +968,7 @@ function FundingMixWidget() {
           <div className="flex min-w-0 flex-col gap-1">
             <div className="flex items-center gap-2">
               <span className="size-2 rounded-full bg-[var(--chart-1)]" />
-              <span className="text-sm font-medium text-[var(--rem-fg)]">Fiat accounts</span>
+              <span className="truncate text-sm font-medium text-[var(--rem-fg)]">Fiat</span>
             </div>
             <span className="text-xl font-semibold tabular-nums text-[var(--rem-fg)]">
               {CARDS_FUNDING_MIX.fiatShare}%
@@ -881,7 +980,7 @@ function FundingMixWidget() {
           <div className="flex min-w-0 flex-col items-end gap-1 text-right">
             <div className="flex items-center gap-2">
               <span className="size-2 rounded-full bg-[var(--chart-3)]" />
-              <span className="text-sm font-medium text-[var(--rem-fg)]">USDC wallets</span>
+              <span className="truncate text-sm font-medium text-[var(--rem-fg)]">USDC</span>
             </div>
             <span className="text-xl font-semibold tabular-nums text-[var(--rem-fg)]">
               {CARDS_FUNDING_MIX.stablecoinShare}%
@@ -1001,22 +1100,34 @@ function RemittancesBreakdownWidget({ flush = false }: { flush?: boolean }) {
 
 const TRANSFER_MONTH_BARS = TRANSFER_COUNTS.slice(-8)
 
-function TransfersMonthWidget({ flush = false }: { flush?: boolean }) {
+function TransfersMonthWidget({
+  flush = false,
+  compact = false,
+}: {
+  flush?: boolean
+  compact?: boolean
+}) {
   return (
-    <Widget description="Last 8 months" flush={flush} title="Transfers per month">
+    <Widget
+      compact={compact}
+      description="Last 8 months"
+      flush={flush}
+      title="Transfers per month"
+    >
       <BarChart series={TRANSFER_MONTH_BARS} />
     </Widget>
   )
 }
 
-function TransfersKpi() {
+function TransfersKpi({ compact = false }: { compact?: boolean }) {
   return (
     <KpiTile
       badge={null}
-      caption="Every leg settled end to end"
+      caption="Last 30 days"
       chart={false}
+      compact={compact}
       series={TRANSFER_COUNTS.map((point) => point.transfers)}
-      title="Transfers settled"
+      title="Transfers"
       value={KPIS.transfers30Day}
     />
   )
@@ -1026,16 +1137,17 @@ const MASONRY_CONFIG_IDS = new Set(["limits", "economics"])
 const MASONRY_WALLET_IDS = new Set(["wallet-custody"])
 
 const cloudKickerClassName =
-  "font-mono text-xs uppercase tracking-wide text-muted transition-colors duration-500 ease-out"
+  "max-w-[32rem] text-left text-[15px] font-normal leading-relaxed text-muted transition-colors duration-500 ease-out sm:text-[16px]"
 
-const cloudTitleClassName = `relative text-left transition-colors duration-500 ease-out ${landingNewLargeDisplayClassName}`
+const cloudTitleClassName =
+  "relative text-left font-sans text-[clamp(50px,12.5vw,72px)] leading-none tracking-tighter text-foreground transition-colors duration-500 ease-out md:text-[clamp(44px,9vw,90px)]"
 
 const CLOUD_ACTION_CHIPS = [
   "Assets",
+  "Payments",
   "Wallets",
   "Cards",
   "Remittances",
-  "Payments",
 ] as const
 
 type CloudActionChip = (typeof CLOUD_ACTION_CHIPS)[number]
@@ -1051,17 +1163,25 @@ const CLOUD_PLACEHOLDER_MS: Record<CloudActionChip, number> = {
 
 const CLOUD_ACTIVE_CHIP: CloudActionChip = "Remittances"
 
+const CHIP_ROW_CLASS =
+  "mt-7 flex w-0 min-w-full touch-pan-x flex-nowrap items-center gap-3 overflow-x-auto overflow-y-hidden overscroll-x-contain [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
+const CHIP_ROW_FADE_CLASS =
+  "[mask-image:linear-gradient(to_right,black_0,black_calc(100%-1.5rem),transparent_100%)] [-webkit-mask-image:linear-gradient(to_right,black_0,black_calc(100%-1.5rem),transparent_100%)]"
+
 function CloudActionChips({
   active,
   onActiveChange,
+  fadeOverflow,
 }: {
   active: CloudActionChip
   onActiveChange: (label: CloudActionChip) => void
+  fadeOverflow?: boolean
 }) {
   const reduceMotion = useReducedMotion()
   const morphing = useCloudMorphBusy()
   const progress = useMotionValue(0)
   const [run, setRun] = useState(0)
+  const rowRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     if (reduceMotion) {
@@ -1081,8 +1201,24 @@ function CloudActionChips({
     return () => controls.stop()
   }, [active, morphing, onActiveChange, progress, reduceMotion, run])
 
+  useLayoutEffect(() => {
+    const row = rowRef.current
+    if (!row) return
+    const chip = row.querySelector<HTMLElement>("[aria-pressed=true]")
+    if (!chip) return
+    const left = chip.offsetLeft - (row.clientWidth - chip.offsetWidth) / 2
+    row.scrollTo({
+      left: Math.max(0, left),
+      behavior: reduceMotion ? "auto" : "smooth",
+    })
+  }, [active, reduceMotion])
+
   return (
-    <div className="mt-7 flex flex-wrap items-center gap-3" aria-label="Cloud products">
+    <div
+      ref={rowRef}
+      aria-label="Cloud products"
+      className={`${CHIP_ROW_CLASS}${fadeOverflow ? ` ${CHIP_ROW_FADE_CLASS}` : ""}`}
+    >
       {CLOUD_ACTION_CHIPS.map((label) => (
         <LandingNewActionChip
           key={label}
@@ -1102,13 +1238,19 @@ function CloudActionChips({
 function CloudTitle({
   product,
   onProductChange,
+  stacked,
+  fill,
 }: {
   product: CloudActionChip
   onProductChange: (label: CloudActionChip) => void
+  stacked?: boolean
+  fill?: boolean
 }) {
   return (
-    <LatticePlate>
-      <p className={cloudKickerClassName}>Cloud</p>
+    <LatticePlate fill={fill}>
+      <p className={cloudKickerClassName}>
+        Every product, one console.
+      </p>
       <h2
         id="landing-new-cloud-heading"
         className={`${cloudTitleClassName} mt-3 min-w-0 md:mt-4`}
@@ -1117,16 +1259,27 @@ function CloudTitle({
         <br />
         and start today.
       </h2>
-      <CloudActionChips active={product} onActiveChange={onProductChange} />
+      <CloudActionChips
+        active={product}
+        fadeOverflow={stacked}
+        onActiveChange={onProductChange}
+      />
     </LatticePlate>
   )
 }
 
 type CloudPackFrame = {
-  stacked: boolean
+  preview: boolean
+  beside: boolean
   cols: number
   side: number
+  kpi: number
+  sideRows: number
+  kpiRows: number
   sideStart: number | undefined
+  sideRowStart?: number
+  kpiStart?: number
+  kpiRowStart?: number
 }
 
 function remittanceCompare() {
@@ -1144,44 +1297,11 @@ function remittanceCompare() {
   return { extraPerBase, largestCorridor, worstCost }
 }
 
-function AssetSupplyWidget() {
-  const asset = LIVE_ASSETS[0]
-  return (
-    <LatticeListCard flush title={asset.name}>
-      <LatticeListRow lined={false}>
-        <div className="flex flex-wrap items-baseline gap-x-2">
-          <span className="text-2xl font-semibold leading-none tracking-tight tabular-nums text-[var(--rem-fg)]">
-            {asset.supply}
-          </span>
-          <span className="text-sm font-medium leading-none text-[var(--rem-muted)]">
-            {asset.symbol}
-          </span>
-        </div>
-      </LatticeListRow>
-      <LatticeListRow lined={false}>
-        <div className="grid grid-cols-2 gap-x-3">
-          <div className="flex flex-col gap-0.5">
-            <span className="text-xs text-[var(--rem-muted)]">Holders</span>
-            <span className="text-sm font-medium tabular-nums text-[var(--rem-fg)]">
-              {asset.holders}
-            </span>
-          </div>
-          <div className="flex flex-col gap-0.5">
-            <span className="text-xs text-[var(--rem-muted)]">24h volume</span>
-            <span className="text-sm font-medium tabular-nums text-[var(--rem-fg)]">
-              {asset.volume24h}
-            </span>
-          </div>
-        </div>
-      </LatticeListRow>
-    </LatticeListCard>
-  )
-}
-
-function AssetActivityWidget() {
+function AssetActivityWidget({ compact = false }: { compact?: boolean }) {
   const asset = LIVE_ASSETS[0]
   return (
     <Widget
+      compact={compact}
       description="Holders and mints, last 12 months"
       flush
       legend={
@@ -1227,20 +1347,21 @@ const SPLIT_PACKS = new Set<CloudActionChip>(["Assets", "Wallets", "Remittances"
 /**
  * Per-pack spans for slots 2–8. List cards are one cell per header/item so
  * adding a row grows the cell; mix/chart widgets keep a leftover cell.
- * Slot 8 is the split companion (fee / access) and is omitted for Cards/Payments.
+ * Slot 7 is omitted for Assets. Slot 8 is the split companion (fee / access)
+ * and is omitted for Cards/Payments.
  */
 const CLOUD_PACK_ITEM_ROWS: Record<
   CloudActionChip,
   readonly [number, number, number, number, number, number, number]
 > = {
   Assets: [
-    configCount(SEED_ASSET_CONFIG, "status"),
+    ECONOMICS_ROWS,
     configCount(SEED_ASSET_CONFIG, "roles"),
     LIMITS_ROWS,
     configCount(SEED_ASSET_CONFIG, "behavior"),
     CHART_MIN_ROWS,
-    CHART_MIN_ROWS - 2,
-    ECONOMICS_ROWS,
+    0,
+    configCount(SEED_ASSET_CONFIG, "status"),
   ],
   Wallets: [
     FEATURES_ROWS,
@@ -1272,6 +1393,118 @@ const CLOUD_PACK_ITEM_ROWS: Record<
   ],
 }
 
+function cloudTitleBeside(cols: number) {
+  return cols >= CLOUD_TITLE_BESIDE_MIN_COLS
+}
+
+function cloudSlotCols(
+  slot: number,
+  product: CloudActionChip,
+  stacked: boolean,
+  cols: number,
+) {
+  if (stacked) return cols
+  if (slot === 1) return TRANSFERS_COLS
+  if (slot === 3) return product === "Assets" ? ROLES_COLS : FUNDING_COLS
+  if (slot === 4 || slot === 8) return LIMITS_COLS
+  if (slot === 5) return BREAKDOWN_COLS
+  return FEATURE_CARD_COLS
+}
+
+function cloudPackPieces(
+  cols: number,
+  preview: boolean,
+  visuals: readonly CloudActionChip[],
+): LatticePackPiece[] {
+  const beside = cloudTitleBeside(cols)
+  const titleCols = beside ? Math.max(1, cols - FEATURE_CARD_COLS) : cols
+  const titleRows = preview ? PREVIEW_TITLE_ROWS : TITLE_ROWS
+  const rowsFor = (index: number) => CLOUD_PACK_ITEM_ROWS[visuals[index]][index - 2]
+  const pieces: LatticePackPiece[] = [
+    {
+      cols: titleCols,
+      rows: titleRows,
+      colStart: beside ? 1 : undefined,
+      rowStart: beside ? 1 : undefined,
+    },
+  ]
+  if (preview) {
+    const slots = cloudPreviewSlots(cols, visuals)
+    const y1 = titleRows + 1
+    const y2 = y1 + Math.max(slots[0].rows, slots[1].rows)
+    pieces.push(
+      { cols: slots[0].cols, rows: slots[0].rows, colStart: 1, rowStart: y1 },
+      {
+        cols: slots[1].cols,
+        rows: slots[1].rows,
+        colStart: 1 + slots[0].cols,
+        rowStart: y1,
+      },
+      { cols: slots[2].cols, rows: slots[2].rows, colStart: 1, rowStart: y2 },
+      {
+        cols: slots[3].cols,
+        rows: slots[3].rows,
+        colStart: 1 + slots[2].cols,
+        rowStart: y2,
+      },
+    )
+    return pieces
+  }
+  pieces.push(
+    {
+      cols: FEATURE_CARD_COLS,
+      rows: SPEND_ROWS,
+      colStart: beside ? titleCols + 1 : undefined,
+      rowStart: beside ? 1 : undefined,
+    },
+    { cols: TRANSFERS_COLS, rows: KPI_ROWS },
+  )
+  for (let slot = 2; slot <= 8; slot++) {
+    if (slot === 7 && visuals[7] === "Assets") continue
+    if (slot === 8 && !SPLIT_PACKS.has(visuals[8])) continue
+    const rows = rowsFor(slot)
+    if (rows < 1) continue
+    pieces.push({ cols: cloudSlotCols(slot, visuals[slot], false, cols), rows })
+  }
+  return pieces
+}
+
+function cloudPackRows(
+  cols: number,
+  preview: boolean,
+  visuals: readonly CloudActionChip[],
+) {
+  return packDenseRows(cloudPackPieces(cols, preview, visuals), cols)
+}
+
+function cloudPackCeilingRows(cols: number, preview: boolean) {
+  let max = 1
+  for (const product of CLOUD_ACTION_CHIPS) {
+    const visuals = Array.from({ length: 9 }, () => product)
+    max = Math.max(max, cloudPackRows(cols, preview, visuals))
+  }
+  const mixed: CloudActionChip[] = Array.from(
+    { length: 9 },
+    () => CLOUD_ACTION_CHIPS[0],
+  )
+  for (let slot = 2; slot <= 8; slot++) {
+    let best: CloudActionChip = CLOUD_ACTION_CHIPS[0]
+    let bestScore = -1
+    for (const product of CLOUD_ACTION_CHIPS) {
+      const rows = CLOUD_PACK_ITEM_ROWS[product][slot - 2]
+      if (rows < 1) continue
+      const score = rows * cloudSlotCols(slot, product, false, cols)
+      if (score > bestScore) {
+        bestScore = score
+        best = product
+      }
+    }
+    mixed[slot] = best
+  }
+  if (preview) return max
+  return Math.max(max, cloudPackRows(cols, preview, mixed))
+}
+
 function CloudSideSlot({
   frame,
   children,
@@ -1285,9 +1518,9 @@ function CloudSideSlot({
       className={MORPH_CELL}
       colStart={frame.sideStart}
       cols={frame.side}
-      minRows={SPEND_ROWS}
-      rowStart={frame.stacked ? undefined : 1}
-      rows={frame.stacked ? "auto" : SPEND_ROWS}
+      minRows={frame.sideRows}
+      rowStart={frame.sideRowStart}
+      rows={frame.sideRows}
       shiftIndex={0}
     >
       <CloudMorphCard index={0}>{children}</CloudMorphCard>
@@ -1306,9 +1539,11 @@ function CloudKpiSlot({
     <LatticeCell
       bodyClassName={MORPH_BODY}
       className={MORPH_CELL}
-      cols={frame.stacked ? frame.cols : TRANSFERS_COLS}
-      minRows={2}
-      rows={frame.stacked ? "auto" : 2}
+      colStart={frame.kpiStart}
+      cols={frame.kpi}
+      minRows={frame.kpiRows}
+      rowStart={frame.kpiRowStart}
+      rows={frame.kpiRows}
       shiftIndex={1}
     >
       <CloudMorphCard index={1}>{children}</CloudMorphCard>
@@ -1321,20 +1556,26 @@ function CloudItemCell({
   cols,
   minRows,
   stacked,
+  colStart,
+  rowStart,
   children,
 }: {
   index: number
   cols: number
   minRows: number
   stacked: boolean
+  colStart?: number
+  rowStart?: number
   children: ReactNode
 }) {
   return (
     <LatticeCell
       bodyClassName={MORPH_BODY}
       className={MORPH_CELL}
+      colStart={stacked ? undefined : colStart}
       cols={cols}
       minRows={minRows}
+      rowStart={stacked ? undefined : rowStart}
       rows={stacked ? "auto" : minRows}
       shiftIndex={index}
     >
@@ -1343,9 +1584,16 @@ function CloudItemCell({
   )
 }
 
-function SentVsDeliveredChart({ flush = false }: { flush?: boolean }) {
+function SentVsDeliveredChart({
+  flush = false,
+  compact = false,
+}: {
+  flush?: boolean
+  compact?: boolean
+}) {
   return (
     <Widget
+      compact={compact}
       description="Monthly EUR-equivalent volume, last 12 months"
       flush={flush}
       legend={
@@ -1372,15 +1620,27 @@ function SentVsDeliveredChart({ flush = false }: { flush?: boolean }) {
   )
 }
 
-function CloudSideBody({ product }: { product: CloudActionChip }) {
-  if (product === "Assets") return <AssetActivityWidget />
-  if (product === "Wallets") return <WalletFlowMixWidget flush />
-  if (product === "Cards") return <SpendChart flush />
-  if (product === "Payments") return <TransfersMonthWidget flush />
-  return <SentVsDeliveredChart flush />
+function CloudSideBody({
+  product,
+  compact,
+}: {
+  product: CloudActionChip
+  compact?: boolean
+}) {
+  if (product === "Assets") return <AssetActivityWidget compact={compact} />
+  if (product === "Wallets") return <WalletFlowMixWidget compact={compact} flush />
+  if (product === "Cards") return <SpendChart compact={compact} flush />
+  if (product === "Payments") return <TransfersMonthWidget compact={compact} flush />
+  return <SentVsDeliveredChart compact={compact} flush />
 }
 
-function CloudKpiBody({ product }: { product: CloudActionChip }) {
+function CloudKpiBody({
+  product,
+  compact,
+}: {
+  product: CloudActionChip
+  compact?: boolean
+}) {
   const asset = LIVE_ASSETS[0]
   if (product === "Assets") {
     return (
@@ -1388,6 +1648,7 @@ function CloudKpiBody({ product }: { product: CloudActionChip }) {
         badge={null}
         caption="Unique holders on this asset"
         chart={false}
+        compact={compact}
         hero
         series={asset.activity.map((point) => point.holders)}
         title="Holders"
@@ -1401,6 +1662,7 @@ function CloudKpiBody({ product }: { product: CloudActionChip }) {
         badge={null}
         caption="Across all wallets"
         chart={false}
+        compact={compact}
         hero
         series={WALLET_ASSET_MIX.map((entry) => entry.valueUsd)}
         title="Total held"
@@ -1414,6 +1676,7 @@ function CloudKpiBody({ product }: { product: CloudActionChip }) {
         badge={null}
         caption="vs previous month"
         chart={false}
+        compact={compact}
         hero
         series={CARDS_KPIS.activeCardsTrend}
         title="Active cards"
@@ -1427,6 +1690,7 @@ function CloudKpiBody({ product }: { product: CloudActionChip }) {
         badge={null}
         caption="Fee plus FX spread, blended"
         chart={false}
+        compact={compact}
         hero
         lowerIsBetter
         series={COST_TREND}
@@ -1435,15 +1699,17 @@ function CloudKpiBody({ product }: { product: CloudActionChip }) {
       />
     )
   }
-  return <TransfersKpi />
+  return <TransfersKpi compact={compact} />
 }
 
 function CloudItemBody({
   product,
   slot,
+  compact,
 }: {
   product: CloudActionChip
   slot: 2 | 3 | 4 | 5 | 6 | 7 | 8
+  compact?: boolean
 }) {
   const asset = LIVE_ASSETS[0]
   const { extraPerBase, largestCorridor, worstCost } = remittanceCompare()
@@ -1451,7 +1717,7 @@ function CloudItemBody({
 
   if (slot === 2) {
     if (product === "Assets") {
-      return <CloudConfigSection id="status" sections={asset.config} />
+      return <CloudConfigSection id="economics" sections={asset.config} />
     }
     if (product === "Wallets") {
       return <CloudConfigSection id="wallet-features" sections={WALLET_CONFIG_SECTIONS} />
@@ -1459,15 +1725,18 @@ function CloudItemBody({
     if (product === "Cards") {
       return (
         <KpiTile
-          caption="Held against card balances"
-          series={CARDS_KPIS.custodyTrend}
-          title="USDC in custody"
-          value={formatCompactMoney(CARDS_KPIS.usdcInCustodyAmount, "USD")}
+          caption="Fiat and USDC legs combined"
+          compact={compact}
+          series={CARDS_KPIS.volumeTrend}
+          title="30-day spend"
+          value={formatCompactMoney(CARDS_KPIS.volume30DayAmount, "USD")}
         />
       )
     }
     if (product === "Payments") {
-      return <CorridorMixWidget flush largestCorridor={largestCorridor} />
+      return (
+        <CorridorMixWidget compact={compact} flush largestCorridor={largestCorridor} />
+      )
     }
     return <CloudConfigSection id="wallet-custody" sections={WALLET_CONFIG_SECTIONS} />
   }
@@ -1476,9 +1745,32 @@ function CloudItemBody({
     if (product === "Assets") {
       return <CloudConfigSection id="roles" sections={asset.config} />
     }
-    if (product === "Wallets") return <WalletFlowMixWidget flush />
+    if (product === "Wallets") {
+      return <CloudConfigSection id="wallet-assets" sections={WALLET_CONFIG_SECTIONS} />
+    }
     if (product === "Payments") {
-      return <CostCompareWidget extraPerBase={extraPerBase} flush worstCost={worstCost} />
+      return (
+        <CostCompareWidget extraPerBase={extraPerBase} flush worstCost={worstCost} />
+      )
+    }
+    if (product === "Cards") {
+      return (
+        <KpiTile
+          badge={
+            <span className={`rounded-full px-2 py-0.5 text-[11px] font-medium ${CHIP.success}`}>
+              Collected
+            </span>
+          }
+          caption="Network fee collections"
+          compact={compact}
+          series={CARDS_KPIS.feesTrend}
+          title="Collected fees"
+          value={formatCompactMoney(CARDS_KPIS.collectedFees, "USD")}
+        />
+      )
+    }
+    if (product === "Remittances" && compact) {
+      return <RemittancesBreakdownWidget flush />
     }
     return <FundingMixWidget />
   }
@@ -1547,10 +1839,12 @@ function CloudItemBody({
     if (product === "Wallets") {
       return <CloudConfigSection id="wallet-access" sections={WALLET_CONFIG_SECTIONS} />
     }
+    if (product === "Assets") {
+      return <CloudConfigSection id="status" sections={asset.config} />
+    }
     return <CloudConfigSection id="economics" sections={asset.config} />
   }
 
-  if (product === "Assets") return <AssetSupplyWidget />
   return <TransfersMonthWidget flush />
 }
 
@@ -1561,91 +1855,133 @@ function CloudPack({
   frame: CloudPackFrame
   visuals: readonly CloudActionChip[]
 }) {
-  const { stacked, cols } = frame
+  const { preview } = frame
   const rowsFor = (index: number) => CLOUD_PACK_ITEM_ROWS[visuals[index]][index - 2]
+  const slots = preview ? cloudPreviewSlots(frame.cols, visuals) : null
+  const y1 = PREVIEW_TITLE_ROWS + 1
+  const y2 = slots ? y1 + Math.max(slots[0].rows, slots[1].rows) : 0
+  const sideFrame: CloudPackFrame = slots
+    ? {
+        ...frame,
+        side: slots[0].cols,
+        sideRows: slots[0].rows,
+        sideStart: 1,
+        sideRowStart: y1,
+      }
+    : frame
+  const kpiFrame: CloudPackFrame = slots
+    ? {
+        ...frame,
+        kpi: slots[1].cols,
+        kpiRows: slots[1].rows,
+        kpiStart: 1 + slots[0].cols,
+        kpiRowStart: y1,
+      }
+    : frame
 
   return (
     <>
-      <CloudSideSlot frame={frame}>
-        <CloudSideBody product={visuals[0]} />
+      <CloudSideSlot frame={sideFrame}>
+        <CloudSideBody compact={preview} product={visuals[0]} />
       </CloudSideSlot>
-      <CloudKpiSlot frame={frame}>
-        <CloudKpiBody product={visuals[1]} />
+      <CloudKpiSlot frame={kpiFrame}>
+        <CloudKpiBody compact={preview} product={visuals[1]} />
       </CloudKpiSlot>
-      <CloudItemCell cols={FEATURE_CARD_COLS} index={2} minRows={rowsFor(2)} stacked={stacked}>
-        <CloudItemBody product={visuals[2]} slot={2} />
+      <CloudItemCell
+        colStart={slots ? 1 : undefined}
+        cols={slots ? slots[2].cols : FEATURE_CARD_COLS}
+        index={2}
+        minRows={slots ? slots[2].rows : rowsFor(2)}
+        rowStart={slots ? y2 : undefined}
+        stacked={false}
+      >
+        <CloudItemBody compact={preview} product={visuals[2]} slot={2} />
       </CloudItemCell>
       <CloudItemCell
-        cols={stacked ? cols : visuals[3] === "Assets" ? ROLES_COLS : FUNDING_COLS}
+        colStart={slots ? 1 + slots[2].cols : undefined}
+        cols={slots ? slots[3].cols : visuals[3] === "Assets" ? ROLES_COLS : FUNDING_COLS}
         index={3}
-        minRows={rowsFor(3)}
-        stacked={stacked}
+        minRows={slots ? slots[3].rows : rowsFor(3)}
+        rowStart={slots ? y2 : undefined}
+        stacked={false}
       >
-        <CloudItemBody product={visuals[3]} slot={3} />
+        <CloudItemBody compact={preview} product={visuals[3]} slot={3} />
       </CloudItemCell>
-      <CloudItemCell
-        cols={stacked ? cols : LIMITS_COLS}
-        index={4}
-        minRows={rowsFor(4)}
-        stacked={stacked}
-      >
-        <CloudItemBody product={visuals[4]} slot={4} />
-      </CloudItemCell>
-      <CloudItemCell
-        cols={stacked ? cols : BREAKDOWN_COLS}
-        index={5}
-        minRows={rowsFor(5)}
-        stacked={stacked}
-      >
-        <CloudItemBody product={visuals[5]} slot={5} />
-      </CloudItemCell>
-      <CloudItemCell cols={FEATURE_CARD_COLS} index={6} minRows={rowsFor(6)} stacked={stacked}>
-        <CloudItemBody product={visuals[6]} slot={6} />
-      </CloudItemCell>
-      <CloudItemCell
-        cols={stacked ? cols : FEATURE_CARD_COLS}
-        index={7}
-        minRows={rowsFor(7)}
-        stacked={stacked}
-      >
-        <CloudItemBody product={visuals[7]} slot={7} />
-      </CloudItemCell>
-      {SPLIT_PACKS.has(visuals[8]) ? (
-        <CloudItemCell
-          cols={stacked ? cols : LIMITS_COLS}
-          index={8}
-          minRows={rowsFor(8)}
-          stacked={stacked}
-        >
-          <CloudItemBody product={visuals[8]} slot={8} />
-        </CloudItemCell>
-      ) : null}
+      {preview ? null : (
+        <>
+          <CloudItemCell cols={LIMITS_COLS} index={4} minRows={rowsFor(4)} stacked={false}>
+            <CloudItemBody product={visuals[4]} slot={4} />
+          </CloudItemCell>
+          <CloudItemCell cols={BREAKDOWN_COLS} index={5} minRows={rowsFor(5)} stacked={false}>
+            <CloudItemBody product={visuals[5]} slot={5} />
+          </CloudItemCell>
+          <CloudItemCell cols={FEATURE_CARD_COLS} index={6} minRows={rowsFor(6)} stacked={false}>
+            <CloudItemBody product={visuals[6]} slot={6} />
+          </CloudItemCell>
+          {visuals[7] !== "Assets" ? (
+            <CloudItemCell
+              cols={FEATURE_CARD_COLS}
+              index={7}
+              minRows={rowsFor(7)}
+              stacked={false}
+            >
+              <CloudItemBody product={visuals[7]} slot={7} />
+            </CloudItemCell>
+          ) : null}
+          {SPLIT_PACKS.has(visuals[8]) ? (
+            <CloudItemCell cols={LIMITS_COLS} index={8} minRows={rowsFor(8)} stacked={false}>
+              <CloudItemBody product={visuals[8]} slot={8} />
+            </CloudItemCell>
+          ) : null}
+        </>
+      )}
     </>
   )
 }
 
 function CloudWidgetCells() {
-  const { cols, stacked } = useLatticeGrid()
+  const { cols } = useLatticeGrid()
   const [product, setProduct] = useState<CloudActionChip>(CLOUD_ACTIVE_CHIP)
-  const side = stacked ? cols : FEATURE_CARD_COLS
-  const titleCols = stacked ? cols : cols - FEATURE_CARD_COLS
-  const sideStart = stacked ? undefined : titleCols + 1
-  const frame: CloudPackFrame = { stacked, cols, side, sideStart }
+  const preview = cols < CLOUD_MASONRY_MIN_COLS
+  const beside = cloudTitleBeside(cols)
+  const titleCols = beside ? cols - FEATURE_CARD_COLS : cols
+  const sideStart = beside ? titleCols + 1 : undefined
+  const frame: CloudPackFrame = {
+    preview,
+    beside,
+    cols,
+    side: FEATURE_CARD_COLS,
+    kpi: TRANSFERS_COLS,
+    sideRows: SPEND_ROWS,
+    kpiRows: KPI_ROWS,
+    sideStart,
+    sideRowStart: beside ? 1 : undefined,
+  }
 
   return (
-    <CloudMorphRoot immediate={[0]} product={product}>
+    <CloudMorphRoot
+      ambient={!preview}
+      immediate={preview ? [0, 1, 2, 3] : [0]}
+      key={preview ? "preview" : "masonry"}
+      product={product}
+    >
       {(visuals) => (
         <>
           <LatticeCell
-            colStart={stacked ? undefined : 1}
+            colStart={beside || preview ? 1 : undefined}
             cols={titleCols}
-            minRows={TITLE_ROWS}
+            minRows={preview ? PREVIEW_TITLE_ROWS : TITLE_ROWS}
             paper={false}
-            rowStart={stacked ? undefined : 1}
-            rows={stacked ? "auto" : TITLE_ROWS}
+            rowStart={beside || preview ? 1 : undefined}
+            rows={preview ? PREVIEW_TITLE_ROWS : TITLE_ROWS}
             stroke={false}
           >
-            <CloudTitle product={product} onProductChange={setProduct} />
+            <CloudTitle
+              fill={!beside}
+              product={product}
+              stacked={preview}
+              onProductChange={setProduct}
+            />
           </LatticeCell>
           <CloudPack frame={frame} visuals={visuals} />
         </>
@@ -1655,10 +1991,32 @@ function CloudWidgetCells() {
 }
 
 function CloudWidgetGrid() {
+  const ref = useRef<HTMLDivElement>(null)
+  const [cols, setCols] = useState(LATTICE_COLUMN_MAX_COLS)
+
+  useLayoutEffect(() => {
+    const el = ref.current
+    if (!el) return
+    const apply = () => {
+      const next = Math.max(1, floorCells(el.getBoundingClientRect().width))
+      setCols((prev) => (prev === next ? prev : next))
+    }
+    apply()
+    const observer = new ResizeObserver(apply)
+    observer.observe(el)
+    return () => observer.disconnect()
+  }, [])
+
+  const preview = cols < CLOUD_MASONRY_MIN_COLS
+  const minRows = cloudPackCeilingRows(cols, preview)
+  const minHeight = useLatticeHeightLock(cols, minRows)
+
   return (
-    <LatticeGrid className="overflow-visible" minCols={FEATURE_ROW_MIN_COLS} dense>
-      <CloudWidgetCells />
-    </LatticeGrid>
+    <div ref={ref} className="relative w-full min-w-0" style={{ minHeight }}>
+      <LatticeGrid className="overflow-visible" minCols={CLOUD_PAIR_MIN_COLS} dense>
+        <CloudWidgetCells />
+      </LatticeGrid>
+    </div>
   )
 }
 
@@ -1682,6 +2040,7 @@ function AssetConfigSectionBlock({
 }) {
   return (
     <LatticeListCard
+      fit={hideTitle}
       flush
       label={hideTitle ? section.title : undefined}
       title={hideTitle ? undefined : section.title}
@@ -1734,9 +2093,16 @@ function AssetConfigSectionBlock({
   )
 }
 
-function SpendChart({ flush = false }: { flush?: boolean }) {
+function SpendChart({
+  flush = false,
+  compact = false,
+}: {
+  flush?: boolean
+  compact?: boolean
+}) {
   return (
     <Widget
+      compact={compact}
       description="Monthly authorization volume, last 12 months"
       flush={flush}
       legend={
@@ -1832,10 +2198,22 @@ function AssetsBand() {
   )
 }
 
-function WalletFlowMixWidget({ flush = false }: { flush?: boolean }) {
+function WalletFlowMixWidget({
+  flush = false,
+  compact = false,
+}: {
+  flush?: boolean
+  compact?: boolean
+}) {
   const mix = WALLET_FLOW_MIX
   return (
-    <LatticeListCard description="Send, receive, and swap" flush={flush} title="Flow mix · 30 days">
+    <LatticeListCard
+      description={compact ? undefined : "Send, receive, and swap"}
+      fit={compact}
+      flush={flush}
+      label={compact ? "Flow mix · 30 days" : undefined}
+      title={compact ? undefined : "Flow mix · 30 days"}
+    >
       <LatticeListRow grow={2}>
         <div className="grid grid-cols-3 gap-3">
           {(
@@ -1898,14 +2276,14 @@ function WalletFlowMixWidget({ flush = false }: { flush?: boolean }) {
         </div>
       </LatticeListRow>
       <LatticeListRow>
-        <div className="grid grid-cols-1 gap-x-3 gap-y-1 sm:grid-cols-2">
-          <div className="flex flex-col gap-0.5">
+        <div className="grid grid-cols-2 gap-x-3 gap-y-1">
+          <div className="flex min-w-0 flex-col gap-0.5">
             <span className="text-xs text-[var(--rem-muted)]">Avg. send size</span>
             <span className="text-sm font-medium tabular-nums text-[var(--rem-fg)]">
               {mix.avgSendSize}
             </span>
           </div>
-          <div className="flex flex-col gap-0.5">
+          <div className="flex min-w-0 flex-col gap-0.5">
             <span className="text-xs text-[var(--rem-muted)]">Avg. swap size</span>
             <span className="text-sm font-medium tabular-nums text-[var(--rem-fg)]">
               {mix.avgConvertSize}
@@ -1993,13 +2371,15 @@ function WalletsBand() {
 function CorridorMixWidget({
   largestCorridor,
   flush = false,
+  compact = false,
 }: {
   largestCorridor: number
   flush?: boolean
+  compact?: boolean
 }) {
   return (
     <LatticeListCard
-      description="Rolling 30 days, EUR-equivalent sent"
+      description={compact ? undefined : "Rolling 30 days, EUR-equivalent sent"}
       flush={flush}
       title="Volume by corridor"
     >

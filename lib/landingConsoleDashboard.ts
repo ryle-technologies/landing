@@ -319,7 +319,7 @@ function liveAssetConfig({
     },
     {
       id: "economics",
-      title: "Economics",
+      title: "Fee & chain",
       rows: [
         { id: "feeBps", title: "Fee", description: fee, icon: "dollar" },
         { id: "chain", title: "Chain", description: "Base", icon: "globe" },

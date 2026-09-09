@@ -174,7 +174,7 @@ export function WalletDemo({
   showCard?: boolean
   /** Scripted cursor that runs a send flow on loop while the phone is in view. */
   autoplay?: boolean
-  /** When false, pointer input is ignored so autoplay is never interrupted. */
+  /** When false, pointer and wheel input are ignored so autoplay is never interrupted. */
   interactive?: boolean
 }) {
   const stageRef = useRef<HTMLDivElement>(null)
@@ -205,6 +205,7 @@ export function WalletDemo({
       style={{ visibility: scale == null ? "hidden" : undefined }}
     >
       <div
+        className="relative"
         style={{
           width: WALLET_DEMO_FRAME_W * s,
           height: WALLET_DEMO_FRAME_H * s,
@@ -230,6 +231,14 @@ export function WalletDemo({
             />
           </WalletDemoStoreProvider>
         </div>
+        {/*
+         * Captures wheel/touch so inner overflow:auto sheets do not steal
+         * page scroll. Sits beside the scaled frame: Safari still scrolls
+         * overflow:auto descendants of pointer-events: none.
+         */}
+        {interactive ? null : (
+          <div aria-hidden className="absolute inset-0 z-10 touch-pan-y" />
+        )}
       </div>
     </div>
   )

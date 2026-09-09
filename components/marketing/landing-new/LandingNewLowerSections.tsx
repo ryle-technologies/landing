@@ -1,350 +1,183 @@
-import { LandingHomeBuildingNewBlock } from "@/components/marketing/landing/LandingHomeBuildingNewBlock"
 import {
   LandingHomeNavFadeOutMarker,
 } from "@/components/marketing/landing/LandingHomeStickyNav"
-import { LandingFooterMarquee } from "@/components/marketing/landing/LandingFooterMarquee"
 import { LandingNewConsoleSection } from "@/components/marketing/landing-new/LandingNewConsoleSection"
+import { LandingNewFooter } from "@/components/marketing/landing-new/LandingNewFooter"
 import { LandingNewFeatureCards } from "@/components/marketing/landing-new/LandingNewFeatureCards"
 import { LandingNewRemittancesSection } from "@/components/marketing/landing-new/LandingNewRemittancesSection"
-import { LandingNewProductsCarousel } from "@/components/marketing/landing-new/LandingNewProductsCarousel"
-import { LandingNewPossibilitiesMarquee } from "@/components/marketing/landing-new/LandingNewPossibilitiesMarquee"
+import {
+  LandingNewProductsCarousel,
+  type LandingNewProductsCarouselItem,
+} from "@/components/marketing/landing-new/LandingNewProductsCarousel"
 import { LandingNewPillarsHeading } from "@/components/marketing/landing-new/LandingNewPillarsHeading"
+import { LandingNewLatticeCtaCell } from "@/components/marketing/landing-new/LandingNewLatticeCta"
 import { LatticePlate } from "@/components/marketing/landing-new/lattice/LatticePlate"
 import { LatticeSection } from "@/components/marketing/landing-new/lattice/LatticeSection"
-import {
-  landingHeroPrimaryCtaClassName,
-  landingHeroTitleClassName,
-} from "@/lib/landingHeroTypography"
-import { landingViewportBleedClassName } from "@/lib/landingLayout"
 import { LATTICE_SPACE } from "@/lib/landingLattice"
-import type { LandingNewUseCaseShapeKind } from "@/lib/landingNewUseCaseSolids"
-import {
-  LANDING_PRODUCT_OVERVIEW_CARDS,
-  type LandingProductOverviewId,
-} from "@/lib/landingProductOverview"
 
 const LANDING_PILLARS_SECTION_TITLE_PREFIX =
-  "Ryle gives teams the infrastructure to build, launch, and operate digital assets"
+  "Build, launch and run digital assets in products you already have,"
 
-const LANDING_PILLARS_SECTION_TITLE_ACCENT = "within your products"
+const LANDING_PILLARS_SECTION_TITLE_ACCENT = "or your next ones"
 
-const LANDING_USE_CASES = [
-  {
-    label: "Tokenized assets",
-    shape: "cube" as const,
-    body: "Issue and operate tokens for property, funds, inventory or produce: mint, redeem, pause, reconcile.",
-  },
+/** Tiles on the grid at once; the rest of the pool rotates in Cloud-style. */
+const LANDING_PILLARS_SLOTS = 15
+
+/**
+ * What you can build with the stack. One tile per outcome, grouped by the
+ * hero verbs (issue / move / spend / hold) plus what AI agents can do on it.
+ *
+ * The array is interleaved across those groups on purpose: slots fill in
+ * pool order, so the first {@link LANDING_PILLARS_SLOTS} tiles show the whole
+ * range (assets, payments, the card, wallets, agents) before rotation starts.
+ * Titles stay under ~29 characters so an idle tile never exceeds the
+ * 5-column expanded width. `badge` marks the two items that depend on
+ * partners we have not signed.
+ */
+const LANDING_PILLARS_POOL: readonly LandingNewProductsCarouselItem[] = [
   {
     label: "Your own stablecoin",
-    shape: "sphere" as const,
-    body: "Launch a unit of value for your product or network, with reserves and controls you keep.",
-  },
-  {
-    label: "Investor payouts",
-    shape: "tetrahedron" as const,
-    body: "Pay rents, yields and redemptions to holders without a manual back office.",
+    shape: "sphere",
+    body: "A dollar or local-currency unit for your product. You hold the reserves, set the rules, and see every mint and redemption.",
   },
   {
     label: "Cross-border payments",
-    shape: "torus" as const,
-    body: "Move money between countries in seconds, inside your own product.",
+    shape: "torus",
+    body: "Send money between countries in seconds on stablecoin rails, inside your own app.",
   },
   {
-    label: "Supplier and distributor settlement",
-    shape: "hexPrism" as const,
-    body: "Pay partners onchain. Fast, programmable, without publishing terms.",
+    label: "Wallet inside your app",
+    shape: "cube",
+    body: "Sign up, hold, send, receive and pay without leaving your product. No seed phrases.",
   },
   {
-    label: "Wallets in your app",
-    shape: "octahedron" as const,
-    body: "Let users hold and move value inside the product they already use. No separate app.",
+    label: "Wallets for AI agents",
+    shape: "hexPrism",
+    body: "Give an agent a balance, a spending limit and an allowlist. It pays for what it needs; you see every transaction.",
   },
   {
-    label: "Loyalty and rewards",
-    shape: "icosahedron" as const,
-    body: "Points, community or brand units on the same ledger as the rest of the money.",
-  },
-  {
-    label: "Cards",
+    label: "Your own card",
+    shape: "slab",
     badge: "In design with partners",
-    shape: "slab" as const,
-    body: "Let users spend from the asset, under your brand.",
-  },
-] as const
-
-const PRODUCT_SHAPES: Record<LandingProductOverviewId, LandingNewUseCaseShapeKind> = {
-  cards: "torus",
-  remittances: "sphere",
-  wallet: "cube",
-  assets: "hexPrism",
-  custody: "octahedron",
-  proofs: "icosahedron",
-}
-
-const LANDING_PRODUCT_POSSIBILITIES = LANDING_PRODUCT_OVERVIEW_CARDS.map((card) => ({
-  label: card.title,
-  badge: "Product",
-  shape: PRODUCT_SHAPES[card.id],
-  body: card.description,
-}))
-
-const LANDING_POSSIBILITIES_REST = [
-  {
-    label: "Contracts you already issued",
-    badge: "Tokenization platforms",
-    shape: "cube" as const,
-    body: "Issue and operate tokens against the contracts you already deployed. A factory, not another tenant.",
+    body: "A card under your brand that spends from stablecoin, fiat, or an asset you issued.",
   },
   {
-    label: "Mint, redeem, pause",
-    badge: "Tokenization platforms",
-    shape: "sphere" as const,
-    body: "Run supply from the console: mint, redeem, pause, and reconcile reserves.",
+    label: "Tokenized real estate",
+    shape: "octahedron",
+    body: "Sell a building or a plot as units investors can buy, hold and trade. Rent flows to holders automatically.",
   },
   {
-    label: "Private cap tables",
-    badge: "Tokenization platforms",
-    shape: "tetrahedron" as const,
-    body: "Holder lists and redemptions stay off the public ledger. Supply stays provable.",
+    label: "Supplier payments",
+    shape: "tetrahedron",
+    body: "Settle invoices onchain in minutes, on terms you program: due dates, splits, approvals.",
   },
   {
-    label: "Investor onboarding",
-    badge: "Tokenization platforms",
-    shape: "torus" as const,
-    body: "KYC, wallet, then investment — without a manual accreditation desk.",
+    label: "Partner wallets",
+    shape: "icosahedron",
+    body: "The same wallet inside your clients’ apps, each with its own brand, rules and limits.",
   },
   {
-    label: "Custody and upgrades",
-    badge: "Tokenization platforms",
-    shape: "hexPrism" as const,
-    body: "Key custody and contract-upgrade governance, next to the asset you already run.",
+    label: "Pay per request",
+    shape: "sphere",
+    body: "Charge for your API, data or content per call, in stablecoin. Apps and agents pay as they go.",
   },
   {
-    label: "Console as back office",
-    badge: "Tokenization platforms",
-    shape: "octahedron" as const,
-    body: "Replace a pile of repos with a back office that fits the stack you already have.",
+    label: "Tokenized commodities",
+    shape: "torus",
+    body: "Grain, energy or metals as onchain units, redeemable for the physical stock.",
   },
   {
-    label: "Proof of reserves",
-    badge: "Tokenization platforms",
-    shape: "icosahedron" as const,
-    body: "Prove supply and backing without publishing holders.",
+    label: "Gasless transactions",
+    shape: "cube",
+    body: "Your users send and pay without ever holding a gas token. You cover the fee, or price it in.",
   },
   {
-    label: "Scoped disclosure",
-    badge: "Tokenization platforms",
-    shape: "slab" as const,
-    body: "Show auditors and regulators only what policy allows.",
+    label: "Run ops from your AI tools",
+    shape: "hexPrism",
+    body: "Mint, redeem, reconcile and pull reports from Cursor, Claude or ChatGPT. The console speaks MCP.",
   },
   {
-    label: "White-label wallets",
-    badge: "Fintechs and orchestrators",
-    shape: "cube" as const,
-    body: "Wallets inside partner and bank apps. No standalone product.",
+    label: "Loyalty and cashback",
+    shape: "slab",
+    body: "Points and cashback on the same ledger as the money, so they can be spent, not just collected.",
   },
   {
-    label: "Remittance corridors",
-    badge: "Fintechs and orchestrators",
-    shape: "sphere" as const,
-    body: "Cross-border corridors for the institutions you already serve, inside their apps.",
+    label: "Marketplace payouts",
+    shape: "octahedron",
+    body: "Collect from buyers, take your fee, pay sellers on a schedule. One ledger for all of it.",
   },
   {
-    label: "Hybrid cards",
-    badge: "Fintechs and orchestrators",
-    shape: "tetrahedron" as const,
-    body: "Fiat and stablecoin cards under the partner brand. In design with partners.",
+    label: "Investor wallet",
+    shape: "tetrahedron",
+    body: "KYC, then buy, hold and sell your assets in one flow. Onboarding runs itself.",
   },
   {
-    label: "Orchestrator console",
-    badge: "Fintechs and orchestrators",
-    shape: "torus" as const,
-    body: "One console that sees orchestrator, institution, and end user.",
+    label: "Agents paying agents",
+    shape: "icosahedron",
+    body: "Services settle with each other in seconds, under limits you set. No invoices, no month-end.",
   },
   {
-    label: "Gasless transfers",
-    badge: "Fintechs and orchestrators",
-    shape: "hexPrism" as const,
-    body: "End users send without holding a gas token.",
+    label: "Fund and trust shares",
+    shape: "sphere",
+    body: "Issue fund units, run subscriptions and redemptions from the console, and keep the holder list off the public chain.",
   },
   {
-    label: "Fiat on and off ramps",
-    badge: "Fintechs and orchestrators",
-    shape: "octahedron" as const,
-    body: "Ramps through the partners they already use. You keep the ledger.",
+    label: "Payroll in stablecoin",
+    shape: "torus",
+    body: "Pay teams and contractors in any country, same day, from one balance.",
   },
   {
-    label: "Policy per institution",
-    badge: "Fintechs and orchestrators",
-    shape: "icosahedron" as const,
-    body: "Allowlists, KYC, and limits, gated per institution.",
+    label: "Build with your coding agent",
+    shape: "cube",
+    body: "SDK and docs written for AI tools. Have your agent wire a wallet or a payout flow into your app in an afternoon.",
   },
   {
     label: "Tokenized inventory",
-    badge: "Brands and corporates",
-    shape: "slab" as const,
-    body: "Casks, bottles, stock — tokenized without replacing the program you have.",
+    shape: "hexPrism",
+    body: "Bottles, batches or stock as onchain units. Ownership and payment move together.",
   },
   {
-    label: "Distributor settlement",
-    badge: "Brands and corporates",
-    shape: "cube" as const,
-    body: "Pay distributors onchain without publishing terms.",
+    label: "Multi-entity treasury",
+    shape: "slab",
+    body: "Move funds between subsidiaries and accounts instantly, with every transfer attributed and exportable.",
   },
   {
-    label: "Loyalty on the ledger",
-    badge: "Brands and corporates",
-    shape: "sphere" as const,
-    body: "Points, community or brand units on the same ledger as the money.",
+    label: "Agent-run treasury",
+    shape: "octahedron",
+    body: "An agent sweeps, rebalances and distributes on rules you set, and stops at limits it cannot cross.",
   },
   {
-    label: "Provenance next to payment",
-    badge: "Brands and corporates",
-    shape: "tetrahedron" as const,
-    body: "Authenticity and payment on one ledger. Economics stay private.",
+    label: "Bring your own contracts",
+    shape: "tetrahedron",
+    body: "Already issued a token? Plug it into the console and run mint, redeem and reporting without redeploying.",
   },
   {
-    label: "Inter-entity treasury",
-    badge: "Brands and corporates",
-    shape: "torus" as const,
-    body: "Move funds across entities without publishing internal flows.",
+    label: "Dividends and rents",
+    shape: "icosahedron",
+    body: "Pay every holder their share each period, automatically. No spreadsheet, no manual desk.",
   },
   {
-    label: "Company stablecoin",
-    badge: "Brands and corporates",
-    shape: "hexPrism" as const,
-    body: "Payroll and vendor payments on a unit you issue.",
+    label: "An agent on the audit log",
+    shape: "sphere",
+    body: "Every mint, transfer and policy change, read by an agent that flags what looks wrong before it becomes a problem.",
   },
   {
-    label: "Private collateral",
-    badge: "Brands and corporates",
-    shape: "octahedron" as const,
-    body: "Collateral and internal flows stay off the public record.",
+    label: "Fiat in and out",
+    shape: "torus",
+    badge: "Through partners",
+    body: "Let users top up and cash out through the ramp partners you choose. You keep the ledger.",
   },
-  {
-    label: "Auditor disclosure",
-    badge: "Brands and corporates",
-    shape: "icosahedron" as const,
-    body: "Selective disclosure for auditors, without publishing economics.",
-  },
-  {
-    label: "Tokenize real assets",
-    badge: "Real-asset operators",
-    shape: "slab" as const,
-    body: "Lots, land, energy, grain or produce — issued and operated under your brand.",
-  },
-  {
-    label: "Fund-share structures",
-    badge: "Real-asset operators",
-    shape: "cube" as const,
-    body: "Fideicomiso and fund shares, with a cap table that stays private.",
-  },
-  {
-    label: "Rents and yields",
-    badge: "Real-asset operators",
-    shape: "sphere" as const,
-    body: "Distribute rents, yields and redemptions to holders without a manual desk.",
-  },
-  {
-    label: "Branded investor wallet",
-    badge: "Real-asset operators",
-    shape: "tetrahedron" as const,
-    body: "A wallet under the operator’s brand. No separate app.",
-  },
-  {
-    label: "Community token",
-    badge: "Real-asset operators",
-    shape: "torus" as const,
-    body: "A loyalty or community unit alongside the asset, on the same ledger.",
-  },
-  {
-    label: "Asset traceability",
-    badge: "Real-asset operators",
-    shape: "hexPrism" as const,
-    body: "Crop and asset traceability sitting next to the token.",
-  },
-  {
-    label: "Spend from the asset",
-    badge: "Real-asset operators",
-    shape: "octahedron" as const,
-    body: "Cards that spend from the tokenized asset. In design with partners.",
-  },
-  {
-    label: "Treasury across subsidiaries",
-    badge: "Any buyer",
-    shape: "icosahedron" as const,
-    body: "Hold and move funds across entities without publishing reserve size or internal flows.",
-  },
-  {
-    label: "Your own stablecoin",
-    badge: "Any buyer",
-    shape: "slab" as const,
-    body: "A unit of value for your product or network, with reserves and controls you keep.",
-  },
-  {
-    label: "Supplier settlement",
-    badge: "Any buyer",
-    shape: "cube" as const,
-    body: "Pay partners onchain. Fast, programmable, without publishing terms.",
-  },
-  {
-    label: "Marketplace settlement",
-    badge: "Any buyer",
-    shape: "sphere" as const,
-    body: "Settle buyers and sellers without leaking take rates or payouts.",
-  },
-  {
-    label: "Embedded wallets",
-    badge: "Any buyer",
-    shape: "tetrahedron" as const,
-    body: "Signup, send, receive, request, pay — inside the product they already use.",
-  },
-  {
-    label: "Cards",
-    badge: "Any buyer",
-    shape: "torus" as const,
-    body: "Let users spend from the asset, under your brand. In design with partners.",
-  },
-  {
-    label: "AI-agent wallets",
-    badge: "Any buyer",
-    shape: "hexPrism" as const,
-    body: "Agents that hold balances, pay for services, and settle with other agents under policy.",
-  },
-  {
-    label: "Bank settlement",
-    badge: "Any buyer",
-    shape: "octahedron" as const,
-    body: "Institution settlement that does not expose customer balances or liquidity.",
-  },
-  {
-    label: "Compliance in your cloud",
-    badge: "Any buyer",
-    shape: "icosahedron" as const,
-    body: "Disclosures, proofs, an audit log, and data residency in the client’s cloud.",
-  },
-] as const
+]
 
-const LANDING_POSSIBILITIES_TITLE_LEAD =
-  "We can help you build the fintech experience your company needs."
+const LANDING_POSSIBILITIES_TITLE_PREFIX = "Your product, at the speed of"
 
-const LANDING_POSSIBILITIES_TITLE_PREFIX = "Issue, move, spend. Modular. Private."
+const LANDING_POSSIBILITIES_TITLE_ACCENT = "the internet"
 
-const LANDING_POSSIBILITIES_TITLE_ACCENT = "Yours"
+/** Hero face, stepped under 120px so the line wraps once in a 16-cell column. */
+const LANDING_POSSIBILITIES_TITLE_CLASS =
+  "font-sans text-[clamp(64px,12vw,104px)] leading-none tracking-tighter text-foreground"
 
-const MARKETING_CLOSING_HEADLINE = "Own the rails your business runs on."
-
-const MARKETING_CLOSING_SUBTITLE =
-  "Issue, move, spend. Modular. Private by design. Yours."
-
-const CLOSING_CTA_LABEL = "Talk to us"
-
-const FOOTER_MARQUEE_WORDS = ["Modular", "Private", "Yours"] as const
-
-const buildingNewTitleClassName = `relative text-left text-muted transition-colors duration-500 ease-out ${landingHeroTitleClassName}`
-
-const buildingNewSublineClassName =
-  "max-w-none text-left font-serif text-[28px] font-normal italic leading-snug tracking-[-0.03em] text-foreground transition-colors duration-500 ease-out sm:text-[32px]"
+const LANDING_POSSIBILITIES_CTA_LABEL = "Talk to us"
 
 /**
  * Everything below the hero. Each block is a `LatticeSection`, so every
@@ -368,54 +201,33 @@ export function LandingNewLowerSections() {
         </LatticePlate>
         <LandingNewProductsCarousel
           ariaLabel="Use cases"
-          className={`w-full ${LATTICE_SPACE.block}`}
-          items={LANDING_USE_CASES}
+          className={`w-full ${LATTICE_SPACE.blockTight}`}
+          items={LANDING_PILLARS_POOL}
+          slots={LANDING_PILLARS_SLOTS}
         />
       </LatticeSection>
       <LandingNewConsoleSection headingId="landing-new-wallet-heading" />
       <LandingNewFeatureCards />
       <LandingNewRemittancesSection />
+      <LandingHomeNavFadeOutMarker />
       <LatticeSection
         aria-labelledby="landing-new-possibilities-heading"
         grid
-        gridMask="fadeBoth"
+        gridMask="fadeIn"
+        pad={false}
+        className={LATTICE_SPACE.sectionBottom}
       >
-        <LatticePlate>
+        <LatticePlate inset={false}>
           <LandingNewPillarsHeading
             headingId="landing-new-possibilities-heading"
-            lead={LANDING_POSSIBILITIES_TITLE_LEAD}
             prefix={LANDING_POSSIBILITIES_TITLE_PREFIX}
             accent={LANDING_POSSIBILITIES_TITLE_ACCENT}
+            displayClassName={LANDING_POSSIBILITIES_TITLE_CLASS}
           />
         </LatticePlate>
-        <div className={`${landingViewportBleedClassName} ${LATTICE_SPACE.block}`}>
-          <LandingNewPossibilitiesMarquee
-            ariaLabel="What you can build"
-            className="w-full"
-            leadItems={LANDING_PRODUCT_POSSIBILITIES}
-            items={LANDING_POSSIBILITIES_REST}
-          />
-        </div>
+        <LandingNewLatticeCtaCell label={LANDING_POSSIBILITIES_CTA_LABEL} />
       </LatticeSection>
-      <LandingHomeNavFadeOutMarker />
-      <LatticeSection
-        aria-labelledby="landing-new-building-new-heading"
-        grid={false}
-        pad={false}
-        className="pt-48 md:pt-64"
-      >
-        <LandingHomeBuildingNewBlock
-          headingId="landing-new-building-new-heading"
-          title={MARKETING_CLOSING_HEADLINE}
-          subtitle={MARKETING_CLOSING_SUBTITLE}
-          titleClassName={buildingNewTitleClassName}
-          sublineClassName={buildingNewSublineClassName}
-          contactCtaClassName={landingHeroPrimaryCtaClassName}
-          contactCtaLabel={CLOSING_CTA_LABEL}
-          sitemapInColumn
-        />
-      </LatticeSection>
-      <LandingFooterMarquee words={FOOTER_MARQUEE_WORDS} className="-mt-8" />
+      <LandingNewFooter />
     </>
   )
 }

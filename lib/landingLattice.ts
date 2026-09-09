@@ -1,5 +1,5 @@
 /**
- * The new-landing 64px lattice.
+ * The home landing 64px lattice.
  *
  * One rule: every box edge that should read as "on the grid" sits on a
  * multiple of {@link LATTICE_CELL_PX} measured from the **content column's
@@ -43,6 +43,8 @@ export const LATTICE_SPACE = {
   sectionBottom: "pb-16 md:pb-32",
   /** Gap between a heading plate and the block below it. */
   block: "mt-16 md:mt-32",
+  /** One cell between a heading plate and the cards below. */
+  blockTight: "mt-16",
   /** Copy inset inside a cell: half a cell from `md`, a little tighter on a 5-cell column. */
   inset: "p-6 md:p-8",
   /**

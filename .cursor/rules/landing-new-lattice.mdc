@@ -28,9 +28,10 @@ changing sections. Summary of the hard rules:
   between sizes, but every rest pose (full cell or the 64×64 block) has edges
   ≡ 0 (mod 64) from the cell origin. No `left: 50%` / `translate(-50%)` pins
   that land on a half-cell.
-- Do not import lattice primitives into `components/marketing/landing/*`
-  paths used by `/`; extend shared components with opt-in props whose
-  defaults keep `/` unchanged.
+- `/` is the lattice landing. Do not import lattice primitives into
+  `components/marketing/landing/*` paths used only by `/old-landing`;
+  extend shared components with opt-in props whose defaults keep that
+  page unchanged.
 
 ```tsx
 // ✅ new section

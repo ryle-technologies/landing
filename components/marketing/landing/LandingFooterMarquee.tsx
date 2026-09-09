@@ -3,7 +3,22 @@ const FOOTER_MARQUEE_WORDS = ["Instant", "Private", "Verifiable"] as const;
 const FOOTER_MARQUEE_REPEATS = Array.from({ length: 4 }, (_, index) => index);
 
 const footerStatementClassName =
-  "select-none whitespace-nowrap font-serif text-[clamp(3.05rem,10.7vw,5.25rem)] font-normal italic leading-[0.78] tracking-normal text-[color-mix(in_srgb,var(--muted)_32%,var(--marketing-surface))] transition-colors duration-500 ease-out";
+  "select-none whitespace-nowrap font-serif font-normal italic leading-[0.78] tracking-normal text-[color-mix(in_srgb,var(--muted)_32%,var(--marketing-surface))] transition-colors duration-500 ease-out";
+
+const sizeClassName = {
+  default: "text-[clamp(3.05rem,10.7vw,5.25rem)]",
+  display: "text-[clamp(7rem,26vw,16rem)]",
+} as const;
+
+const frameClassName = {
+  default: "h-[clamp(6.2rem,19vw,10.5rem)]",
+  display: "h-[clamp(7.5rem,22vw,13.5rem)]",
+} as const;
+
+const cropClassName = {
+  default: "translate-y-[20%]",
+  display: "translate-y-[6%]",
+} as const;
 
 const maskBgClass = "bg-[var(--marketing-surface)]";
 
@@ -11,18 +26,24 @@ type LandingFooterMarqueeProps = {
   className?: string;
   /** Marquee words (defaults to Instant / Private / Verifiable). */
   words?: readonly string[];
+  /** `display` is the closing statement on `/`. Defaults keep `/old-landing` unchanged. */
+  size?: keyof typeof sizeClassName;
+  /** Sit the words on the container's bottom edge (no downward crop). */
+  flush?: boolean;
 };
 
 /** Marketing site footer: infinite horizontal marquee (Instant / Private / Verifiable). */
 export function LandingFooterMarquee({
   className = "",
   words = FOOTER_MARQUEE_WORDS,
+  size = "default",
+  flush = false,
 }: LandingFooterMarqueeProps) {
   return (
     <section
       aria-hidden="true"
       className={
-        `relative h-[clamp(6.2rem,19vw,10.5rem)] overflow-hidden pl-[max(0rem,env(safe-area-inset-left))] pr-[max(0rem,env(safe-area-inset-right))] ${className}`.trim()
+        `relative overflow-hidden pl-[max(0rem,env(safe-area-inset-left))] pr-[max(0rem,env(safe-area-inset-right))] ${frameClassName[size]} ${className}`.trim()
       }
     >
       <div
@@ -43,10 +64,10 @@ export function LandingFooterMarquee({
       />
       <div
         aria-hidden
-        className="absolute inset-x-0 bottom-0 translate-y-[20%] overflow-hidden"
+        className={`absolute inset-x-0 bottom-0 overflow-hidden ${flush ? "" : cropClassName[size]}`.trim()}
       >
         <div
-          className={`${footerStatementClassName} landing-footer-marquee flex w-max animate-[landing-footer-marquee_54s_linear_infinite] items-baseline motion-reduce:animate-none`}
+          className={`${footerStatementClassName} ${sizeClassName[size]} landing-footer-marquee flex w-max animate-[landing-footer-marquee_54s_linear_infinite] items-baseline motion-reduce:animate-none`}
         >
           {[0, 1].map((trackIndex) => (
             <span

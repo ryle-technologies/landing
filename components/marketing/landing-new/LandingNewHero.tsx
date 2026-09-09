@@ -3,7 +3,7 @@ import {
   LandingHomeHeroPinContent,
   LandingHomeHeroTopBar,
 } from "@/components/marketing/landing/LandingHomeHeroPinContent"
-import { LandingNewHeroStat } from "@/components/marketing/landing-new/LandingNewHeroStat"
+import { LandingNewHeroCtaRow } from "@/components/marketing/landing-new/LandingNewLatticeCta"
 import { LatticeSection } from "@/components/marketing/landing-new/lattice/LatticeSection"
 import {
   LandingHomeNavScrollScope,
@@ -14,7 +14,8 @@ import {
   landingNewHeroDisplayClassName,
 } from "@/lib/landingHeroTypography"
 import { landingNewColumnHorizontalPadClass } from "@/lib/landingLayout"
-import { LATTICE_ROOT_ATTR, LATTICE_SPACE } from "@/lib/landingLattice"
+import { LATTICE_ROOT_ATTR } from "@/lib/landingLattice"
+import { landingHeroIntroDelays } from "@/lib/landingHeroIntro"
 import { LANDING_MARKETING_CONTACT_HREF } from "@/lib/siteNav"
 
 const LandingNewLowerSections = dynamic(
@@ -24,42 +25,40 @@ const LandingNewLowerSections = dynamic(
     ),
 )
 
-const HERO_TITLE = "The fintech stack that lets your company"
+const HERO_TITLE = "Ship your own"
 
-const HERO_TITLE_TWO_LINE = "The fintech stack that lets\nyour company"
+/** Mobile: line 1 is the prefix; the rotating word sits on line 2. */
+const HERO_TITLE_TWO_LINE = HERO_TITLE
 
 const HERO_ROTATING_WORDS = [
-  "own",
-  "issue",
-  "lend",
-  "finance",
-  "move",
-  "create",
+  "stablecoin",
+  "wallet",
+  "cards",
+  "asset",
+  "payments",
+  "cashback",
 ] as const
 
 const HERO_CTA_LABEL = "Talk to us"
 
 const HERO_SUBLINE =
-  "Issue your own assets, move money instantly, and put payments and cards inside your product, on modular infrastructure that runs in your cloud and stays yours."
+  "Issue assets, move money across borders in seconds, embed wallets and cards in your product. One modular stack, deployed in your cloud. Yours to run."
+
+const { subline: HERO_SUBLINE_DELAY_S, cta: HERO_CTA_DELAY_S } =
+  landingHeroIntroDelays(HERO_TITLE, HERO_ROTATING_WORDS[0])
 
 /**
- * New landing. `<main>` is the lattice root (row 0); every child is a
+ * Home landing. `<main>` is the lattice root (row 0); every child is a
  * `LatticeSection`, so section tops stay on 64px lines all the way down.
  */
 export function LandingNewHero() {
   return (
     <main
-      id="new-landing"
-      aria-label="New landing preview"
+      id="landing-home"
+      aria-label="Home"
       className="w-full min-w-0 scroll-mt-6"
       {...{ [LATTICE_ROOT_ATTR]: "" }}
     >
-      <p
-        aria-hidden
-        className="pointer-events-none fixed top-4 left-[max(2rem,env(safe-area-inset-left))] z-50 font-mono text-[11px] uppercase tracking-wide text-muted/50 sm:text-xs"
-      >
-        Preview · not indexed
-      </p>
       {/* One lattice row: the top bar is full-width like the sticky nav it hands off to. */}
       <LandingHomeHeroTopBar
         className="relative z-10 h-16"
@@ -74,14 +73,22 @@ export function LandingNewHero() {
           heroTitleClassName={landingNewHeroDisplayClassName}
           rotatingWords={HERO_ROTATING_WORDS}
           subline={HERO_SUBLINE}
+          sublineDelay={HERO_SUBLINE_DELAY_S}
           ctaLabel={HERO_CTA_LABEL}
           heroVisual={null}
           topBar={false}
           headlinePlate
           plateClassName="mt-16"
-          ctaRowClassName="mt-8 flex w-full min-w-0 items-start justify-start text-left sm:mt-16"
+          showCta={false}
+          showNetworks={false}
+          afterPlate={
+            <LandingNewHeroCtaRow
+              label={HERO_CTA_LABEL}
+              href={LANDING_MARKETING_CONTACT_HREF}
+              delay={HERO_CTA_DELAY_S}
+            />
+          }
         />
-        <LandingNewHeroStat className={LATTICE_SPACE.block} />
       </LatticeSection>
       <LandingHomeNavScrollScope>
         <div className="relative z-20">

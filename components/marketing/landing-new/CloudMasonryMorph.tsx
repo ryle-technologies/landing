@@ -11,6 +11,10 @@ import {
 } from "react"
 import { animate, motion } from "motion/react"
 import { LATTICE_CELL_PX, LATTICE_COLUMN_ATTR } from "@/lib/landingLattice"
+import {
+  playLatticeShift,
+  readLatticeShiftRects,
+} from "@/components/marketing/landing-new/lattice/latticeShift"
 
 type MiniPose = { x: number; y: number }
 
@@ -145,12 +149,13 @@ const AMBIENT_GROUPS: readonly (readonly number[])[] = [
 const AMBIENT_GAPS_MS = [2800, 3600, 2400, 4200, 3000] as const
 const AMBIENT_HOLD_S = 0.18
 const AMBIENT_FIRST_MS = 2200
-const SHIFT_MS = 420
-const SHIFT_EASE = "cubic-bezier(0.22, 1, 0.36, 1)"
-const SHIFT_AXIS_EPS = 1
-const CLOUD_SHIFT_ATTR = "data-cloud-shift"
-let shiftTimer = 0
 const PACK_INDICES = [0, 1, 2, 3, 4, 5, 6, 7, 8] as const
+const cloudShiftTimer = { current: 0 }
+
+function cloudShiftRoot(): ParentNode {
+  const node = document.querySelector("[data-cloud-morph]")
+  return node?.closest(`[${LATTICE_COLUMN_ATTR}]`) ?? document
+}
 
 type MorphKind = "idle" | "ambient"
 type MorphMode = "idle" | "out" | "in"
@@ -246,63 +251,17 @@ function staggerMap(wave: readonly number[]) {
 }
 
 function readShiftRects() {
-  const map = new Map<number, MiniPose>()
-  for (const node of document.querySelectorAll<HTMLElement>(`[${CLOUD_SHIFT_ATTR}]`)) {
-    const index = Number(node.getAttribute(CLOUD_SHIFT_ATTR))
-    if (!Number.isFinite(index)) continue
-    const rect = node.getBoundingClientRect()
-    map.set(index, { x: rect.left, y: rect.top })
-  }
-  return map
+  return readLatticeShiftRects(cloudShiftRoot())
 }
 
 function playNeighborShift(
   first: ReadonlyMap<number, MiniPose>,
   skip: ReadonlySet<number>,
 ) {
-  window.clearTimeout(shiftTimer)
-  const movers: { node: HTMLElement; dx: number; dy: number }[] = []
-  for (const node of document.querySelectorAll<HTMLElement>(`[${CLOUD_SHIFT_ATTR}]`)) {
-    const index = Number(node.getAttribute(CLOUD_SHIFT_ATTR))
-    node.style.transition = "none"
-    node.style.transform = "none"
-    if (!Number.isFinite(index) || skip.has(index)) continue
-    const prev = first.get(index)
-    if (!prev) continue
-    const last = node.getBoundingClientRect()
-    const dx = prev.x - last.left
-    const dy = prev.y - last.top
-    if (Math.abs(dx) < SHIFT_AXIS_EPS && Math.abs(dy) < SHIFT_AXIS_EPS) continue
-    node.style.transform = `translate(${dx}px, ${dy}px)`
-    movers.push({ node, dx, dy })
-  }
-  if (movers.length === 0) return
-
-  const slide = (transform: (mover: (typeof movers)[number]) => string) => {
-    for (const mover of movers) {
-      mover.node.style.transition = `transform ${SHIFT_MS}ms ${SHIFT_EASE}`
-      mover.node.style.transform = transform(mover)
-    }
-  }
-
-  requestAnimationFrame(() => {
-    requestAnimationFrame(() => {
-      // Horizontal first, then vertical — never a diagonal jump.
-      const bent = movers.filter(
-        ({ dx, dy }) => Math.abs(dx) >= SHIFT_AXIS_EPS && Math.abs(dy) >= SHIFT_AXIS_EPS,
-      )
-      slide(({ dx, dy }) =>
-        Math.abs(dx) >= SHIFT_AXIS_EPS && Math.abs(dy) >= SHIFT_AXIS_EPS
-          ? `translate(0px, ${dy}px)`
-          : "none",
-      )
-      if (bent.length === 0) return
-      shiftTimer = window.setTimeout(() => {
-        for (const { node } of bent) {
-          node.style.transform = "none"
-        }
-      }, SHIFT_MS)
-    })
+  playLatticeShift(first, {
+    root: cloudShiftRoot(),
+    skip,
+    timerRef: cloudShiftTimer,
   })
 }
 
@@ -322,6 +281,7 @@ export function CloudMorphRoot<T>({
   product,
   pin,
   immediate,
+  ambient = true,
   children,
 }: {
   product: T
@@ -329,6 +289,8 @@ export function CloudMorphRoot<T>({
   pin?: readonly number[]
   /** Slots that morph as soon as `product` changes, instead of waiting for ambient. */
   immediate?: readonly number[]
+  /** When false, cards only morph on `product` change (phone preview). */
+  ambient?: boolean
   children: (visuals: readonly T[]) => ReactNode
 }) {
   const [visuals, setVisuals] = useState<T[]>(() => fillSlots(product))
@@ -354,6 +316,8 @@ export function CloudMorphRoot<T>({
   const skipFirstProductRef = useRef(true)
   const generationRef = useRef(0)
   const ambientRef = useRef(0)
+  const ambientOnRef = useRef(ambient)
+  ambientOnRef.current = ambient
   const firstRectsRef = useRef<ReadonlyMap<number, MiniPose>>(EMPTY_HANDOFF)
   const participatingRef = useRef<ReadonlySet<number>>(EMPTY_NUMBERS)
   participatingRef.current = participating
@@ -474,6 +438,10 @@ export function CloudMorphRoot<T>({
         if (eager.length > 0) {
           await playCycle(eager)
           if (cancelled) return
+          continue
+        }
+        if (!ambientOnRef.current) {
+          await waitInterruptible(800, stopWait)
           continue
         }
         const step = ambientRef.current

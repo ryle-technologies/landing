@@ -1,9 +1,15 @@
+"use client"
+
 import type { ReactNode } from "react"
 import { LandingHomeOrbitNetworkNames } from "@/components/marketing/landing/LandingHomeOrbitNetworkNames"
 import { LandingNewFeatureChainSnap } from "@/components/marketing/landing-new/LandingNewFeatureChainSnap"
 import { LandingNewFeatureAgentConsole } from "@/components/marketing/landing-new/LandingNewFeatureAgentConsole"
 import { LandingNewFeatureCloudConsole } from "@/components/marketing/landing-new/LandingNewFeatureCloudConsole"
 import { LandingNewFeatureEventConsole } from "@/components/marketing/landing-new/LandingNewFeatureEventConsole"
+import {
+  LandingNewFeatureCardsCarousel,
+  useIsMobileFeatureCarousel,
+} from "@/components/marketing/landing-new/LandingNewFeatureCardsCarousel"
 import { LandingNewPrivacyCard } from "@/components/marketing/landing-new/LandingNewPrivacyCard"
 import { LatticeCell, LatticeGrid } from "@/components/marketing/landing-new/lattice/LatticeGrid"
 import { LatticePlate } from "@/components/marketing/landing-new/lattice/LatticePlate"
@@ -41,23 +47,23 @@ const cardVisualMonitorClassName =
 
 const FEATURE_KICKER = "Platform"
 
-const FEATURE_TITLE = "A backend ready for enterprises."
-const FEATURE_TITLE_LINE_TWO = "Right inside your current products."
+const FEATURE_TITLE = "One backend."
+const FEATURE_TITLE_LINE_TWO = "Plugs into everything you already run."
 
-const EVM_TITLE = "EVM-ready."
+const EVM_TITLE = "Any EVM network."
 
 const EVM_BODY =
-  "Build on top of our platform with assets across the networks your products already use."
+  "Ethereum, Base, Arbitrum, Polygon and more. One API, every network you already use."
 
 const DEVELOPERS_TITLE = "Built for devs & AI."
 
 const DEVELOPERS_BODY =
-  "APIs, SDKs and MCP interfaces for integrating confidential assets into your product."
+  "Integrate in days. Works from your codebase and from the AI tools your team already uses."
 
 const MONITORING_TITLE = "Live monitoring."
 
 const MONITORING_BODY =
-  "A real-time feed of mints, transfers, disclosures and policy changes. Attributed and exportable."
+  "Every mint, transfer, disclosure and policy change, as it happens. Attributed. Exportable."
 
 const CLOUD_TITLE = "Deployed in your cloud."
 
@@ -118,12 +124,119 @@ function ChainMarqueeField() {
   )
 }
 
+function DevelopersCard() {
+  return (
+    <FeatureCard
+      title={DEVELOPERS_TITLE}
+      body={DEVELOPERS_BODY}
+      visual={<LandingNewFeatureAgentConsole />}
+      visualClassName={cardVisualConsoleClassName}
+    />
+  )
+}
+
+function MonitoringCard() {
+  return (
+    <FeatureCard
+      title={MONITORING_TITLE}
+      body={MONITORING_BODY}
+      visual={
+        <LandingNewFeatureEventConsole
+          fadeClassName={CARD_MASK}
+          snapDelayMs={LANDING_FEATURE_SNAP_STAGGER_MS}
+        />
+      }
+      visualClassName={cardVisualMonitorClassName}
+    />
+  )
+}
+
+function EvmCard() {
+  return (
+    <FeatureCard
+      title={EVM_TITLE}
+      body={EVM_BODY}
+      extra={
+        <LandingHomeOrbitNetworkNames
+          snap
+          className="min-w-0 font-mono text-xs uppercase leading-snug tracking-wide text-muted transition-colors duration-500 ease-out"
+        />
+      }
+      visual={<ChainMarqueeField />}
+      visualFirst
+    />
+  )
+}
+
+function CloudCard() {
+  return (
+    <FeatureCard
+      title={CLOUD_TITLE}
+      body={CLOUD_BODY}
+      visual={<LandingNewFeatureCloudConsole />}
+      visualClassName="relative min-h-[8rem] w-full min-w-0 flex-1 overflow-hidden"
+    />
+  )
+}
+
+function FeatureCardsDesktop() {
+  return (
+    <>
+      <LatticeGrid
+        className={LATTICE_SPACE.blockTight}
+        minCols={FEATURE_ROW_MIN_COLS}
+        indent={1}
+        stroke
+        equalRows
+      >
+        <LatticeCell cols={FEATURE_CARD_COLS} minRows={FEATURE_CARD_MIN_ROWS} indent>
+          <DevelopersCard />
+        </LatticeCell>
+        <LatticeCell cols={FEATURE_CARD_COLS} minRows={FEATURE_CARD_MIN_ROWS}>
+          <MonitoringCard />
+        </LatticeCell>
+        <LatticeCell cols={FEATURE_CARD_COLS} minRows={FEATURE_CARD_MIN_ROWS}>
+          <EvmCard />
+        </LatticeCell>
+      </LatticeGrid>
+      <LatticeGrid minCols={FEATURE_ROW_MIN_COLS} stroke equalRows>
+        <LatticeCell cols={2 * FEATURE_CARD_COLS} minRows={FEATURE_CARD_MIN_ROWS}>
+          <LandingNewPrivacyCard className={CELL_PAD} />
+        </LatticeCell>
+        <LatticeCell cols={FEATURE_CARD_COLS} minRows={FEATURE_CARD_MIN_ROWS}>
+          <CloudCard />
+        </LatticeCell>
+      </LatticeGrid>
+    </>
+  )
+}
+
+function FeatureCardsMobile() {
+  return (
+    <LandingNewFeatureCardsCarousel
+      cardCols={FEATURE_CARD_COLS}
+      minRows={FEATURE_CARD_MIN_ROWS}
+      items={[
+        <DevelopersCard key="devs" />,
+        <MonitoringCard key="monitor" />,
+        <EvmCard key="evm" />,
+        <LandingNewPrivacyCard key="privacy" className={CELL_PAD} />,
+        <CloudCard key="cloud" />,
+      ]}
+    />
+  )
+}
+
 /**
  * Three equal cards (first row indented one cell), then a 2/3 privacy cell
  * and a 1/3 cloud cell. Two `LatticeGrid`s so each row shares one bottom
  * line; the cells carry the stroke and the paper.
+ *
+ * Below `md`, those five cards become a single horizontal carousel.
  */
 export function LandingNewFeatureCards() {
+  const isMobile = useIsMobileFeatureCarousel()
+
   return (
     <LatticeSection
       aria-labelledby="landing-new-features-heading"
@@ -141,62 +254,7 @@ export function LandingNewFeatureCards() {
           {FEATURE_TITLE_LINE_TWO}
         </h2>
       </LatticePlate>
-      <LatticeGrid
-        className={LATTICE_SPACE.block}
-        minCols={FEATURE_ROW_MIN_COLS}
-        indent={1}
-        stroke
-        equalRows
-      >
-        <LatticeCell cols={FEATURE_CARD_COLS} minRows={FEATURE_CARD_MIN_ROWS} indent>
-          <FeatureCard
-            title={DEVELOPERS_TITLE}
-            body={DEVELOPERS_BODY}
-            visual={<LandingNewFeatureAgentConsole />}
-            visualClassName={cardVisualConsoleClassName}
-          />
-        </LatticeCell>
-        <LatticeCell cols={FEATURE_CARD_COLS} minRows={FEATURE_CARD_MIN_ROWS}>
-          <FeatureCard
-            title={MONITORING_TITLE}
-            body={MONITORING_BODY}
-            visual={
-              <LandingNewFeatureEventConsole
-                fadeClassName={CARD_MASK}
-                snapDelayMs={LANDING_FEATURE_SNAP_STAGGER_MS}
-              />
-            }
-            visualClassName={cardVisualMonitorClassName}
-          />
-        </LatticeCell>
-        <LatticeCell cols={FEATURE_CARD_COLS} minRows={FEATURE_CARD_MIN_ROWS}>
-          <FeatureCard
-            title={EVM_TITLE}
-            body={EVM_BODY}
-            extra={
-              <LandingHomeOrbitNetworkNames
-                snap
-                className="min-w-0 font-mono text-xs uppercase leading-snug tracking-wide text-muted transition-colors duration-500 ease-out"
-              />
-            }
-            visual={<ChainMarqueeField />}
-            visualFirst
-          />
-        </LatticeCell>
-      </LatticeGrid>
-      <LatticeGrid minCols={FEATURE_ROW_MIN_COLS} stroke equalRows>
-        <LatticeCell cols={2 * FEATURE_CARD_COLS} minRows={FEATURE_CARD_MIN_ROWS}>
-          <LandingNewPrivacyCard className={CELL_PAD} />
-        </LatticeCell>
-        <LatticeCell cols={FEATURE_CARD_COLS} minRows={FEATURE_CARD_MIN_ROWS}>
-          <FeatureCard
-            title={CLOUD_TITLE}
-            body={CLOUD_BODY}
-            visual={<LandingNewFeatureCloudConsole />}
-            visualClassName="relative min-h-[8rem] w-full min-w-0 flex-1 overflow-hidden"
-          />
-        </LatticeCell>
-      </LatticeGrid>
+      {isMobile ? <FeatureCardsMobile /> : <FeatureCardsDesktop />}
     </LatticeSection>
   )
 }

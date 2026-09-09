@@ -2,7 +2,6 @@ import type { ReactNode } from "react"
 import Image from "next/image"
 import Link from "next/link"
 import { LandingHomeChainsMarquee } from "@/components/marketing/landing/LandingHomeChainsMarquee"
-import { LandingThemeToggle } from "@/components/marketing/landing/LandingThemeToggle"
 import { LandingHomeHeroFadeUp } from "@/components/marketing/landing/LandingHomeHeroFadeUp"
 import { LandingHomeHeroTextEffect } from "@/components/marketing/landing/LandingHomeHeroTextEffect"
 import { LatticePlate } from "@/components/marketing/landing-new/lattice/LatticePlate"
@@ -35,6 +34,8 @@ type LandingHomeHeroPinContentProps = {
   eyebrow?: string
   /** Optional smaller line directly under the headline. */
   subline?: string
+  /** Seconds before the subline fade-up. */
+  sublineDelay?: number
   /** Primary CTA label (defaults to {@link LANDING_MARKETING_CTA_LABEL}). */
   ctaLabel?: string
   /** Cycles the last headline verb (x.ai-style letter morph). */
@@ -49,13 +50,19 @@ type LandingHomeHeroPinContentProps = {
   plateClassName?: string
   /** Spacing above the CTA row. */
   ctaRowClassName?: string
-  /** Render the wordmark / theme-toggle bar. Off when the page draws its own. */
+  /** Render the wordmark bar. Off when the page draws its own. */
   topBar?: boolean
   /** Wrap the headline in a lattice-snapped paper plate (new landing). */
   headlinePlate?: boolean
+  /** Default pill CTA inside the plate. Off when the new landing draws its own. */
+  showCta?: boolean
+  /** Supported-networks cluster beside the pill. */
+  showNetworks?: boolean
+  /** Rendered after the headline plate (home lattice CTA row). */
+  afterPlate?: ReactNode
 }
 
-/** Wordmark + theme toggle row shared by the hero and the new-landing lattice header. */
+/** Wordmark row shared by the hero and the home lattice header. */
 export function LandingHomeHeroTopBar({
   className = "",
   padClassName = landingColumnHorizontalPadClass,
@@ -89,7 +96,6 @@ export function LandingHomeHeroTopBar({
           Ryle
         </span>
       </Link>
-      <LandingThemeToggle />
     </div>
   )
 }
@@ -104,6 +110,7 @@ export function LandingHomeHeroPinContent({
   heroTitleTwoLine,
   eyebrow,
   subline,
+  sublineDelay = 0,
   ctaLabel = LANDING_MARKETING_CTA_LABEL,
   rotatingWords,
   heroVisual,
@@ -113,8 +120,12 @@ export function LandingHomeHeroPinContent({
   ctaRowClassName = "mt-10 flex w-full min-w-0 items-start justify-start text-left sm:mt-12",
   topBar = true,
   headlinePlate = false,
+  showCta = true,
+  showNetworks = true,
+  afterPlate,
 }: LandingHomeHeroPinContentProps) {
   const Plate = headlinePlate ? LatticePlate : "div"
+  const showCtaRow = showCta || showNetworks
   return (
     <>
       <div
@@ -148,33 +159,45 @@ export function LandingHomeHeroPinContent({
             className={heroTitleClassName}
           />
           {subline ? (
-            <p className="mt-4 max-w-[56rem] text-left font-serif text-[21px] font-normal italic leading-snug tracking-[-0.02em] text-muted transition-colors duration-500 ease-out sm:mt-5 sm:text-[24px]">
-              {subline}
-            </p>
-          ) : null}
-          <div className={ctaRowClassName}>
             <LandingHomeHeroFadeUp
-              delay={HERO_CTA_FADE_DELAY_S}
-              className="flex shrink-0 flex-col items-start"
+              delay={sublineDelay}
+              className="mt-4 max-w-[56rem] sm:mt-5"
             >
-              <div className="flex flex-wrap items-center gap-x-5 gap-y-2 sm:gap-x-6">
-                <a
-                  href={contactHref}
-                  className={homeHeroCtaClassName}
-                  {...landingMarketingCtaAnchorProps(contactHref)}
-                >
-                  {ctaLabel}
-                </a>
-                <div className="flex min-w-0 max-w-full items-center gap-2 sm:gap-2.5">
-                  <span className="shrink-0 whitespace-nowrap text-xs font-normal leading-none text-muted-light transition-colors duration-500 ease-out sm:text-[13px]">
-                    {SUPPORTED_NETWORKS_LABEL}
-                  </span>
-                  <LandingHomeChainsMarquee />
-                </div>
-              </div>
+              <p className="text-left font-serif text-[21px] font-normal italic leading-snug tracking-[-0.02em] text-muted transition-colors duration-500 ease-out sm:text-[24px]">
+                {subline}
+              </p>
             </LandingHomeHeroFadeUp>
-          </div>
+          ) : null}
+          {showCtaRow ? (
+            <div className={ctaRowClassName}>
+              <LandingHomeHeroFadeUp
+                delay={HERO_CTA_FADE_DELAY_S}
+                className="flex shrink-0 flex-col items-start"
+              >
+                <div className="flex flex-wrap items-center gap-x-5 gap-y-2 sm:gap-x-6">
+                  {showCta ? (
+                    <a
+                      href={contactHref}
+                      className={homeHeroCtaClassName}
+                      {...landingMarketingCtaAnchorProps(contactHref)}
+                    >
+                      {ctaLabel}
+                    </a>
+                  ) : null}
+                  {showNetworks ? (
+                    <div className="flex min-w-0 max-w-full items-center gap-2 sm:gap-2.5">
+                      <span className="shrink-0 whitespace-nowrap text-xs font-normal leading-none text-muted-light transition-colors duration-500 ease-out sm:text-[13px]">
+                        {SUPPORTED_NETWORKS_LABEL}
+                      </span>
+                      <LandingHomeChainsMarquee />
+                    </div>
+                  ) : null}
+                </div>
+              </LandingHomeHeroFadeUp>
+            </div>
+          ) : null}
         </Plate>
+        {afterPlate}
       </div>
 
       {heroVisual !== undefined ? (

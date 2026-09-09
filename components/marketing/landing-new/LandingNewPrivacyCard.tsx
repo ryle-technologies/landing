@@ -15,7 +15,7 @@ import {
  */
 
 const PRIVACY_CONTENT = {
-  title: "Privacy built-in.",
+  title: "Private by default.",
   body:
     "Amounts, balances and counterparties stay private. Still onchain, visible only to the auditors you choose.",
 } as const

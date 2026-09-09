@@ -26,9 +26,15 @@ function FooterNavAnchor({ link }: { link: FooterNavLink }) {
   )
 }
 
-function FooterSitemapColumn({ column }: { column: FooterNavColumn }) {
+export function FooterSitemapColumn({
+  column,
+  className = "",
+}: {
+  column: FooterNavColumn
+  className?: string
+}) {
   return (
-    <div className="min-w-0">
+    <div className={`min-w-0 ${className}`.trim()}>
       {column.headingHref ? (
         <a
           href={column.headingHref}

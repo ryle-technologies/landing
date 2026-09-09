@@ -1,6 +1,6 @@
 # The new-landing lattice
 
-Layout system for `/new-landing`. Every visible box edge that should read as
+Layout system for `/`. Every visible box edge that should read as
 "on the grid" sits on a multiple of 64px. This document explains the model, the
 four primitives, and the rules that keep new content aligned without any
 per-component snapping code.
@@ -38,8 +38,8 @@ column, and adds a spacer so its total height is a cell multiple.
 | Prop | Default | Notes |
 | --- | --- | --- |
 | `grid` | `true` | Paint the lattice canvas. |
-| `gridMask` | `"solid"` | `solid` · `fadeTop` · `fadeBottom` · `fadeBoth` · `hero` · or a `linear-gradient(...)` string. |
-| `contentFade` | — | `bottom` washes the last six cells so cards and lattice dissolve into the page. |
+| `gridMask` | `"solid"` | `solid` · `fadeTop` · `fadeBottom` · `fadeBoth` · `fadeIn` · `hero` · `pageEnd` · or a `linear-gradient(...)` string. |
+| `contentFade` | — | `bottom` washes the section end so cards and lattice dissolve together. One cell on small screens; eight cells from `md`. |
 | `pad` | `true` | Applies `LATTICE_SPACE.sectionY` (`py-16 md:py-32`). Set `false` and pass your own cell-multiple padding via `className`. |
 | `snap` | `true` | Round height up to whole cells. |
 | `as` | `"section"` | `section` · `div` · `header` · `footer`. |
@@ -145,7 +145,7 @@ cell edges are all on lines by construction.
 
 ## Checking alignment
 
-Headless check: load `/new-landing`, take the first `[data-lattice-column]`'s
+Headless check: load `/`, take the first `[data-lattice-column]`'s
 `left` and `[data-lattice-root]`'s `top` as origins, and assert that every
 `LatticeSection` top/bottom, plate rect, `[style*="grid-column"]` cell rect, and
 `.landing-new-use-case-card` rect is `≡ 0 (mod 64)` on each side. Do this at

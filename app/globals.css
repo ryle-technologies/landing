@@ -188,6 +188,7 @@ select,
   --hero-skin-tint: #6b5d4a;
   --marketing-fab-bg: #ffffff;
   --marketing-fab-fg: #141210;
+  --home-action-chip-stroke: linear-gradient(to bottom, transparent, #e0dbd4);
   --marketing-theme-transition-duration: 900ms;
   --marketing-theme-transition-timing: ease-in-out;
   transition:
@@ -234,6 +235,7 @@ select,
   --hero-skin-tint: #8f8270;
   --marketing-fab-bg: #f5f2ee;
   --marketing-fab-fg: #141210;
+  --home-action-chip-stroke: linear-gradient(to bottom, transparent, #2a2825);
 }
 
 .marketing-viewport-bleed *,
@@ -369,6 +371,41 @@ html:has(.marketing-viewport-bleed.dark) body {
   animation: landing-hero-word-shimmer 3000ms linear 400ms 1 both;
 }
 
+.landing-hero-word-shimmer.landing-hero-underline-wait {
+  animation: none;
+  clip-path: inset(0 100% 0 0);
+}
+
+.landing-hero-word-shimmer.landing-hero-underline-play {
+  animation: landing-hero-word-shimmer 3000ms linear 0ms 1 both;
+}
+
+@keyframes landing-cta-underline-reveal {
+  from {
+    clip-path: inset(0 100% 0 0);
+  }
+  to {
+    clip-path: inset(0 0 0 0);
+  }
+}
+
+@keyframes landing-cta-underline-wipe {
+  from {
+    clip-path: inset(0 0 0 0);
+  }
+  to {
+    clip-path: inset(0 0 0 100%);
+  }
+}
+
+/* Grey bar draws left → right, rainbow runs, then the bar wipes left → right. */
+.landing-hero-word-shimmer.landing-cta-underline-wipe {
+  animation:
+    landing-cta-underline-reveal 500ms cubic-bezier(0.22, 1, 0.36, 1) 0ms 1 both,
+    landing-hero-word-shimmer 3000ms linear 400ms 1 both,
+    landing-cta-underline-wipe 500ms cubic-bezier(0.22, 1, 0.36, 1) 3400ms 1 forwards;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .landing-footer-marquee,
   .landing-chains-marquee,
@@ -378,7 +415,9 @@ html:has(.marketing-viewport-bleed.dark) body {
     transform: translate3d(0, 0, 0);
   }
 
-  .landing-hero-word-shimmer {
+  .landing-hero-word-shimmer,
+  .landing-hero-word-shimmer.landing-cta-underline-wipe,
+  .landing-hero-word-shimmer.landing-hero-underline-play {
     animation: none;
   }
 }
@@ -475,6 +514,18 @@ html:has(.marketing-viewport-bleed.dark) body {
   border-radius: 0;
 }
 
+/*
+ * Inert product phone: home and sheets stay overflow:auto for autoplay
+ * layout, but must not be scroll containers for the user. `clip` does not
+ * create a scrollport, so trackpad over the cell always moves the page.
+ */
+.landing-new-wallet-grid-phone .wallet-demo-scroll,
+.landing-new-wallet-grid-phone .overflow-y-auto {
+  overflow-y: clip !important;
+  overscroll-behavior: none;
+  -webkit-overflow-scrolling: auto;
+}
+
 /* Home column paints the same canvas so the send-sheet peek strip blends in. */
 .wallet-demo-shell .bg-app-gradient {
   background-color: #ffffff;
@@ -492,23 +543,9 @@ html:has(.marketing-viewport-bleed.dark) body {
   transition-timing-function: cubic-bezier(0.65, 0, 0.35, 1) !important;
 }
 
-/* Copy inset eases in with the tile so the 2D mark rides above the title. */
-.marketing-viewport-bleed .landing-new-use-case-card-copy {
-  transition-property: padding !important;
-  transition-duration: 420ms !important;
-  transition-timing-function: cubic-bezier(0.65, 0, 0.35, 1) !important;
-}
-
-/* Idle plate is half-cell; it fills the padded slot as the card opens. */
-.marketing-viewport-bleed .landing-new-use-case-shape-scale {
-  transform-origin: center;
-  transition-duration: 420ms !important;
-  transition-timing-function: cubic-bezier(0.65, 0, 0.35, 1) !important;
-}
-
 @media (prefers-reduced-motion: reduce) {
-  .marketing-viewport-bleed .landing-new-use-case-card-copy,
-  .marketing-viewport-bleed .landing-new-use-case-shape-scale {
+  .marketing-viewport-bleed .landing-new-use-case-card,
+  .marketing-viewport-bleed .landing-new-use-case-card-face {
     transition: none !important;
   }
 }

@@ -49,13 +49,17 @@ function googleVerificationTokens(): string[] | undefined {
   return tokens.length ? tokens : undefined;
 }
 
+/** Default document title (homepage and fallback). */
+export const DEFAULT_SITE_TITLE =
+  "Ryle · Issue, move and spend money onchain";
+
 /** Default meta description (≤155 chars for SERP snippets). */
 export const DEFAULT_SITE_DESCRIPTION =
-  "Bring assets onchain without exposing sensitive activity — launch and operate confidential digital assets for enterprises.";
+  "Modular financial infrastructure for companies: stablecoins, wallets, cross-border payments and cards, live in weeks. Runs in your cloud. Private by default.";
 
 /** Alt text for the static default share card (`app/opengraph-image.png`). */
 export const DEFAULT_OG_IMAGE_ALT =
-  "Ryle — confidential digital assets for companies: launch and operate private onchain assets.";
+  "Ryle — issue, move and spend money onchain: stablecoins, wallets, payments and cards for companies.";
 
 /**
  * Shared root metadata merged in [`app/layout.tsx`](app/layout.tsx) with `icons`.
@@ -76,7 +80,7 @@ export function buildRootMetadata(): Metadata {
       canonical: "/",
     },
     title: {
-      default: "Ryle · Confidential Digital Assets for Companies",
+      default: DEFAULT_SITE_TITLE,
       template: "%s · Ryle",
     },
     description: DEFAULT_SITE_DESCRIPTION,

@@ -31,7 +31,7 @@ const SIZE = HERO_GRID_CELL_PX
 const FOCAL = 3.8
 const SCALE = (SIZE / 2 - 1.4) / SILHOUETTE_EXTENT
 /** Idle plate and 3D solid share this scale so the form does not swell. */
-const PLATE_SCALE = 0.5
+const PLATE_SCALE = 0.88
 /** Solids live in a ~1-radius ball; plates are fitted to SILHOUETTE_EXTENT. */
 const PROJECT_SCALE = SCALE * PLATE_SCALE * SILHOUETTE_EXTENT
 const LIGHT = normalizeLight(-0.38, 0.78, 0.52)

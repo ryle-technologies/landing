@@ -6,9 +6,13 @@ export const landingHeroHeadlineClassName =
 export const landingHeroH1ClassName =
   "font-serif font-normal italic leading-snug tracking-normal text-[28px] sm:text-[36px]"
 
-/** Giant display type shared by the new-landing h1 and the 2,000,000 figure. */
+/**
+ * Giant display type for the home landing h1.
+ * Below `sm` the headline is two nowrap lines, so the floor is lower and
+ * `LandingHomeHeroTextEffect` shrinks further to the lattice column.
+ */
 export const landingNewHeroDisplayClassName =
-  "font-sans text-[clamp(72px,14vw,120px)] leading-none tracking-tighter text-foreground"
+  "font-sans text-[clamp(36px,11vw,72px)] leading-none tracking-tighter text-foreground sm:text-[clamp(72px,14vw,120px)]"
 
 /** Section-scale display type — same face and tracking as the h1, stepped down. */
 export const landingNewSectionDisplayClassName =
