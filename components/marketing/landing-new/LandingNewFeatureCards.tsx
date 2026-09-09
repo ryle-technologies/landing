@@ -76,7 +76,6 @@ function FeatureCard({
   visual,
   extra,
   visualClassName,
-  visualFirst = false,
   className = "",
 }: {
   title: string
@@ -84,34 +83,18 @@ function FeatureCard({
   extra?: ReactNode
   visual: ReactNode
   visualClassName?: string
-  visualFirst?: boolean
   className?: string
 }) {
-  const copy = (
-    <div className="w-full min-w-0">
-      <h3 className={cardTitleClassName}>{title}</h3>
-      {body ? <p className={cardBodyClassName}>{body}</p> : null}
-    </div>
-  )
   return (
     <article
       className={`flex h-full min-w-0 flex-col items-start justify-start gap-6 text-left ${CELL_PAD} ${className}`}
     >
-      {visualFirst ? (
-        <>
-          <div className={`w-full min-w-0 ${visualClassName ?? ""}`}>{visual}</div>
-          <div className="mt-auto flex w-full min-w-0 flex-col gap-6">
-            {extra ? <div className="w-full min-w-0">{extra}</div> : null}
-            {copy}
-          </div>
-        </>
-      ) : (
-        <>
-          {copy}
-          <div className={`w-full min-w-0 ${visualClassName ?? ""}`}>{visual}</div>
-          {extra ? <div className="w-full min-w-0">{extra}</div> : null}
-        </>
-      )}
+      <div className="w-full min-w-0">
+        <h3 className={cardTitleClassName}>{title}</h3>
+        {body ? <p className={cardBodyClassName}>{body}</p> : null}
+      </div>
+      <div className={`w-full min-w-0 ${visualClassName ?? ""}`}>{visual}</div>
+      {extra ? <div className="w-full min-w-0">{extra}</div> : null}
     </article>
   )
 }
@@ -163,7 +146,6 @@ function EvmCard() {
         />
       }
       visual={<ChainMarqueeField />}
-      visualFirst
     />
   )
 }
