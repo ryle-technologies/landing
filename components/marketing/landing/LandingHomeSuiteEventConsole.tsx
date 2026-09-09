@@ -28,11 +28,35 @@ const HTTP_METHOD_LABELS = [
 const TOP_HALF_LINE_COUNT = alphaWebHeroAsciiHalf("top").ascii.split("\n").length
 const heightPlaceholder = Array(TOP_HALF_LINE_COUNT).fill("\u00a0").join("\n")
 
+type LandingHomeSuiteEventConsoleProps = {
+  className?: string
+  /** Top/bottom fade fill. Defaults to the page surface. */
+  fadeClassName?: string
+  /** Fade strip height. Defaults to `h-20`. */
+  fadeSizeClassName?: string
+  /** Fill the parent instead of sizing to the ASCII strip. */
+  fill?: boolean
+  /** Passed through to {@link EventConsole} carousel motion. */
+  carouselMotion?: "linear" | "snap"
+  carouselSnapMs?: number
+  carouselHoldMs?: number
+  carouselSnapDelayMs?: number
+}
+
 /**
  * Duplicate of {@link LandingHomeBanksConsole} for the developers/API bridge on the home
  * landing (after the supported-networks block) — edit here without changing the banks pillar console.
  */
-export function LandingHomeSuiteEventConsole() {
+export function LandingHomeSuiteEventConsole({
+  className,
+  fadeClassName = "bg-[var(--marketing-surface)]",
+  fadeSizeClassName = "h-20",
+  fill = false,
+  carouselMotion = "linear",
+  carouselSnapMs,
+  carouselHoldMs,
+  carouselSnapDelayMs,
+}: LandingHomeSuiteEventConsoleProps = {}) {
   const feed = useMockEventStream({ append: false })
   const blockRef = useRef<HTMLDivElement>(null)
   const [fontPx, setFontPx] = useState(MIN_PX)
@@ -61,16 +85,18 @@ export function LandingHomeSuiteEventConsole() {
 
   return (
     <div
-      className="relative w-full min-w-0 max-w-none"
+      className={["relative w-full min-w-0 max-w-none", fill ? "h-full min-h-0" : "", className ?? ""].join(" ")}
       ref={blockRef}
     >
-      <pre
-        aria-hidden
-        className="m-0 w-full min-w-0 max-w-full p-0 overflow-hidden whitespace-pre font-mono leading-[1.03] text-transparent [letter-spacing:0] [tab-size:1] select-none pointer-events-none"
-        style={{ fontSize: `${fontPx}px` }}
-      >
-        {heightPlaceholder}
-      </pre>
+      {fill ? null : (
+        <pre
+          aria-hidden
+          className="m-0 w-full min-w-0 max-w-full p-0 overflow-hidden whitespace-pre font-mono leading-[1.03] text-transparent [letter-spacing:0] [tab-size:1] select-none pointer-events-none"
+          style={{ fontSize: `${fontPx}px` }}
+        >
+          {heightPlaceholder}
+        </pre>
+      )}
       <div
         className="absolute inset-0 flex min-h-0 min-w-0 items-center py-1"
         aria-label="Example event log between suite and networks"
@@ -83,6 +109,10 @@ export function LandingHomeSuiteEventConsole() {
                 feed={feed}
                 embedded
                 variant="carousel"
+                carouselMotion={carouselMotion}
+                carouselSnapMs={carouselSnapMs}
+                carouselHoldMs={carouselHoldMs}
+                carouselSnapDelayMs={carouselSnapDelayMs}
                 carouselStartAlignBelowMd
                 timeTone="slightlyDarker"
                 swatchTone="slightlyDarker"
@@ -94,7 +124,7 @@ export function LandingHomeSuiteEventConsole() {
           </div>
           <div
             aria-hidden
-            className="pointer-events-none absolute inset-x-0 top-0 z-[1] h-20 bg-[var(--marketing-surface)] transition-colors duration-500 ease-out"
+            className={`pointer-events-none absolute inset-x-0 top-0 z-[1] ${fadeSizeClassName} ${fadeClassName} transition-colors duration-500 ease-out`}
             style={{
               WebkitMaskImage: "linear-gradient(to bottom, black, transparent)",
               maskImage: "linear-gradient(to bottom, black, transparent)",
@@ -102,7 +132,7 @@ export function LandingHomeSuiteEventConsole() {
           />
           <div
             aria-hidden
-            className="pointer-events-none absolute inset-x-0 bottom-0 z-[1] h-20 bg-[var(--marketing-surface)] transition-colors duration-500 ease-out"
+            className={`pointer-events-none absolute inset-x-0 bottom-0 z-[1] ${fadeSizeClassName} ${fadeClassName} transition-colors duration-500 ease-out`}
             style={{
               WebkitMaskImage: "linear-gradient(to top, black, transparent)",
               maskImage: "linear-gradient(to top, black, transparent)",

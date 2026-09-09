@@ -1,7 +1,7 @@
 /** Cookie + `localStorage` key for the isolated marketing light/dark theme. */
 export const MARKETING_THEME_STORAGE_KEY = "marketing-theme";
 
-const MARKETING_THEME_COOKIE = MARKETING_THEME_STORAGE_KEY;
+export const MARKETING_THEME_COOKIE = MARKETING_THEME_STORAGE_KEY;
 
 const ONE_YEAR_SECONDS = 60 * 60 * 24 * 365;
 

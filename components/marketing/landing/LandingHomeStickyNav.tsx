@@ -17,10 +17,7 @@ import {
 } from "motion/react"
 import { LandingTopNav } from "@/components/marketing/landing/LandingTopNav"
 import { useMarketingScrollContainer } from "@/components/marketing/MarketingThemeProvider"
-import {
-  landingColumnHorizontalPadClass,
-  landingContentMaxWidthClass,
-} from "@/lib/landingLayout"
+import { landingColumnHorizontalPadClass } from "@/lib/landingLayout"
 
 /** Ref to the closing-section scroll marker (see {@link LandingHomeNavFadeOutMarker}). */
 const LandingNavFadeOutContext =
@@ -62,7 +59,18 @@ const landingNavTopScrollFadeStyle = {
  * Fixed post-hero nav. The sentinel keeps the reveal threshold in the document
  * flow, while the nav itself stays anchored at the top and fades in place.
  */
-export function LandingHomeStickyNav() {
+export function LandingHomeStickyNav({
+  padClassName = landingColumnHorizontalPadClass,
+  sentinelInFlow = true,
+}: {
+  padClassName?: string
+  /**
+   * The reveal sentinel is 25dvh tall. In flow it doubles as spacing below
+   * the hero; off, it is absolutely positioned so it adds no height (the
+   * new landing keeps its sections on the 64px lattice).
+   */
+  sentinelInFlow?: boolean
+} = {}) {
   const scrollContainerRef = useMarketingScrollContainer()
   const fadeOutRef = useContext(LandingNavFadeOutContext)
   const sentinelRef = useRef<HTMLDivElement>(null)
@@ -96,18 +104,26 @@ export function LandingHomeStickyNav() {
 
   return (
     <>
-      <div ref={sentinelRef} aria-hidden className="h-[25dvh]" />
+      {sentinelInFlow ? (
+        <div ref={sentinelRef} aria-hidden className="h-[25dvh]" />
+      ) : (
+        <div aria-hidden className="relative h-0 w-full">
+          <div
+            ref={sentinelRef}
+            className="pointer-events-none absolute inset-x-0 top-0 h-[25dvh]"
+          />
+        </div>
+      )}
       <motion.div
         initial={false}
         style={{
           opacity,
           scale: reduceMotion ? 1 : scale,
-          x: "-50%",
           y: reduceMotion ? 0 : y,
         }}
         className={[
-          `fixed top-0 left-1/2 z-50 w-full ${landingContentMaxWidthClass}`,
-          `${landingColumnHorizontalPadClass} py-4 sm:py-5`,
+          "fixed inset-x-0 top-0 z-50 w-full max-w-none",
+          `${padClassName} py-4 sm:py-5`,
           "origin-top",
           isInteractive ? "pointer-events-auto" : "pointer-events-none",
         ].join(" ")}

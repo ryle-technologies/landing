@@ -3,12 +3,16 @@ import type { Viewport } from "next";
 import {
   buildRootMetadata,
   DEFAULT_SITE_DESCRIPTION,
+  DEFAULT_SITE_TITLE,
 } from "@/lib/metadata";
 import { MarketingThemeProvider } from "@/components/marketing/MarketingThemeProvider";
 
 /** Marketing routes inherit root metadata; reaffirm canonical for `/`. */
 export const metadata: Metadata = {
   ...buildRootMetadata(),
+  title: {
+    absolute: DEFAULT_SITE_TITLE,
+  },
   description: DEFAULT_SITE_DESCRIPTION,
   alternates: {
     canonical: "/",
@@ -27,9 +31,8 @@ export const viewport: Viewport = {
  * wrapped by `DeskShell`, so without this wrapper the route would shrink-wrap
  * and sit in the middle of the viewport.
  *
- * The full-bleed wrapper + light/dark theme isolation lives in
- * `MarketingThemeProvider` (client component) so that toggling dark mode on
- * `/landing/home` only repaints the marketing surround and never touches the
+ * The full-bleed wrapper lives in `MarketingThemeProvider` (client component).
+ * Marketing is light-only for now; the wrapper still isolates tokens from the
  * wallet/app theme on `<html>`.
  */
 export default function MarketingLayout({
@@ -37,14 +40,5 @@ export default function MarketingLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  /*
-   * Landing scroll crossfade is light (hero) → dark (suite onward). Persisted
-   * theme prefs apply only via the nav toggle, not SSR/cookie, so hydration
-   * matches the hero and scroll can drive the handoff.
-   */
-  return (
-    <MarketingThemeProvider initialIsDark={false}>
-      {children}
-    </MarketingThemeProvider>
-  );
+  return <MarketingThemeProvider>{children}</MarketingThemeProvider>;
 }

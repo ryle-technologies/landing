@@ -6,7 +6,7 @@ export default function manifest(): MetadataRoute.Manifest {
     name: "Ryle",
     short_name: "Ryle",
     description:
-      "Bring assets onchain without exposing sensitive activity. Launch digital assets, move value, and manage private operations with infrastructure built for enterprises and companies.",
+      "Modular financial infrastructure for companies: stablecoins, wallets, cross-border payments and cards, live in weeks. Runs in your cloud. Private by default.",
     start_url: "/",
     display: "standalone",
     background_color: BRAND_THEME_LIGHT,

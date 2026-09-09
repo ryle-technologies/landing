@@ -28,6 +28,7 @@ const nextConfig: NextConfig = {
     return [
       { source: "/landing", destination: "/", permanent: true },
       { source: "/landing/:path*", destination: "/", permanent: true },
+      { source: "/new-landing", destination: "/", permanent: true },
     ];
   },
   async rewrites() {

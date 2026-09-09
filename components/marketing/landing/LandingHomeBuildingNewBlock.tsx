@@ -23,6 +23,19 @@ type LandingHomeBuildingNewBlockProps = {
   sublineClassName: string
   contactCtaClassName: string
   headingId: string
+  /** Contact CTA label (defaults to {@link LANDING_MARKETING_CTA_LABEL}). */
+  contactCtaLabel?: string
+  /**
+   * Keep the docs sitemap inside the enclosing column instead of breaking
+   * out to the viewport with its own max-width (new landing: the column is
+   * the lattice).
+   */
+  sitemapInColumn?: boolean
+  /**
+   * Render the sitemap and rights row. Turn off when the page places its
+   * footer elsewhere (new landing: after the possibilities carousel).
+   */
+  footer?: boolean
 }
 
 /**
@@ -36,6 +49,9 @@ export function LandingHomeBuildingNewBlock({
   sublineClassName,
   contactCtaClassName,
   headingId,
+  contactCtaLabel = LANDING_MARKETING_CTA_LABEL,
+  sitemapInColumn = false,
+  footer = true,
 }: LandingHomeBuildingNewBlockProps) {
   const hasHeading = Boolean(title.trim())
 
@@ -64,7 +80,7 @@ export function LandingHomeBuildingNewBlock({
           className={contactCtaClassName}
           {...landingMarketingCtaAnchorProps()}
         >
-          {LANDING_MARKETING_CTA_LABEL}
+          {contactCtaLabel}
         </a>
         <a
           href={DOCS_BASE_HREF}
@@ -74,21 +90,58 @@ export function LandingHomeBuildingNewBlock({
           {LANDING_DOCS_CTA_LABEL}
         </a>
       </div>
-      <div className={`${landingViewportBleedClassName} mt-10 sm:mt-11`}>
-        <LandingFooterSitemap />
-      </div>
-      <div className="mt-9 flex min-w-0 flex-nowrap items-center justify-between gap-3 text-left sm:mt-11">
-        <Link
-          href="/"
-          aria-label="Ryle — go to home"
-          className="inline-flex shrink-0 items-baseline no-underline transition-opacity duration-500 ease-out hover:opacity-80 focus-visible:rounded-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-foreground"
-        >
-          <LandingNavWordmark typeClassName={landingFooterWordmarkTypeClassName} />
-        </Link>
-        <span className="shrink-0 text-right text-xs font-normal leading-none tracking-[-0.01em] text-muted/60">
-          2026 / All rights reserved.
-        </span>
-      </div>
+      {footer ? (
+        <>
+          {sitemapInColumn ? (
+            <div className="mt-10 sm:mt-11">
+              <LandingFooterSitemap contentClassName="w-full min-w-0" innerClassName="" />
+            </div>
+          ) : (
+            <div className={`${landingViewportBleedClassName} mt-10 sm:mt-11`}>
+              <LandingFooterSitemap />
+            </div>
+          )}
+          <LandingFooterRights className="mt-9 sm:mt-11" />
+        </>
+      ) : null}
     </LandingHomeClosingScrollReveal>
+  )
+}
+
+/** Wordmark + rights line that closes the footer. */
+export function LandingFooterRights({
+  className = "",
+  orientation = "row",
+}: {
+  className?: string
+  /** `stack` is for a lattice cell; `row` is the original full-width bar. */
+  orientation?: "row" | "stack"
+}) {
+  const stacked = orientation === "stack"
+  return (
+    <div
+      className={
+        stacked
+          ? `flex h-full min-w-0 flex-col items-start justify-between gap-6 text-left ${className}`
+          : `flex min-w-0 flex-nowrap items-center justify-between gap-3 text-left ${className}`
+      }
+    >
+      <Link
+        href="/"
+        aria-label="Ryle — go to home"
+        className="inline-flex shrink-0 items-baseline no-underline transition-opacity duration-500 ease-out hover:opacity-80 focus-visible:rounded-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-foreground"
+      >
+        <LandingNavWordmark typeClassName={landingFooterWordmarkTypeClassName} />
+      </Link>
+      <span
+        className={
+          stacked
+            ? "text-left text-xs font-normal leading-none tracking-[-0.01em] text-muted/60"
+            : "shrink-0 text-right text-xs font-normal leading-none tracking-[-0.01em] text-muted/60"
+        }
+      >
+        2026 / All rights reserved.
+      </span>
+    </div>
   )
 }

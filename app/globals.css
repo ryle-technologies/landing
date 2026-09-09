@@ -29,6 +29,8 @@
   --color-border: var(--border);
   --color-border-strong: var(--border-strong);
   --color-surface-tint: var(--surface-tint);
+  --color-avatar-bg: var(--avatar-bg);
+  --color-positive: var(--positive);
 }
 
 * {
@@ -144,13 +146,40 @@ select,
   initial-value: #141210;
 }
 
+/**
+ * ─── New-landing lattice column ─────────────────────────────────────────────
+ * Content column for every `LatticeSection` (see `lib/landingLattice.ts`).
+ * Always a whole number of 64px cells and centred, so its left edge is a
+ * lattice line and anything sized in cells inside it lands on the grid.
+ * Caps at 16 cells (1024px); keeps at least a 16px gutter (32px at the cap).
+ */
+.landing-lattice-column {
+  width: calc(100% - 4rem);
+  max-width: 64rem;
+  margin-inline: auto;
+}
+
+@supports (width: round(down, 10px, 4px)) {
+  .landing-lattice-column {
+    width: min(64rem, round(down, 100% - 2rem, 4rem));
+  }
+}
+
+/* 1px lattice line — same values as LATTICE_LINE_LIGHT / _DARK for the canvas. */
+.marketing-viewport-bleed {
+  --lattice-line: rgba(232, 228, 223, 0.88);
+}
+
+.marketing-viewport-bleed.dark {
+  --lattice-line: rgba(58, 55, 51, 0.92);
+}
+
 .marketing-viewport-bleed {
   --page-backdrop: #f5f2ee;
   --marketing-surface: #f5f2ee;
-  /* Darker navy ink (same family as hero water ~#617197). */
-  --foreground: #1a2740;
-  --muted: #5c6b84;
-  --muted-light: #7a879c;
+  --foreground: #141210;
+  --muted: #867d73;
+  --muted-light: #a0988e;
   --background: #ffffff;
   --surface: #ffffff;
   --surface-tint: #fbfaf8;
@@ -158,7 +187,8 @@ select,
   --border-strong: #ddd8d2;
   --hero-skin-tint: #6b5d4a;
   --marketing-fab-bg: #ffffff;
-  --marketing-fab-fg: #1a2740;
+  --marketing-fab-fg: #141210;
+  --home-action-chip-stroke: linear-gradient(to bottom, transparent, #e0dbd4);
   --marketing-theme-transition-duration: 900ms;
   --marketing-theme-transition-timing: ease-in-out;
   transition:
@@ -193,19 +223,19 @@ select,
 }
 
 .marketing-viewport-bleed.dark {
-  /* Deep navy aligned with the hero etching blues (~#617197 water). */
-  --marketing-surface: #0f1726;
-  --foreground: #c5d0e3;
-  --muted: #8e9bb0;
-  --muted-light: #6f7d93;
-  --background: #0f1726;
-  --surface: #162033;
-  --surface-tint: #1c2940;
-  --border: #243247;
-  --border-strong: #334560;
+  --marketing-surface: #141210;
+  --foreground: var(--page-backdrop);
+  --muted: #b5aea6;
+  --muted-light: #9a938a;
+  --background: #141210;
+  --surface: #1e1c19;
+  --surface-tint: #2c2a27;
+  --border: #2a2825;
+  --border-strong: #3a3733;
   --hero-skin-tint: #8f8270;
   --marketing-fab-bg: #f5f2ee;
-  --marketing-fab-fg: #1a2740;
+  --marketing-fab-fg: #141210;
+  --home-action-chip-stroke: linear-gradient(to bottom, transparent, #2a2825);
 }
 
 .marketing-viewport-bleed *,
@@ -265,7 +295,7 @@ html:has(.marketing-viewport-bleed) body {
 
 html:has(.marketing-viewport-bleed.dark),
 html:has(.marketing-viewport-bleed.dark) body {
-  background-color: #0f1726;
+  background-color: #141210;
   background-image: none;
   transition: background-color var(--marketing-theme-transition-duration, 900ms)
     var(--marketing-theme-transition-timing, ease-in-out);
@@ -280,11 +310,115 @@ html:has(.marketing-viewport-bleed.dark) body {
   }
 }
 
+@keyframes landing-possibilities-marquee-left {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    transform: translate3d(-50%, 0, 0);
+  }
+}
+
+@keyframes landing-possibilities-marquee-right {
+  from {
+    transform: translate3d(-50%, 0, 0);
+  }
+  to {
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+.landing-possibilities-marquee-left {
+  animation: landing-possibilities-marquee-left
+    var(--possibilities-marquee-duration, 80s) linear infinite;
+}
+
+.landing-possibilities-marquee-right {
+  animation: landing-possibilities-marquee-right
+    var(--possibilities-marquee-duration, 80s) linear infinite;
+}
+
+.landing-possibilities-marquee:hover .landing-possibilities-marquee-left,
+.landing-possibilities-marquee:hover .landing-possibilities-marquee-right {
+  animation-play-state: paused;
+}
+
+@keyframes landing-hero-word-shimmer {
+  0% {
+    background-position: 150% center;
+  }
+  100% {
+    background-position: -150% center;
+  }
+}
+
+.landing-hero-word-shimmer {
+  bottom: -0.18em;
+  background-image: linear-gradient(
+    90deg,
+    color-mix(in srgb, var(--foreground) 22%, transparent) 0%,
+    color-mix(in srgb, var(--foreground) 22%, transparent) 35%,
+    #6366f1 40%,
+    #a855f7 45%,
+    #ec4899 50%,
+    #f97316 55%,
+    #eab308 60%,
+    color-mix(in srgb, var(--foreground) 22%, transparent) 65%,
+    color-mix(in srgb, var(--foreground) 22%, transparent) 100%
+  );
+  background-size: 400% 100%;
+  transform-origin: left center;
+  animation: landing-hero-word-shimmer 3000ms linear 400ms 1 both;
+}
+
+.landing-hero-word-shimmer.landing-hero-underline-wait {
+  animation: none;
+  clip-path: inset(0 100% 0 0);
+}
+
+.landing-hero-word-shimmer.landing-hero-underline-play {
+  animation: landing-hero-word-shimmer 3000ms linear 0ms 1 both;
+}
+
+@keyframes landing-cta-underline-reveal {
+  from {
+    clip-path: inset(0 100% 0 0);
+  }
+  to {
+    clip-path: inset(0 0 0 0);
+  }
+}
+
+@keyframes landing-cta-underline-wipe {
+  from {
+    clip-path: inset(0 0 0 0);
+  }
+  to {
+    clip-path: inset(0 0 0 100%);
+  }
+}
+
+/* Grey bar draws left → right, rainbow runs, then the bar wipes left → right. */
+.landing-hero-word-shimmer.landing-cta-underline-wipe {
+  animation:
+    landing-cta-underline-reveal 500ms cubic-bezier(0.22, 1, 0.36, 1) 0ms 1 both,
+    landing-hero-word-shimmer 3000ms linear 400ms 1 both,
+    landing-cta-underline-wipe 500ms cubic-bezier(0.22, 1, 0.36, 1) 3400ms 1 forwards;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .landing-footer-marquee,
-  .landing-chains-marquee {
+  .landing-chains-marquee,
+  .landing-possibilities-marquee-left,
+  .landing-possibilities-marquee-right {
     animation: none;
     transform: translate3d(0, 0, 0);
+  }
+
+  .landing-hero-word-shimmer,
+  .landing-hero-word-shimmer.landing-cta-underline-wipe,
+  .landing-hero-word-shimmer.landing-hero-underline-play {
+    animation: none;
   }
 }
 
@@ -302,5 +436,316 @@ html:has(.marketing-viewport-bleed.dark) body {
   html,
   body {
     padding: 0;
+  }
+}
+
+/*
+ * ─── Wallet demo (hero showcase) ─────────────────────────────────────────────
+ * Frontend-only replica of the private wallet, rendered inside a phone frame on
+ * the landing hero. Design tokens are scoped to `.wallet-demo-shell` so the
+ * wallet keeps its cream skin regardless of the marketing light/dark theme.
+ */
+.wallet-demo-shell {
+  --page-backdrop: #f7f7f6;
+  --background: #f8f5f1;
+  --canvas-start: #e8e3db;
+  --app-gradient: linear-gradient(
+    180deg,
+    #e8e3db 0%,
+    #f0ece6 22%,
+    #f6f3ef 45%,
+    #fdfcfa 72%,
+    #ffffff 100%
+  );
+  --app-noise-svg: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 256 256'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.78' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.16'/%3E%3C/svg%3E");
+  --app-canvas-image:
+    radial-gradient(
+      ellipse 180% 100% at 40% 0%,
+      rgba(255, 255, 255, 0.8) 0%,
+      transparent 100%
+    ),
+    var(--app-noise-svg),
+    var(--app-gradient);
+  --app-canvas-size: 100% 520px, 128px 128px, 100% 100%;
+  --app-canvas-repeat: no-repeat, repeat, no-repeat;
+  --app-canvas-position: center top, 0 0, 0 0;
+  --foreground: #141210;
+  --surface: #ffffff;
+  --muted: #8a8279;
+  --muted-light: #b0a9a0;
+  --border: #e0dbd4;
+  --border-strong: #cec9c0;
+  --avatar-bg: #dedad4;
+  --avatar-bg-gradient: linear-gradient(145deg, #e6e1da 0%, #cec8be 100%);
+  --surface-tint: #f2ede6;
+  --positive: #1f9a55;
+  --card-shadow:
+    0 2px 4px rgba(20, 18, 12, 0.045), 0 1px 2px rgba(20, 18, 12, 0.055),
+    0 0 1px rgba(20, 18, 12, 0.05);
+  --home-action-chip-stroke: linear-gradient(to bottom, transparent, #e0dbd4);
+  --avatar-ghost-edge-soft:
+    0 1px 2px rgba(20, 16, 12, 0.05), 0 0 0 1px rgba(20, 16, 12, 0.032);
+  --quote-flash: rgba(190, 145, 55, 0.11);
+  --avatar-photo-filter: sepia(38%) saturate(85%) contrast(1.03) brightness(1.01);
+
+  position: relative;
+  width: 390px;
+  height: 844px;
+  flex-shrink: 0;
+  overflow: hidden;
+  isolation: isolate;
+  color: var(--foreground);
+  background-color: #ffffff;
+  background-image: var(--app-canvas-image);
+  background-size: var(--app-canvas-size);
+  background-repeat: var(--app-canvas-repeat);
+  background-position: var(--app-canvas-position);
+  border: 1px solid var(--border);
+  border-radius: 22px;
+  -webkit-font-smoothing: antialiased;
+}
+
+/*
+ * Wallet section phone: drop the device chrome so the 390×844 frame fills
+ * the snapped lattice cell. The cluster outline is the cell stroke.
+ */
+.landing-new-wallet-grid-phone .wallet-demo-shell {
+  border: 0;
+  border-radius: 0;
+}
+
+/*
+ * Inert product phone: home and sheets stay overflow:auto for autoplay
+ * layout, but must not be scroll containers for the user. `clip` does not
+ * create a scrollport, so trackpad over the cell always moves the page.
+ */
+.landing-new-wallet-grid-phone .wallet-demo-scroll,
+.landing-new-wallet-grid-phone .overflow-y-auto {
+  overflow-y: clip !important;
+  overscroll-behavior: none;
+  -webkit-overflow-scrolling: auto;
+}
+
+/* Home column paints the same canvas so the send-sheet peek strip blends in. */
+.wallet-demo-shell .bg-app-gradient {
+  background-color: #ffffff;
+  background-image: var(--app-canvas-image);
+  background-size: var(--app-canvas-size);
+  background-repeat: var(--app-canvas-repeat);
+  background-position: var(--app-canvas-position);
+}
+
+/* Use-case tiles: size and Cloud plate chrome ease together. */
+.marketing-viewport-bleed .landing-new-use-case-card,
+.marketing-viewport-bleed .landing-new-use-case-card-face {
+  transition-property: width, height, left, background-color, border-radius, box-shadow !important;
+  transition-duration: 420ms !important;
+  transition-timing-function: cubic-bezier(0.65, 0, 0.35, 1) !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .marketing-viewport-bleed .landing-new-use-case-card,
+  .marketing-viewport-bleed .landing-new-use-case-card-face {
+    transition: none !important;
+  }
+}
+
+/* Track slides one lattice cell after a tile collapses. */
+.marketing-viewport-bleed .landing-new-use-case-track {
+  transition-property: transform !important;
+}
+
+/*
+ * The marketing wrapper pins `transition-property` to a short list so theme
+ * crossfades stay clean. Inside the phone the skin is fixed, so widen the list
+ * enough for the wallet's own micro-transitions (step dots, chips, hover tints).
+ */
+.marketing-viewport-bleed .wallet-demo-shell,
+.marketing-viewport-bleed .wallet-demo-shell *,
+.marketing-viewport-bleed .wallet-demo-shell *::before,
+.marketing-viewport-bleed .wallet-demo-shell *::after {
+  transition-property: transform, opacity, filter, box-shadow, outline-color,
+    outline-offset, width, height, background-color, color, border-color !important;
+}
+
+.wallet-demo-shell .avatar-photo {
+  filter: var(--avatar-photo-filter);
+}
+
+.wallet-demo-shell .no-text-selection,
+.wallet-demo-shell .no-text-selection * {
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+@keyframes wallet-quote-text-shimmer {
+  from {
+    background-position: 0% 50%;
+  }
+  to {
+    background-position: -200% 50%;
+  }
+}
+
+/* Swipe-to-confirm: vertical chevron stream (duplicate column, scroll -50% height). */
+@keyframes wallet-swipe-chevron-marquee {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    transform: translate3d(0, -50%, 0);
+  }
+}
+
+.wallet-demo-shell .swipe-chevron-marquee-track {
+  animation: wallet-swipe-chevron-marquee 2.75s linear infinite;
+  will-change: transform;
+}
+
+.wallet-demo-shell .swipe-chevron-marquee-viewport {
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 22%, black 78%, transparent 100%);
+  mask-image: linear-gradient(to bottom, transparent 0%, black 22%, black 78%, transparent 100%);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wallet-demo-shell .swipe-chevron-marquee-track {
+    animation: none;
+  }
+}
+
+.wallet-demo-shell .quote-shimmer-text {
+  display: inline-block;
+  max-width: 100%;
+  background-image: linear-gradient(
+    100deg,
+    var(--muted) 0%,
+    var(--foreground) 25%,
+    var(--muted) 50%,
+    var(--foreground) 75%,
+    var(--muted) 100%
+  );
+  background-size: 200% 100%;
+  background-repeat: repeat;
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+  animation: wallet-quote-text-shimmer 4.2s linear infinite;
+}
+
+.wallet-demo-shell .quote-shimmer-text.quote-shimmer-text--emphasized {
+  background-image: linear-gradient(
+    100deg,
+    var(--muted-light) 0%,
+    var(--foreground) 25%,
+    var(--muted-light) 50%,
+    var(--foreground) 75%,
+    var(--muted-light) 100%
+  );
+}
+
+@keyframes blink {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0;
+  }
+}
+
+@keyframes wallet-qr-shimmer-sweep {
+  0% {
+    transform: translateX(-120%) skewX(-18deg);
+  }
+  100% {
+    transform: translateX(220%) skewX(-18deg);
+  }
+}
+
+.wallet-demo-shell .qr-shimmer-overlay {
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  border-radius: inherit;
+}
+
+.wallet-demo-shell .qr-shimmer-overlay::after {
+  content: "";
+  position: absolute;
+  top: -20%;
+  left: 0;
+  width: 45%;
+  height: 140%;
+  background: linear-gradient(
+    100deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0) 35%,
+    rgba(255, 255, 255, 0.55) 50%,
+    rgba(255, 255, 255, 0) 65%,
+    transparent 100%
+  );
+  animation: wallet-qr-shimmer-sweep 2.8s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wallet-demo-shell .quote-shimmer-text {
+    animation: none;
+    background: none;
+    background-clip: unset;
+    -webkit-background-clip: unset;
+    -webkit-text-fill-color: unset;
+    color: var(--foreground);
+  }
+
+  .wallet-demo-shell .qr-shimmer-overlay::after {
+    animation: none;
+  }
+}
+
+/*
+ * Remittances console embed — HeroUI light tokens from the ryle-app
+ * remittances page, scoped so marketing dark mode cannot recolour the product UI.
+ */
+.landing-remittances-dashboard {
+  --rem-bg: oklch(0.985 0.002 286);
+  --rem-card: oklch(1 0 0);
+  --rem-fg: oklch(0.21 0.006 286);
+  --rem-muted: oklch(0.556 0.014 286);
+  --rem-border: oklch(0.92 0.004 286);
+  --rem-secondary: oklch(0.96 0.003 286);
+  --accent: oklch(0.21 0.006 286);
+  --accent-foreground: oklch(0.985 0 0);
+  --chart-1: #e56a1a;
+  --chart-1-from: #f3d5b0;
+  --chart-2: #d4892e;
+  --chart-2-from: #f6e2c4;
+  --chart-3: #c99548;
+  --chart-3-from: #f4e8d2;
+  --chart-4: #e0b05c;
+  --chart-4-from: #f7efe3;
+  --success: oklch(0.55 0.16 150);
+  --warning: oklch(0.75 0.15 75);
+  --danger: oklch(0.577 0.215 27);
+  color: var(--rem-fg);
+}
+
+/* Inside the phone: subtle tap-circle cursor like the product's desktop preview. */
+@media (hover: hover) and (pointer: fine) {
+  .marketing-viewport-bleed .wallet-demo-shell,
+  .marketing-viewport-bleed .wallet-demo-shell * {
+    cursor: url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Ccircle cx='12' cy='12' r='7.25' fill='rgba(255,255,255,0.18)' stroke='rgba(20,18,16,0.45)' stroke-width='1'/%3E%3C/svg%3E")
+      12 12, pointer;
+  }
+
+  .marketing-viewport-bleed .wallet-demo-shell input,
+  .marketing-viewport-bleed .wallet-demo-shell textarea {
+    cursor: text;
+  }
+
+  .marketing-viewport-bleed .wallet-demo-shell :disabled,
+  .marketing-viewport-bleed .wallet-demo-shell [aria-disabled="true"] {
+    cursor: not-allowed;
   }
 }

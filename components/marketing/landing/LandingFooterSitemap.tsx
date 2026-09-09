@@ -26,9 +26,15 @@ function FooterNavAnchor({ link }: { link: FooterNavLink }) {
   )
 }
 
-function FooterSitemapColumn({ column }: { column: FooterNavColumn }) {
+export function FooterSitemapColumn({
+  column,
+  className = "",
+}: {
+  column: FooterNavColumn
+  className?: string
+}) {
   return (
-    <div className="min-w-0">
+    <div className={`min-w-0 ${className}`.trim()}>
       {column.headingHref ? (
         <a
           href={column.headingHref}
@@ -51,12 +57,20 @@ function FooterSitemapColumn({ column }: { column: FooterNavColumn }) {
 }
 
 /** Curated docs sitemap grid for the landing footer closing block. */
-export function LandingFooterSitemap() {
+export function LandingFooterSitemap({
+  contentClassName = landingFooterSitemapContentClassName,
+  innerClassName = landingFooterSitemapMaxWidthClass,
+}: {
+  /** Outer column (defaults to the marketing column + gutters). */
+  contentClassName?: string
+  /** Inner width cap (defaults to `max-w-4xl`). */
+  innerClassName?: string
+} = {}) {
   return (
     <div className="w-full pb-18 pt-24 sm:pb-22 sm:pt-28">
       <nav aria-label="Footer" className="w-full">
-      <div className={landingFooterSitemapContentClassName}>
-        <div className={`w-full min-w-0 ${landingFooterSitemapMaxWidthClass}`}>
+      <div className={contentClassName}>
+        <div className={`w-full min-w-0 ${innerClassName}`}>
           <div className="grid grid-cols-2 gap-x-5 gap-y-8 md:grid-cols-3">
             {FOOTER_DOCS_COLUMNS.map((column) => (
               <FooterSitemapColumn key={column.heading} column={column} />

@@ -2,6 +2,7 @@
  * Shared layout for `/landing/home` and the desktop shell top nav so widths stay aligned.
  *
  * Native `max-w-5xl` (64rem → 1024px at 16px root).
+ * Marketing nav bars use {@link landingColumnHorizontalPadClass} only (full viewport width).
  */
 export const landingContentMaxWidthClass = "max-w-5xl"
 
@@ -10,6 +11,13 @@ export const landingFooterSitemapMaxWidthClass = "max-w-4xl"
 
 export const landingColumnHorizontalPadClass =
   "px-6 pl-[max(1.5rem,env(safe-area-inset-left))] pr-[max(1.5rem,env(safe-area-inset-right))]"
+
+/**
+ * New-landing full-width bars (top bar, sticky nav): half-cell gutter.
+ * Section content lives in the lattice column instead — see `lib/landingLattice.ts`.
+ */
+export const landingNewColumnHorizontalPadClass =
+  "px-8 pl-[max(2rem,env(safe-area-inset-left))] pr-[max(2rem,env(safe-area-inset-right))]"
 
 export const landingColumnPadClass =
   `mx-auto w-full min-w-0 ${landingContentMaxWidthClass} ${landingColumnHorizontalPadClass}`

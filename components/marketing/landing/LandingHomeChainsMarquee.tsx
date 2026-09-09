@@ -53,6 +53,8 @@ type LandingHomeChainsMarqueeProps = {
    * `section`: full-width of parent, taller strip, larger logos (supported-networks block).
    */
   variant?: "hero" | "section"
+  /** Edge-fade fill. Defaults to the page surface so existing call sites stay unchanged. */
+  maskClassName?: string
 }
 
 const VARIANT_SHELL: Record<NonNullable<LandingHomeChainsMarqueeProps["variant"]>, string> = {
@@ -99,6 +101,7 @@ function opacityFromCenterNorm(distanceFromCenter: number, halfWidth: number) {
 export function LandingHomeChainsMarquee({
   className = "",
   variant = "hero",
+  maskClassName = maskBgClass,
 }: LandingHomeChainsMarqueeProps) {
   const containerRef = useRef<HTMLSpanElement>(null)
   const markRefs = useRef<(HTMLSpanElement | null)[]>([])
@@ -175,14 +178,14 @@ export function LandingHomeChainsMarquee({
       className={`${outerClass} ${shellClass} ${className}`.trim()}
     >
       <span
-        className={`pointer-events-none absolute inset-y-0 left-0 z-10 ${maskW} ${maskBgClass} transition-colors duration-500 ease-out`}
+        className={`pointer-events-none absolute inset-y-0 left-0 z-10 ${maskW} ${maskClassName} transition-colors duration-500 ease-out`}
         style={{
           WebkitMaskImage: "linear-gradient(to right, black, transparent)",
           maskImage: "linear-gradient(to right, black, transparent)",
         }}
       />
       <span
-        className={`pointer-events-none absolute inset-y-0 right-0 z-10 ${maskW} ${maskBgClass} transition-colors duration-500 ease-out`}
+        className={`pointer-events-none absolute inset-y-0 right-0 z-10 ${maskW} ${maskClassName} transition-colors duration-500 ease-out`}
         style={{
           WebkitMaskImage: "linear-gradient(to left, black, transparent)",
           maskImage: "linear-gradient(to left, black, transparent)",

@@ -1,0 +1,52 @@
+---
+description: 64px lattice layout rules for the new landing (components/marketing/landing-new)
+globs: components/marketing/landing-new/**/*.tsx, lib/landingLattice.ts
+alwaysApply: false
+---
+
+# New-landing lattice
+
+Read `components/marketing/landing-new/lattice/README.md` before adding or
+changing sections. Summary of the hard rules:
+
+- Every direct child of `<main data-lattice-root>` is a `LatticeSection`. Never
+  insert a plain wrapper with its own height between sections.
+- Size in cells: `LatticeCell cols={5} rows="auto" minRows={5}`. No
+  `md:grid-cols-*`, no pixel widths, no fractional columns. Use `LatticeGrid
+  minCols` for the stacking threshold, not Tailwind breakpoints.
+- Spacing between lattice boxes only from `LATTICE_SPACE` in
+  `lib/landingLattice.ts` (`sectionY`, `block`, …). Free spacing is allowed
+  only inside a cell or plate.
+- Headings/stats on the grid go in `LatticePlate`; card clusters in
+  `LatticeGrid` with `stroke` (+ `equalRows` for one shared bottom line).
+- Strokes: `latticeCellStrokeClassName` only. No `border`, `ring`, or
+  `0 0 0 1px` shadows on lattice boxes.
+- Full-bleed content inside a section uses `landingViewportBleedClassName` and
+  measures its inset from the enclosing `[data-lattice-column]`; never
+  hard-code column widths or gutters.
+- Motion stays on the lattice too. A collapsing or sliding card may tween
+  between sizes, but every rest pose (full cell or the 64×64 block) has edges
+  ≡ 0 (mod 64) from the cell origin. No `left: 50%` / `translate(-50%)` pins
+  that land on a half-cell.
+- `/` is the lattice landing. Do not import lattice primitives into
+  `components/marketing/landing/*` paths used only by `/old-landing`;
+  extend shared components with opt-in props whose defaults keep that
+  page unchanged.
+
+```tsx
+// ✅ new section
+<LatticeSection grid gridMask="fadeBoth" aria-labelledby="x">
+  <LatticePlate><h2 id="x">…</h2></LatticePlate>
+  <LatticeGrid className={LATTICE_SPACE.block} minCols={15} stroke equalRows>
+    <LatticeCell cols={5} minRows={5}>…</LatticeCell>
+  </LatticeGrid>
+</LatticeSection>
+
+// ❌ off the grid
+<section className="py-24">
+  <div className="grid md:grid-cols-3 gap-6">…</div>
+</section>
+```
+
+After layout changes, verify at 1440/1024/768/390 that section, plate, cell and
+tile edges are ≡ 0 (mod 64) from the column left / root top (see README).

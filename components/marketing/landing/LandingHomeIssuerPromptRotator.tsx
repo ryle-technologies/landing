@@ -13,14 +13,14 @@ const ROTATING_SENTENCES = [
   "Enterprise onchain programs",
 ] as const
 
-const SENTENCE_COUNT = ROTATING_SENTENCES.length
-
 /** Matches {@link LandingHomeOrbitNetworkNames} idle interval. */
 const ROTATE_MS = 4500
 
 type LandingHomeIssuerPromptRotatorProps = {
   /** Matches the suite section `h2` (e.g. {@link buildingNewTitleClassName}). */
   titleClassName: string
+  /** Rotating prompts (defaults to the home landing set). */
+  sentences?: readonly string[]
 }
 
 /** Opacity only — matches {@link LandingHomeOrbitNetworkNames}. */
@@ -53,31 +53,33 @@ function RotatingSentenceSlot({ sentence }: { sentence: string }) {
 /** Rotating marketing prompts above the suite heading (opacity crossfade). */
 export function LandingHomeIssuerPromptRotator({
   titleClassName,
+  sentences = ROTATING_SENTENCES,
 }: LandingHomeIssuerPromptRotatorProps) {
   const reduceMotion = useReducedMotion()
   const [sentenceIndex, setSentenceIndex] = useState(0)
 
-  const visibleSentence = ROTATING_SENTENCES[sentenceIndex]
+  const sentenceCount = sentences.length
+  const visibleSentence = sentences[sentenceIndex]
 
   useEffect(() => {
     if (reduceMotion) return
 
     const id = window.setTimeout(() => {
-      setSentenceIndex((i) => (i + 1) % SENTENCE_COUNT)
+      setSentenceIndex((i) => (i + 1) % sentenceCount)
     }, ROTATE_MS)
 
     return () => window.clearTimeout(id)
-  }, [sentenceIndex, reduceMotion])
+  }, [sentenceIndex, reduceMotion, sentenceCount])
 
   useEffect(() => {
     if (!reduceMotion) return
 
     const id = window.setInterval(() => {
-      setSentenceIndex((i) => (i + 1) % SENTENCE_COUNT)
+      setSentenceIndex((i) => (i + 1) % sentenceCount)
     }, ROTATE_MS)
 
     return () => window.clearInterval(id)
-  }, [reduceMotion])
+  }, [reduceMotion, sentenceCount])
 
   const promptClass = `${titleClassName} mb-4 min-h-[1.2em] min-w-0 max-w-full sm:mb-6`
 

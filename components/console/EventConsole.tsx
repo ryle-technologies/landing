@@ -1,9 +1,10 @@
 "use client"
 
 import type { CSSProperties, ReactNode } from "react"
-import { useEffect, useLayoutEffect, useRef, useState } from "react"
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react"
 import { AnimatePresence, motion } from "motion/react"
 import { LuCornerDownRight } from "react-icons/lu"
+import { useLandingSnapLoop } from "@/lib/useLandingSnapLoop"
 import type { MockEventStreamControls } from "./mockEventSource"
 import type { FeedEvent, HttpMethod } from "./types"
 
@@ -37,6 +38,17 @@ const METHOD_SWATCH_DARKER: Record<HttpMethod, string> = {
 
 type EventConsoleSwatchTone = "default" | "slightlyDarker"
 type EventConsoleTimeTone = "default" | "slightlyDarker"
+type EventConsoleSize = "default" | "compact"
+
+const LIST_TYPE_CLASS: Record<EventConsoleSize, string> = {
+  default: "font-mono text-sm leading-relaxed tracking-tight",
+  compact: "font-mono text-xs leading-3 tracking-tight",
+}
+
+const SWATCH_HEIGHT_PX: Record<EventConsoleSize, number> = {
+  default: 14,
+  compact: 12,
+}
 
 /** Base width matches previous `w-9` (36px); each row is ±0–8px, stable for SSR/RSC. */
 const METHOD_SWATCH_BASE_PX = 36
@@ -109,24 +121,37 @@ function EventConsoleMarquee({
   embedded,
   listBody,
   remeasureKey,
+  size = "default",
   carouselStartAlignBelowMd = false,
+  carouselMotion = "linear",
+  carouselSnapMs,
+  carouselHoldMs,
+  carouselSnapDelayMs,
 }: {
   active: boolean
   embedded: boolean
   listBody: (keySuffix: string) => ReactNode
   remeasureKey: string | number
+  size?: EventConsoleSize
   /**
    * When true, the narrow `max-w-[52ch]` track is flush left below `md`; from `md` up
    * keeps `mx-auto` like the default carousel layout.
    */
   carouselStartAlignBelowMd?: boolean
+  /** `snap` holds then ease-in-out steps (same timing as the landing use-case carousel). */
+  carouselMotion?: "linear" | "snap"
+  carouselSnapMs?: number
+  carouselHoldMs?: number
+  carouselSnapDelayMs?: number
 }) {
   const trackRef = useRef<HTMLDivElement>(null)
   const segmentPxRef = useRef(0)
+  const rowPxRef = useRef(0)
   const offsetPxRef = useRef(0)
   const lastTsRef = useRef<number | null>(null)
   const rafIdRef = useRef(0)
   const [reduceMotion, setReduceMotion] = useState(false)
+  const isSnap = carouselMotion === "snap"
 
   useEffect(() => {
     const mq = window.matchMedia("(prefers-reduced-motion: reduce)")
@@ -151,6 +176,10 @@ function EventConsoleMarquee({
       if (seg < 2) return
       const prev = segmentPxRef.current
       segmentPxRef.current = seg
+      const firstRow = firstOl.querySelector(":scope > li")
+      if (firstRow) {
+        rowPxRef.current = (firstRow as HTMLElement).getBoundingClientRect().height
+      }
       if (prev > 0) {
         let o = offsetPxRef.current % seg
         if (Number.isNaN(o) || o < 0) o = 0
@@ -167,9 +196,28 @@ function EventConsoleMarquee({
     return () => ro.disconnect()
   }, [remeasureKey, embedded])
 
+  const applySnapOffset = useCallback((offsetPx: number) => {
+    const el = trackRef.current
+    if (el) el.style.transform = `translate3d(0, ${-offsetPx}px, 0)`
+  }, [])
+  const getSnapStepPx = useCallback(() => rowPxRef.current, [])
+  const getSnapWrapPx = useCallback(() => segmentPxRef.current, [])
+
+  useLandingSnapLoop({
+    enabled: isSnap && active && !reduceMotion,
+    getStepPx: getSnapStepPx,
+    getWrapPx: getSnapWrapPx,
+    apply: applySnapOffset,
+    holdMs: carouselHoldMs,
+    snapMs: carouselSnapMs,
+    startDelayMs: carouselSnapDelayMs,
+  })
+
   useEffect(() => {
     const el = trackRef.current
     if (!el) return
+
+    if (isSnap) return
 
     if (reduceMotion || !active) {
       offsetPxRef.current = 0
@@ -201,7 +249,7 @@ function EventConsoleMarquee({
       cancelAnimationFrame(rafIdRef.current)
       lastTsRef.current = null
     }
-  }, [active, reduceMotion])
+  }, [active, isSnap, reduceMotion])
 
   useEffect(() => {
     if (reduceMotion && trackRef.current) {
@@ -226,7 +274,7 @@ function EventConsoleMarquee({
           ref={trackRef}
           className="ec-event-console-track flex min-h-0 w-full min-w-0 flex-col will-change-transform [transform:translate3d(0,0,0)]"
         >
-          <ol className="flex min-w-0 shrink-0 flex-col font-mono text-sm leading-relaxed tracking-tight">
+          <ol className={`flex min-w-0 shrink-0 flex-col ${LIST_TYPE_CLASS[size]}`}>
             {listBody("")}
           </ol>
           {embedded ? (
@@ -235,7 +283,7 @@ function EventConsoleMarquee({
             <div className="h-12 w-full shrink-0" aria-hidden />
           )}
           <ol
-            className="ec-event-console-dup flex min-w-0 shrink-0 flex-col font-mono text-sm leading-relaxed tracking-tight"
+            className={`ec-event-console-dup flex min-w-0 shrink-0 flex-col ${LIST_TYPE_CLASS[size]}`}
             aria-hidden
           >
             {listBody("-dup")}
@@ -268,6 +316,11 @@ export function EventConsole({
   swatchTone = "default",
   variant = "default",
   carouselStartAlignBelowMd = false,
+  carouselMotion = "linear",
+  size = "default",
+  carouselSnapMs,
+  carouselHoldMs,
+  carouselSnapDelayMs,
 }: {
   /** Pauses and resets carousel motion when false. */
   active?: boolean
@@ -281,6 +334,8 @@ export function EventConsole({
   timeTone?: EventConsoleTimeTone
   /** Slightly stronger swatches for marketing embeds that need more contrast. */
   swatchTone?: EventConsoleSwatchTone
+  /** Compact type + matching swatch height for small marketing cards. */
+  size?: EventConsoleSize
   /** `carousel` = continuous upward marquee; `default` = line-by-line presence animation. */
   variant?: "default" | "carousel"
   /**
@@ -288,6 +343,11 @@ export function EventConsole({
    * of centering (`mx-auto`). From `md` up keeps centered track. Default `false`.
    */
   carouselStartAlignBelowMd?: boolean
+  /** `snap` holds then ease-in-out steps (same timing as the landing use-case carousel). */
+  carouselMotion?: "linear" | "snap"
+  carouselSnapMs?: number
+  carouselHoldMs?: number
+  carouselSnapDelayMs?: number
 }) {
   const { events } = feed
   const isCarousel = variant === "carousel" && events.length > 0
@@ -301,6 +361,7 @@ export function EventConsole({
         getTimeColumn={getTimeColumn}
         timeTone={timeTone}
         swatchTone={swatchTone}
+        size={size}
         presentation={isCarousel ? "marquee" : "default"}
       />
     ))
@@ -312,7 +373,12 @@ export function EventConsole({
         embedded={embedded}
         listBody={listBody}
         remeasureKey={events.length}
+        size={size}
         carouselStartAlignBelowMd={carouselStartAlignBelowMd}
+        carouselMotion={carouselMotion}
+        carouselSnapMs={carouselSnapMs}
+        carouselHoldMs={carouselHoldMs}
+        carouselSnapDelayMs={carouselSnapDelayMs}
       />
     )
   }
@@ -320,7 +386,7 @@ export function EventConsole({
   return (
     <aside className="min-w-0 w-full overflow-visible text-foreground">
       <div className="mx-auto min-w-0 max-w-[52ch] min-[1080px]:mx-0 min-[1080px]:max-w-none">
-        <ol className="flex min-w-0 flex-col font-mono text-sm leading-relaxed tracking-tight">
+        <ol className={`flex min-w-0 flex-col ${LIST_TYPE_CLASS[size]}`}>
           {events.length === 0 ? (
             <li className="flex items-center gap-2 text-muted">
               <span
@@ -339,6 +405,7 @@ export function EventConsole({
                   getTimeColumn={getTimeColumn}
                   timeTone={timeTone}
                   swatchTone={swatchTone}
+                  size={size}
                   presentation="default"
                 />
               ))}
@@ -358,6 +425,7 @@ function EventRow({
   getTimeColumn,
   timeTone,
   swatchTone,
+  size = "default",
   presentation = "default",
 }: {
   event: FeedEvent
@@ -365,9 +433,12 @@ function EventRow({
   getTimeColumn?: (event: FeedEvent, index: number) => string
   timeTone: EventConsoleTimeTone
   swatchTone: EventConsoleSwatchTone
+  size?: EventConsoleSize
   /** `marquee` = no row motion (used inside seamless CSS vertical scroll). */
   presentation?: "default" | "marquee"
 }) {
+  const swatchH = SWATCH_HEIGHT_PX[size]
+  const isCompact = size === "compact"
   const isMarquee = presentation === "marquee"
   const failed = event.status === "failed"
   const pending = event.status === "pending"
@@ -396,39 +467,40 @@ function EventRow({
 
   const rowInner = (
     <div
-      className={`flex w-full min-w-0 flex-nowrap gap-2 text-left ${
-        childRow ? "items-center" : "items-baseline"
+      className={`flex w-full min-w-0 flex-nowrap items-center text-left ${
+        isCompact ? "gap-1.5" : "gap-2"
       }`}
     >
       {childRow ? (
         <LuCornerDownRight
           aria-hidden
-          className="pointer-events-none h-3.5 w-3.5 shrink-0 text-muted"
+          className="pointer-events-none shrink-0 text-muted"
+          style={{ width: swatchH, height: swatchH }}
           strokeWidth={2}
         />
       ) : null}
       <span className={`shrink-0 ${timeClass}`}>{time}</span>
       <span
-        className={`inline-block shrink-0 self-center h-3.5 rounded-sm ${swatchClass}`}
-        style={{ width: swatchW }}
+        className={`block shrink-0 rounded-sm ${swatchClass}`}
+        style={{ width: swatchW, height: swatchH }}
         title={method ?? undefined}
         aria-hidden
       />
       <span
-        className={`inline-block shrink-0 self-center h-3.5 rounded-sm ${swatchClass}`}
-        style={{ width: typeSwatchW }}
+        className={`block shrink-0 rounded-sm ${swatchClass}`}
+        style={{ width: typeSwatchW, height: swatchH }}
         aria-hidden
       />
       {isMarquee ? (
         <span
-          className={`inline-block shrink-0 self-center h-3.5 min-w-0 max-w-full origin-right rounded-sm ${swatchClass}`}
-          style={{ width: summarySwatchW, ...SUMMARY_SWATCH_FADE }}
+          className={`block shrink-0 min-w-0 max-w-full origin-right rounded-sm ${swatchClass}`}
+          style={{ width: summarySwatchW, height: swatchH, ...SUMMARY_SWATCH_FADE }}
           aria-hidden
         />
       ) : (
         <motion.span
-          className={`inline-block shrink-0 self-center h-3.5 min-w-0 max-w-full origin-right rounded-sm ${swatchClass}`}
-          style={{ width: summarySwatchW, ...SUMMARY_SWATCH_FADE }}
+          className={`block shrink-0 min-w-0 max-w-full origin-right rounded-sm ${swatchClass}`}
+          style={{ width: summarySwatchW, height: swatchH, ...SUMMARY_SWATCH_FADE }}
           aria-hidden
           initial={{ opacity: 0, x: 14 }}
           animate={{ opacity: pending ? 0.7 : 1, x: 0 }}
