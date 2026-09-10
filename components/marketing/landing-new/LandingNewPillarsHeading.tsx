@@ -45,6 +45,7 @@ export function LandingNewPillarsHeading({
   accentUnderline = true,
   displayClassName = pillarsDisplayClassName,
 }: LandingNewPillarsHeadingProps) {
+  const prefixWrapClassName = accentOnOwnLine ? "whitespace-nowrap" : "inline"
   const accentWrapClassName = [
     accentOnOwnLine ? "block" : "",
     accentWrap ? "" : "whitespace-nowrap",
@@ -103,7 +104,7 @@ export function LandingNewPillarsHeading({
       <span aria-hidden className={`${restClassName} ${displayClassName}`}>
         {reduceMotion ? (
           <>
-            {prefix}{" "}
+            <span className={prefixWrapClassName}>{prefix}</span>{" "}
             <span className={accentWrapClassName}>
               <span
                 className={
@@ -118,20 +119,23 @@ export function LandingNewPillarsHeading({
           </>
         ) : !inView ? (
           <span className="opacity-0">
-            {prefix} {accent}.
+            <span className={prefixWrapClassName}>{prefix}</span>{" "}
+            <span className={accentWrapClassName}>{accent}.</span>
           </span>
         ) : (
           <>
-            <TextEffect
-              per="word"
-              as="span"
-              preset="blur"
-              className="inline"
-              speedReveal={HERO_TEXT_SPEED_REVEAL}
-              speedSegment={HERO_TEXT_SPEED_SEGMENT}
-            >
-              {prefix}
-            </TextEffect>{" "}
+            <span className={prefixWrapClassName}>
+              <TextEffect
+                per="word"
+                as="span"
+                preset="blur"
+                className="inline"
+                speedReveal={HERO_TEXT_SPEED_REVEAL}
+                speedSegment={HERO_TEXT_SPEED_SEGMENT}
+              >
+                {prefix}
+              </TextEffect>
+            </span>{" "}
             {/* Period travels with the accent so it can never wrap alone. */}
             <span className={accentWrapClassName}>
               <span
