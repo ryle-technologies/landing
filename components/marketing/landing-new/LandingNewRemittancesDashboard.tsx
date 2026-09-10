@@ -119,7 +119,7 @@ const WIDGET_MIN_ROWS = 6
 const CHART_MIN_ROWS = 5
 const TRANSFERS_ROWS = 4
 const SPEND_ROWS = 4
-const TITLE_ROWS = 6
+const TITLE_ROWS = 7
 /** Room for the larger mobile display line + chip row in preview. */
 const PREVIEW_TITLE_ROWS = 5
 /** Phone pack: 4×3 + 2×2 on top, 2×2 + 4×3 below. */
@@ -838,8 +838,10 @@ function DualLineChart({
 
 function BarChart({
   series,
+  compact = false,
 }: {
   series: readonly { month: string; transfers: number }[]
+  compact?: boolean
 }) {
   const max = Math.max(...series.map((point) => point.transfers))
   return (
@@ -857,16 +859,18 @@ function BarChart({
           </div>
         ))}
       </div>
-      <div className="mt-2 flex h-8 gap-2">
-        {series.map((point) => (
-          <span
-            key={point.month}
-            className="min-w-0 flex-1 truncate text-center text-[10px] leading-8 text-[var(--rem-muted)]"
-          >
-            {point.month.replace(" '26", "")}
-          </span>
-        ))}
-      </div>
+      {compact ? null : (
+        <div className="mt-2 flex h-8 gap-2">
+          {series.map((point) => (
+            <span
+              key={point.month}
+              className="min-w-0 flex-1 truncate text-center text-[10px] leading-8 text-[var(--rem-muted)]"
+            >
+              {point.month.replace(" '26", "")}
+            </span>
+          ))}
+        </div>
+      )}
     </div>
   )
 }
@@ -1054,7 +1058,73 @@ function SettlementWidget() {
   )
 }
 
-function RemittancesBreakdownWidget({ flush = false }: { flush?: boolean }) {
+function RemittanceLeakageRow({
+  segment,
+  tight = false,
+}: {
+  segment: (typeof BREAKDOWN_LEAKAGE)[number]
+  tight?: boolean
+}) {
+  const body = (
+    <>
+      <div className="flex items-baseline justify-between gap-3">
+        <span className="min-w-0 truncate text-sm text-[var(--rem-fg)]">{segment.label}</span>
+        <span className="flex shrink-0 items-baseline gap-2">
+          <span className="text-sm font-medium tabular-nums text-[var(--rem-fg)]">
+            {formatCompactMoney(segment.amount, "EUR")}
+          </span>
+          <span className="text-xs tabular-nums text-[var(--rem-muted)]">
+            {formatPercent(segment.sharePct)}
+          </span>
+        </span>
+      </div>
+      <GradientBar
+        animated
+        tone={segment.tone}
+        widthPct={LARGEST_LEAKAGE > 0 ? (segment.sharePct / LARGEST_LEAKAGE) * 100 : 0}
+      />
+    </>
+  )
+  if (tight) {
+    return <div className="flex flex-col gap-1">{body}</div>
+  }
+  return <LatticeListRow lined={false}>{body}</LatticeListRow>
+}
+
+function RemittancesBreakdownWidget({
+  flush = false,
+  compact = false,
+}: {
+  flush?: boolean
+  compact?: boolean
+}) {
+  if (compact) {
+    return (
+      <section
+        className={`flex min-h-0 min-w-0 flex-col overflow-hidden rounded-2xl border border-[var(--rem-border)] bg-[var(--rem-card)] p-3 ${
+          flush ? "h-full" : ""
+        }`}
+      >
+        <header className="shrink-0">
+          <h3 className="text-sm font-semibold leading-none text-[var(--rem-fg)]">
+            Remittances breakdown
+          </h3>
+          <p className="mt-1 truncate text-xs leading-none text-[var(--rem-muted)]">
+            credited to recipients
+          </p>
+        </header>
+        <div className="mt-2 flex min-h-0 flex-1 flex-col justify-center gap-2">
+          <span className="text-2xl font-semibold leading-none tabular-nums text-[var(--rem-fg)]">
+            {formatPercent(VALUE_SPLIT.delivered.sharePct)}
+          </span>
+          {BREAKDOWN_LEAKAGE.map((segment) => (
+            <RemittanceLeakageRow key={segment.key} segment={segment} tight />
+          ))}
+        </div>
+      </section>
+    )
+  }
+
   return (
     <LatticeListCard
       description="credited to recipients"
@@ -1067,24 +1137,7 @@ function RemittancesBreakdownWidget({ flush = false }: { flush?: boolean }) {
         </span>
       </LatticeListRow>
       {BREAKDOWN_LEAKAGE.map((segment) => (
-        <LatticeListRow key={segment.key} lined={false}>
-          <div className="flex items-baseline justify-between gap-3">
-            <span className="min-w-0 truncate text-sm text-[var(--rem-fg)]">{segment.label}</span>
-            <span className="flex shrink-0 items-baseline gap-2">
-              <span className="text-sm font-medium tabular-nums text-[var(--rem-fg)]">
-                {formatCompactMoney(segment.amount, "EUR")}
-              </span>
-              <span className="text-xs tabular-nums text-[var(--rem-muted)]">
-                {formatPercent(segment.sharePct)}
-              </span>
-            </span>
-          </div>
-          <GradientBar
-            animated
-            tone={segment.tone}
-            widthPct={LARGEST_LEAKAGE > 0 ? (segment.sharePct / LARGEST_LEAKAGE) * 100 : 0}
-          />
-        </LatticeListRow>
+        <RemittanceLeakageRow key={segment.key} segment={segment} />
       ))}
     </LatticeListCard>
   )
@@ -1106,7 +1159,7 @@ function TransfersMonthWidget({
       flush={flush}
       title="Transfers per month"
     >
-      <BarChart series={TRANSFER_MONTH_BARS} />
+      <BarChart compact={compact} series={TRANSFER_MONTH_BARS} />
     </Widget>
   )
 }
@@ -1131,8 +1184,11 @@ const MASONRY_WALLET_IDS = new Set(["wallet-custody"])
 const cloudKickerClassName =
   "max-w-[32rem] text-left text-[15px] font-normal leading-relaxed text-muted transition-colors duration-500 ease-out sm:text-[16px]"
 
-const CLOUD_HEADING_PREFIX = "Use Ryle Cloud"
-const CLOUD_HEADING_ACCENT = "and start today"
+const CLOUD_HEADING_PREFIX = "Get Ryle for record"
+const CLOUD_HEADING_ACCENT = "time-to-market"
+/** Two display lines: prefix then accent. Sized per breakpoint so each line stays one line. */
+const CLOUD_HEADING_DISPLAY_CLASS =
+  "font-sans text-[36px] leading-[0.95] tracking-[-0.04em] text-foreground md:text-[50px] md:leading-none md:tracking-tighter lg:text-[72px]"
 
 const CLOUD_ACTION_CHIPS = [
   "Assets",
@@ -1249,7 +1305,9 @@ function CloudTitle({
           prefix={CLOUD_HEADING_PREFIX}
           accent={CLOUD_HEADING_ACCENT}
           accentOnOwnLine
+          accentWrap={false}
           accentUnderline={false}
+          displayClassName={CLOUD_HEADING_DISPLAY_CLASS}
         />
       </div>
       <CloudActionChips
@@ -1739,7 +1797,7 @@ function CloudItemBody({
         return (
           <KpiTile
             badge={null}
-            caption={fee.caption}
+            caption="Per transaction"
             chart={false}
             compact
             hero
@@ -1820,7 +1878,13 @@ function CloudItemBody({
       return <CloudConfigSection id="roles" sections={asset.config} />
     }
     if (product === "Wallets") {
-      return <CloudConfigSection id="wallet-assets" sections={WALLET_CONFIG_SECTIONS} />
+      return (
+        <CloudConfigSection
+          compact={compact}
+          id="wallet-assets"
+          sections={WALLET_CONFIG_SECTIONS}
+        />
+      )
     }
     if (product === "Payments") {
       return (
@@ -1844,7 +1908,7 @@ function CloudItemBody({
       )
     }
     if (product === "Remittances" && compact) {
-      return <RemittancesBreakdownWidget flush />
+      return <RemittancesBreakdownWidget compact flush />
     }
     return <FundingMixWidget />
   }
@@ -2051,7 +2115,7 @@ function CloudWidgetCells() {
             stroke={false}
           >
             <CloudTitle
-              fill={!beside}
+              fill
               product={product}
               stacked={preview}
               onProductChange={setProduct}
@@ -2097,20 +2161,26 @@ function CloudWidgetGrid() {
 function CloudConfigSection({
   id,
   sections,
+  compact = false,
 }: {
   id: string
   sections: readonly AssetConfigSection[]
+  compact?: boolean
 }) {
   const section = sections.find((item) => item.id === id)
-  return section ? <AssetConfigSectionBlock hideTitle section={section} /> : null
+  return section ? (
+    <AssetConfigSectionBlock compact={compact} hideTitle section={section} />
+  ) : null
 }
 
 function AssetConfigSectionBlock({
   section,
   hideTitle = false,
+  compact = false,
 }: {
   section: AssetConfigSection
   hideTitle?: boolean
+  compact?: boolean
 }) {
   return (
     <LatticeListCard
@@ -2122,6 +2192,10 @@ function AssetConfigSectionBlock({
       {section.rows.map((row, index) => {
         const Icon = CONFIG_ICON[row.icon]
         const hideDescription = row.kind === "chip"
+        const description =
+          compact && row.description.startsWith("On · ")
+            ? row.description.slice("On · ".length)
+            : row.description
         return (
           <LatticeListRow
             key={row.id}
@@ -2141,7 +2215,7 @@ function AssetConfigSectionBlock({
               </p>
               {hideDescription ? null : row.kind === "address" ? (
                 <p className="mt-1 font-mono text-xs font-semibold leading-none text-[var(--rem-muted)]">
-                  {truncateAddress(row.description)}
+                  {truncateAddress(description)}
                 </p>
               ) : (
                 <p
@@ -2149,7 +2223,7 @@ function AssetConfigSectionBlock({
                     row.kind === "placeholder" ? "italic" : ""
                   }`}
                 >
-                  {row.description}
+                  {description}
                 </p>
               )}
             </div>
@@ -2280,6 +2354,60 @@ function WalletFlowMixWidget({
   compact?: boolean
 }) {
   const mix = WALLET_FLOW_MIX
+  const legs: {
+    name: string
+    share: number
+    amount: string
+    color: string
+    align: string
+    tone: ChartTone
+  }[] = compact
+    ? [
+          {
+            name: "Send",
+            share: mix.sendShare,
+            amount: mix.sendAmount,
+            color: "var(--chart-1)",
+            align: "items-start text-left",
+            tone: 1,
+          },
+          {
+            name: "Receive",
+            share: mix.receiveShare,
+            amount: mix.receiveAmount,
+            color: "var(--chart-3)",
+            align: "items-end text-right",
+            tone: 3,
+          },
+        ]
+      : [
+          {
+            name: "Send",
+            share: mix.sendShare,
+            amount: mix.sendAmount,
+            color: "var(--chart-1)",
+            align: "items-start text-left",
+            tone: 1,
+          },
+          {
+            name: "Receive",
+            share: mix.receiveShare,
+            amount: mix.receiveAmount,
+            color: "var(--chart-3)",
+            align: "items-center text-center",
+            tone: 3,
+          },
+          {
+            name: "Swap",
+            share: mix.convertShare,
+            amount: mix.convertAmount,
+            color: "var(--chart-4)",
+            align: "items-end text-right",
+            tone: 4,
+          },
+        ]
+  const barTotal = legs.reduce((sum, leg) => sum + leg.share, 0)
+
   return (
     <LatticeListCard
       description={compact ? undefined : "Send, receive, and swap"}
@@ -2289,32 +2417,8 @@ function WalletFlowMixWidget({
       title={compact ? undefined : "Flow mix · 30 days"}
     >
       <LatticeListRow grow={2}>
-        <div className="grid grid-cols-3 gap-3">
-          {(
-            [
-              {
-                name: "Send",
-                share: mix.sendShare,
-                amount: mix.sendAmount,
-                color: "var(--chart-1)",
-                align: "items-start text-left",
-              },
-              {
-                name: "Receive",
-                share: mix.receiveShare,
-                amount: mix.receiveAmount,
-                color: "var(--chart-3)",
-                align: "items-center text-center",
-              },
-              {
-                name: "Swap",
-                share: mix.convertShare,
-                amount: mix.convertAmount,
-                color: "var(--chart-4)",
-                align: "items-end text-right",
-              },
-            ] as const
-          ).map((leg) => (
+        <div className={`grid gap-3 ${compact ? "grid-cols-2" : "grid-cols-3"}`}>
+          {legs.map((leg) => (
             <div key={leg.name} className={`flex min-w-0 flex-col gap-0.5 ${leg.align}`}>
               <div className="flex items-center gap-1.5">
                 <span
@@ -2331,39 +2435,48 @@ function WalletFlowMixWidget({
           ))}
         </div>
         <div
-          aria-label={`Send ${mix.sendShare} percent, receive ${mix.receiveShare} percent, swap ${mix.convertShare} percent`}
+          aria-label={legs
+            .map((leg) => `${leg.name} ${leg.share} percent`)
+            .join(", ")}
           className="flex h-2 w-full overflow-hidden bg-[var(--rem-secondary)]"
           role="img"
         >
-          <span
-            className="h-full shrink-0"
-            style={{ width: `${mix.sendShare}%`, backgroundImage: chartGradient(1) }}
-          />
-          <span
-            className="h-full shrink-0"
-            style={{ width: `${mix.receiveShare}%`, backgroundImage: chartGradient(3) }}
-          />
-          <span
-            className="h-full shrink-0"
-            style={{ width: `${mix.convertShare}%`, backgroundImage: chartGradient(4) }}
-          />
+          {legs.map((leg) => (
+            <span
+              key={leg.name}
+              className="h-full shrink-0"
+              style={{
+                width: `${barTotal > 0 ? (leg.share / barTotal) * 100 : 0}%`,
+                backgroundImage: chartGradient(leg.tone),
+              }}
+            />
+          ))}
         </div>
       </LatticeListRow>
       <LatticeListRow>
-        <div className="grid grid-cols-2 gap-x-3 gap-y-1">
+        {compact ? (
           <div className="flex min-w-0 flex-col gap-0.5">
             <span className="text-xs text-[var(--rem-muted)]">Avg. send size</span>
             <span className="text-sm font-medium tabular-nums text-[var(--rem-fg)]">
               {mix.avgSendSize}
             </span>
           </div>
-          <div className="flex min-w-0 flex-col gap-0.5">
-            <span className="text-xs text-[var(--rem-muted)]">Avg. swap size</span>
-            <span className="text-sm font-medium tabular-nums text-[var(--rem-fg)]">
-              {mix.avgConvertSize}
-            </span>
+        ) : (
+          <div className="grid grid-cols-2 gap-x-3 gap-y-1">
+            <div className="flex min-w-0 flex-col gap-0.5">
+              <span className="text-xs text-[var(--rem-muted)]">Avg. send size</span>
+              <span className="text-sm font-medium tabular-nums text-[var(--rem-fg)]">
+                {mix.avgSendSize}
+              </span>
+            </div>
+            <div className="flex min-w-0 flex-col gap-0.5">
+              <span className="text-xs text-[var(--rem-muted)]">Avg. swap size</span>
+              <span className="text-sm font-medium tabular-nums text-[var(--rem-fg)]">
+                {mix.avgConvertSize}
+              </span>
+            </div>
           </div>
-        </div>
+        )}
       </LatticeListRow>
     </LatticeListCard>
   )
