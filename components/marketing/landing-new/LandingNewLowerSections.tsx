@@ -16,9 +16,9 @@ import { LatticeSection } from "@/components/marketing/landing-new/lattice/Latti
 import { LATTICE_SPACE } from "@/lib/landingLattice"
 
 const LANDING_PILLARS_SECTION_TITLE_PREFIX =
-  "Build, launch and run digital assets in products you already have,"
+  "Launch and run digital assets across your products,"
 
-const LANDING_PILLARS_SECTION_TITLE_ACCENT = "or your next ones"
+const LANDING_PILLARS_SECTION_TITLE_ACCENT = "now and next"
 
 /** Tiles on the grid at once; the rest of the pool rotates in Cloud-style. */
 const LANDING_PILLARS_SLOTS = 15
@@ -192,12 +192,14 @@ export function LandingNewLowerSections() {
         grid
         gridMask="fadeTop"
       >
-        <LatticePlate>
-          <LandingNewPillarsHeading
-            headingId="landing-new-pillars-heading"
-            prefix={LANDING_PILLARS_SECTION_TITLE_PREFIX}
-            accent={LANDING_PILLARS_SECTION_TITLE_ACCENT}
-          />
+        <LatticePlate inset={false} fill>
+          <div className={LATTICE_SPACE.inset}>
+            <LandingNewPillarsHeading
+              headingId="landing-new-pillars-heading"
+              prefix={LANDING_PILLARS_SECTION_TITLE_PREFIX}
+              accent={LANDING_PILLARS_SECTION_TITLE_ACCENT}
+            />
+          </div>
         </LatticePlate>
         <LandingNewProductsCarousel
           ariaLabel="Use cases"

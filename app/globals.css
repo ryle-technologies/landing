@@ -389,6 +389,21 @@ html:has(.marketing-viewport-bleed.dark) body {
   }
 }
 
+@keyframes landing-feature-card-fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.landing-feature-card-fade {
+  background: linear-gradient(to bottom, white, transparent);
+  opacity: 0;
+  animation: landing-feature-card-fade 240ms ease-in-out forwards;
+}
+
 @keyframes landing-cta-underline-wipe {
   from {
     clip-path: inset(0 0 0 0);

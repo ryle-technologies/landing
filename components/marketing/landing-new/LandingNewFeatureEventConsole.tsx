@@ -57,7 +57,6 @@ const ROW_PX = 16
 const FEED_H = VISIBLE_ROWS * ROW_PX
 
 type LandingNewFeatureEventConsoleProps = {
-  fadeClassName: string
   snapDelayMs?: number
 }
 
@@ -108,7 +107,6 @@ function MonitorRow({ event }: { event: MonitorEvent }) {
  * policy, limit — type, amount, bar, actor.
  */
 export function LandingNewFeatureEventConsole({
-  fadeClassName,
   snapDelayMs = 0,
 }: LandingNewFeatureEventConsoleProps) {
   const reduceMotion = useReducedMotion() ?? false
@@ -195,14 +193,6 @@ export function LandingNewFeatureEventConsole({
             <MonitorRow key={`${event.id}-${index}`} event={event} />
           ))}
         </div>
-        <div
-          aria-hidden
-          className={`pointer-events-none absolute inset-x-0 top-0 z-[1] h-4 ${fadeClassName} transition-colors duration-500 ease-out`}
-          style={{
-            WebkitMaskImage: "linear-gradient(to bottom, black, transparent)",
-            maskImage: "linear-gradient(to bottom, black, transparent)",
-          }}
-        />
     </div>
   )
 }
