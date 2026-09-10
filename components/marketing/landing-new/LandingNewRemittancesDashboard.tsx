@@ -2354,9 +2354,15 @@ function WalletFlowMixWidget({
   compact?: boolean
 }) {
   const mix = WALLET_FLOW_MIX
-  const legs = (
-    compact
-      ? [
+  const legs: {
+    name: string
+    share: number
+    amount: string
+    color: string
+    align: string
+    tone: ChartTone
+  }[] = compact
+    ? [
           {
             name: "Send",
             share: mix.sendShare,
@@ -2400,7 +2406,6 @@ function WalletFlowMixWidget({
             tone: 4,
           },
         ]
-  )
   const barTotal = legs.reduce((sum, leg) => sum + leg.share, 0)
 
   return (
