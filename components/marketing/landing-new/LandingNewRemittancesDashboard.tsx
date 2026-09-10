@@ -2400,7 +2400,7 @@ function WalletFlowMixWidget({
             tone: 4,
           },
         ]
-  ) as const
+  )
   const barTotal = legs.reduce((sum, leg) => sum + leg.share, 0)
 
   return (
