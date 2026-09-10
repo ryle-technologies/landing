@@ -220,21 +220,19 @@ export function LandingNewFeatureCards() {
     <LatticeSection
       aria-labelledby="landing-new-features-heading"
       grid
-      gridMask="fadeBottom"
+      gridMask="fadeTopBottom"
     >
-      <LatticePlate inset={false} fill>
-        <div className={LATTICE_SPACE.inset}>
-          <p className={kickerClassName}>{FEATURE_KICKER}</p>
-          <div className="mt-3 min-w-0 md:mt-4 md:max-w-[56rem]">
-            <LandingNewPillarsHeading
-              headingId="landing-new-features-heading"
-              prefix={FEATURE_TITLE_PREFIX}
-              accent={FEATURE_TITLE_ACCENT}
-              accentOnOwnLine
-              accentWrap
-              accentUnderline={false}
-            />
-          </div>
+      <LatticePlate fill>
+        <p className={kickerClassName}>{FEATURE_KICKER}</p>
+        <div className="mt-3 min-w-0 md:mt-4 md:max-w-[56rem]">
+          <LandingNewPillarsHeading
+            headingId="landing-new-features-heading"
+            prefix={FEATURE_TITLE_PREFIX}
+            accent={FEATURE_TITLE_ACCENT}
+            accentOnOwnLine
+            accentWrap
+            accentUnderline={false}
+          />
         </div>
       </LatticePlate>
       {isMobile ? <FeatureCardsMobile /> : <FeatureCardsDesktop />}

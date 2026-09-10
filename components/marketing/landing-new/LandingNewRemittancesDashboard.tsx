@@ -1239,26 +1239,24 @@ function CloudTitle({
   fill?: boolean
 }) {
   return (
-    <LatticePlate fill={fill} inset={false}>
-      <div className={LATTICE_SPACE.inset}>
-        <p className={cloudKickerClassName}>
-          Every product, one console.
-        </p>
-        <div className="mt-3 min-w-0 md:mt-4">
-          <LandingNewPillarsHeading
-            headingId="landing-new-cloud-heading"
-            prefix={CLOUD_HEADING_PREFIX}
-            accent={CLOUD_HEADING_ACCENT}
-            accentOnOwnLine
-            accentUnderline={false}
-          />
-        </div>
-        <CloudActionChips
-          active={product}
-          fadeOverflow={stacked}
-          onActiveChange={onProductChange}
+    <LatticePlate fill={fill}>
+      <p className={cloudKickerClassName}>
+        Every product, one console.
+      </p>
+      <div className="mt-3 min-w-0 md:mt-4">
+        <LandingNewPillarsHeading
+          headingId="landing-new-cloud-heading"
+          prefix={CLOUD_HEADING_PREFIX}
+          accent={CLOUD_HEADING_ACCENT}
+          accentOnOwnLine
+          accentUnderline={false}
         />
       </div>
+      <CloudActionChips
+        active={product}
+        fadeOverflow={stacked}
+        onActiveChange={onProductChange}
+      />
     </LatticePlate>
   )
 }
