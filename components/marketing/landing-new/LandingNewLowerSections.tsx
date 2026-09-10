@@ -92,11 +92,6 @@ const LANDING_PILLARS_POOL: readonly LandingNewProductsCarouselItem[] = [
     body: "Your users send and pay without ever holding a gas token. You cover the fee, or price it in.",
   },
   {
-    label: "Run ops from your AI tools",
-    shape: "hexPrism",
-    body: "Mint, redeem, reconcile and pull reports from Cursor, Claude or ChatGPT. The console speaks MCP.",
-  },
-  {
     label: "Loyalty and cashback",
     shape: "slab",
     body: "Points and cashback on the same ledger as the money, so they can be spent, not just collected.",
@@ -127,11 +122,6 @@ const LANDING_PILLARS_POOL: readonly LandingNewProductsCarouselItem[] = [
     body: "Pay teams and contractors in any country, same day, from one balance.",
   },
   {
-    label: "Build with your coding agent",
-    shape: "cube",
-    body: "SDK and docs written for AI tools. Have your agent wire a wallet or a payout flow into your app in an afternoon.",
-  },
-  {
     label: "Tokenized inventory",
     shape: "hexPrism",
     body: "Bottles, batches or stock as onchain units. Ownership and payment move together.",
@@ -147,19 +137,9 @@ const LANDING_PILLARS_POOL: readonly LandingNewProductsCarouselItem[] = [
     body: "An agent sweeps, rebalances and distributes on rules you set, and stops at limits it cannot cross.",
   },
   {
-    label: "Bring your own contracts",
-    shape: "tetrahedron",
-    body: "Already issued a token? Plug it into the console and run mint, redeem and reporting without redeploying.",
-  },
-  {
     label: "Dividends and rents",
     shape: "icosahedron",
     body: "Pay every holder their share each period, automatically. No spreadsheet, no manual desk.",
-  },
-  {
-    label: "An agent on the audit log",
-    shape: "sphere",
-    body: "Every mint, transfer and policy change, read by an agent that flags what looks wrong before it becomes a problem.",
   },
   {
     label: "Fiat in and out",
@@ -192,14 +172,12 @@ export function LandingNewLowerSections() {
         grid
         gridMask="fadeTop"
       >
-        <LatticePlate inset={false} fill>
-          <div className={LATTICE_SPACE.inset}>
-            <LandingNewPillarsHeading
-              headingId="landing-new-pillars-heading"
-              prefix={LANDING_PILLARS_SECTION_TITLE_PREFIX}
-              accent={LANDING_PILLARS_SECTION_TITLE_ACCENT}
-            />
-          </div>
+        <LatticePlate fill>
+          <LandingNewPillarsHeading
+            headingId="landing-new-pillars-heading"
+            prefix={LANDING_PILLARS_SECTION_TITLE_PREFIX}
+            accent={LANDING_PILLARS_SECTION_TITLE_ACCENT}
+          />
         </LatticePlate>
         <LandingNewProductsCarousel
           ariaLabel="Use cases"

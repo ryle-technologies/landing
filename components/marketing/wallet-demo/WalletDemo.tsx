@@ -160,6 +160,7 @@ export function WalletDemo({
   showCard = true,
   autoplay = false,
   interactive = true,
+  align = "center",
 }: {
   className?: string
   /** Cap so the phone never renders larger than its logical size. */
@@ -176,6 +177,8 @@ export function WalletDemo({
   autoplay?: boolean
   /** When false, pointer and wheel input are ignored so autoplay is never interrupted. */
   interactive?: boolean
+  /** Letterbox leftover: `center` splits it, `top` pins the frame to the cell top. */
+  align?: "center" | "top"
 }) {
   const stageRef = useRef<HTMLDivElement>(null)
   const [scale, setScale] = useState<number | null>(null)
@@ -201,7 +204,7 @@ export function WalletDemo({
   return (
     <div
       ref={stageRef}
-      className={`relative flex h-full w-full min-w-0 items-center justify-center ${className}`.trim()}
+      className={`relative flex h-full w-full min-w-0 justify-center ${align === "top" ? "items-start" : "items-center"} ${className}`.trim()}
       style={{ visibility: scale == null ? "hidden" : undefined }}
     >
       <div

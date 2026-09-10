@@ -22,8 +22,17 @@ import {
  */
 export const LATTICE_GRID_MASKS = {
   solid: undefined,
-  fadeTop: "linear-gradient(to bottom, transparent 0%, black 16%, black 100%)",
+  /**
+   * Cell-based, not a % of section height — a tall section would otherwise
+   * still show a hard lattice at the top. First two cells empty, then in
+   * over three more so the heading sits on paper and the cards get the grid.
+   */
+  fadeTop:
+    "linear-gradient(to bottom, transparent 0%, transparent 128px, black 320px, black 100%)",
   fadeBottom: "linear-gradient(to bottom, black 0%, black 84%, transparent 100%)",
+  /** Same top fade as fadeTop, plus the cards dissolve at the section end. */
+  fadeTopBottom:
+    "linear-gradient(to bottom, transparent 0%, transparent 128px, black 320px, black 84%, transparent 100%)",
   fadeBoth: "linear-gradient(to bottom, transparent 0%, black 12%, black 88%, transparent 100%)",
   /**
    * Like fadeBoth, but the first two cells stay empty so a section-top

@@ -11,7 +11,7 @@ export function LandingNewRemittancesSection() {
       aria-labelledby="landing-new-cloud-heading"
       columnClassName="landing-remittances-dashboard"
       grid
-      gridMask="fadeBoth"
+      gridMask="fadeTopBottom"
       contentFade="bottom"
     >
       <LandingNewRemittancesDashboard />
