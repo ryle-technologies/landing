@@ -9,6 +9,7 @@ import {
 } from "react"
 import { animate, motion, useMotionValue, useReducedMotion } from "motion/react"
 import { LandingNewActionChip } from "@/components/marketing/landing-new/LandingNewActionChip"
+import { LandingNewPillarsHeading } from "@/components/marketing/landing-new/LandingNewPillarsHeading"
 import { LandingNewWalletAssetMark } from "@/components/marketing/landing-new/LandingNewWalletAssetMark"
 import {
   CloudMorphCard,
@@ -121,6 +122,8 @@ const SPEND_ROWS = 4
 const TITLE_ROWS = 6
 /** Room for the larger mobile display line + chip row in preview. */
 const PREVIEW_TITLE_ROWS = 5
+/** Phone pack: 4×3 + 2×2 on top, 2×2 + 4×3 below. */
+const PREVIEW_WIDE_COLS = 4
 const PREVIEW_WIDE_ROWS = 3
 const PREVIEW_NARROW_COLS = 2
 const KPI_ROWS = 2
@@ -133,32 +136,16 @@ function splitAcross(cols: number, parts: number) {
   return Array.from({ length: parts }, (_, i) => base + (i < rem ? 1 : 0))
 }
 
-/** Compact KPI tiles stay 2 cells; charts and lists take leftover, never a forced 50/50. */
-function cloudPreviewIsNarrow(slot: number, product: CloudActionChip) {
-  return slot === 1
+/** Top-right and bottom-left preview tiles are the 2×2 KPIs. */
+function cloudPreviewIsNarrow(slot: number) {
+  return slot === 1 || slot === 2
 }
 
-function cloudPreviewWant(slot: number, product: CloudActionChip): CloudSlotSize {
-  if (cloudPreviewIsNarrow(slot, product)) {
+function cloudPreviewWant(slot: number): CloudSlotSize {
+  if (cloudPreviewIsNarrow(slot)) {
     return { cols: PREVIEW_NARROW_COLS, rows: KPI_ROWS }
   }
-  if (slot === 3) {
-    return {
-      cols:
-        product === "Assets"
-          ? ROLES_COLS
-          : product === "Remittances"
-            ? BREAKDOWN_COLS
-            : product === "Cards"
-              ? FEATURE_CARD_COLS
-              : FUNDING_COLS,
-      rows: PREVIEW_WIDE_ROWS,
-    }
-  }
-  if (slot === 2 && product === "Assets") {
-    return { cols: FEATURE_CARD_COLS, rows: ECONOMICS_ROWS }
-  }
-  return { cols: FEATURE_CARD_COLS, rows: PREVIEW_WIDE_ROWS }
+  return { cols: PREVIEW_WIDE_COLS, rows: PREVIEW_WIDE_ROWS }
 }
 
 function fitPreviewPair(avail: number, a: CloudSlotSize, b: CloudSlotSize) {
@@ -175,9 +162,14 @@ function fitPreviewPair(avail: number, a: CloudSlotSize, b: CloudSlotSize) {
   while (extra > 0) {
     const aNeed = a.cols - ac
     const bNeed = b.cols - bc
-    if (aNeed <= 0 && bNeed <= 0) break
-    if (aNeed >= bNeed) ac += 1
-    else bc += 1
+    if (aNeed > 0 || bNeed > 0) {
+      if (aNeed >= bNeed) ac += 1
+      else bc += 1
+    } else if (a.cols >= b.cols) {
+      ac += 1
+    } else {
+      bc += 1
+    }
     extra -= 1
   }
   return [
@@ -188,9 +180,8 @@ function fitPreviewPair(avail: number, a: CloudSlotSize, b: CloudSlotSize) {
 
 function cloudPreviewSlots(
   cols: number,
-  visuals: readonly CloudActionChip[],
 ): readonly [CloudSlotSize, CloudSlotSize, CloudSlotSize, CloudSlotSize] {
-  const wants = [0, 1, 2, 3].map((slot) => cloudPreviewWant(slot, visuals[slot]))
+  const wants = [0, 1, 2, 3].map((slot) => cloudPreviewWant(slot))
   const [side, kpi] = fitPreviewPair(cols, wants[0], wants[1])
   const [next, last] = fitPreviewPair(cols, wants[2], wants[3])
   return [side, kpi, next, last]
@@ -258,6 +249,7 @@ function DashboardGrid({
 }
 
 const COMPARISON_BASE = 1000
+const PREVIEW_CORRIDOR_VOLUME = 2_148_000
 
 const BREAKDOWN_LEAKAGE = [
   {
@@ -509,7 +501,7 @@ function KpiTile({
       <div className={hero ? "shrink-0" : "flex flex-col gap-0.5"}>
         <h3
           className={`font-medium text-[var(--rem-fg)] ${
-            hero ? "text-sm leading-none" : "text-sm"
+            hero ? `text-sm ${compact ? "leading-tight" : "leading-none"}` : "text-sm"
           }`}
         >
           {title}
@@ -627,7 +619,7 @@ function LatticeListCard({
       {title ? (
         <header className={`flex items-center justify-between gap-3 ${LATTICE_ROW_MIN}`}>
           <div className="min-w-0">
-            <h3 className="text-sm font-semibold leading-none text-[var(--rem-fg)]">{title}</h3>
+            <h3 className="truncate text-sm font-semibold leading-none text-[var(--rem-fg)]">{title}</h3>
             {description ? (
               <p className="mt-1 truncate text-xs leading-none text-[var(--rem-muted)]">
                 {description}
@@ -1139,8 +1131,8 @@ const MASONRY_WALLET_IDS = new Set(["wallet-custody"])
 const cloudKickerClassName =
   "max-w-[32rem] text-left text-[15px] font-normal leading-relaxed text-muted transition-colors duration-500 ease-out sm:text-[16px]"
 
-const cloudTitleClassName =
-  "relative text-left font-sans text-[clamp(50px,12.5vw,72px)] leading-none tracking-tighter text-foreground transition-colors duration-500 ease-out md:text-[clamp(44px,9vw,90px)]"
+const CLOUD_HEADING_PREFIX = "Use Ryle Cloud"
+const CLOUD_HEADING_ACCENT = "and start today"
 
 const CLOUD_ACTION_CHIPS = [
   "Assets",
@@ -1247,23 +1239,26 @@ function CloudTitle({
   fill?: boolean
 }) {
   return (
-    <LatticePlate fill={fill}>
-      <p className={cloudKickerClassName}>
-        Every product, one console.
-      </p>
-      <h2
-        id="landing-new-cloud-heading"
-        className={`${cloudTitleClassName} mt-3 min-w-0 md:mt-4`}
-      >
-        <span className="whitespace-nowrap">Use Ryle Cloud</span>
-        <br />
-        and start today.
-      </h2>
-      <CloudActionChips
-        active={product}
-        fadeOverflow={stacked}
-        onActiveChange={onProductChange}
-      />
+    <LatticePlate fill={fill} inset={false}>
+      <div className={LATTICE_SPACE.inset}>
+        <p className={cloudKickerClassName}>
+          Every product, one console.
+        </p>
+        <div className="mt-3 min-w-0 md:mt-4">
+          <LandingNewPillarsHeading
+            headingId="landing-new-cloud-heading"
+            prefix={CLOUD_HEADING_PREFIX}
+            accent={CLOUD_HEADING_ACCENT}
+            accentOnOwnLine
+            accentUnderline={false}
+          />
+        </div>
+        <CloudActionChips
+          active={product}
+          fadeOverflow={stacked}
+          onActiveChange={onProductChange}
+        />
+      </div>
     </LatticePlate>
   )
 }
@@ -1295,6 +1290,16 @@ function remittanceCompare() {
     0,
   )
   return { extraPerBase, largestCorridor, worstCost }
+}
+
+function assetFeeDisplay(asset: (typeof LIVE_ASSETS)[number]) {
+  const description =
+    asset.config
+      .find((section) => section.id === "economics")
+      ?.rows.find((row) => row.id === "feeBps")?.description ?? "—"
+  const match = /^(\S+)\s+\((.+)\)$/.exec(description)
+  if (match) return { value: match[1], caption: match[2] }
+  return { value: description, caption: "On this asset" }
 }
 
 function AssetActivityWidget({ compact = false }: { compact?: boolean }) {
@@ -1429,7 +1434,7 @@ function cloudPackPieces(
     },
   ]
   if (preview) {
-    const slots = cloudPreviewSlots(cols, visuals)
+    const slots = cloudPreviewSlots(cols)
     const y1 = titleRows + 1
     const y2 = y1 + Math.max(slots[0].rows, slots[1].rows)
     pieces.push(
@@ -1716,6 +1721,77 @@ function CloudItemBody({
   const deliverySeries = DELIVERY_TREND.map((point) => point.seconds)
 
   if (slot === 2) {
+    if (compact) {
+      if (product === "Cards") {
+        return (
+          <KpiTile
+            badge={null}
+            caption="Fiat and USDC legs combined"
+            chart={false}
+            compact
+            hero
+            series={CARDS_KPIS.volumeTrend}
+            title="30-day spend"
+            value={formatCompactMoney(CARDS_KPIS.volume30DayAmount, "USD")}
+          />
+        )
+      }
+      if (product === "Assets") {
+        const fee = assetFeeDisplay(asset)
+        return (
+          <KpiTile
+            badge={null}
+            caption={fee.caption}
+            chart={false}
+            compact
+            hero
+            series={asset.activity.map((point) => point.mints)}
+            title="Fee"
+            value={fee.value}
+          />
+        )
+      }
+      if (product === "Payments") {
+        return (
+          <KpiTile
+            badge={null}
+            caption="Europe → US"
+            chart={false}
+            compact
+            hero
+            series={VOLUME_TREND.map((point) => point.sent)}
+            title="Volume by corridor"
+            value={formatCompactMoney(PREVIEW_CORRIDOR_VOLUME, "EUR")}
+          />
+        )
+      }
+      if (product === "Wallets") {
+        return (
+          <KpiTile
+            badge={null}
+            caption="Last 30 days"
+            chart={false}
+            compact
+            hero
+            series={WALLET_ASSET_MIX.map((entry) => entry.valueUsd)}
+            title="Send volume"
+            value={WALLET_FLOW_MIX.sendAmount}
+          />
+        )
+      }
+      return (
+        <KpiTile
+          badge={null}
+          caption="EUR-equivalent sent"
+          chart={false}
+          compact
+          hero
+          series={VOLUME_TREND.map((point) => point.sent)}
+          title="30-day volume"
+          value={formatCompactMoney(KPIS.volume30DayAmount, "EUR")}
+        />
+      )
+    }
     if (product === "Assets") {
       return <CloudConfigSection id="economics" sections={asset.config} />
     }
@@ -1857,7 +1933,7 @@ function CloudPack({
 }) {
   const { preview } = frame
   const rowsFor = (index: number) => CLOUD_PACK_ITEM_ROWS[visuals[index]][index - 2]
-  const slots = preview ? cloudPreviewSlots(frame.cols, visuals) : null
+  const slots = preview ? cloudPreviewSlots(frame.cols) : null
   const y1 = PREVIEW_TITLE_ROWS + 1
   const y2 = slots ? y1 + Math.max(slots[0].rows, slots[1].rows) : 0
   const sideFrame: CloudPackFrame = slots

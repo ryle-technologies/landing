@@ -26,11 +26,8 @@ export const DOCS_BASE_HREF = "/docs" as const
  * Client-side routing would target the marketing app; `/docs` is rewritten to Mintlify.
  */
 
-/** Marketing docs link label (nav, suite block, closing CTA). */
+/** Marketing docs link label (suite block, closing CTA). */
 export const LANDING_DOCS_CTA_LABEL = "Read our documentation" as const
-
-/** Shorter docs link label for cramped top nav on small viewports. */
-export const LANDING_DOCS_CTA_LABEL_MOBILE = "Read our docs" as const
 
 export type FooterNavLink = {
   label: string

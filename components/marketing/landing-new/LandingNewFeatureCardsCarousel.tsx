@@ -250,10 +250,14 @@ function FeatureCarouselSlide({
   children,
   width,
   height,
+  active,
+  reduceMotion,
 }: {
   children: ReactNode
   width: number
   height: number
+  active: boolean
+  reduceMotion: boolean
 }) {
   return (
     <div
@@ -262,7 +266,18 @@ function FeatureCarouselSlide({
       className="relative shrink-0 touch-pan-y bg-[var(--marketing-surface)]"
       style={{ width, height }}
     >
-      <div className="flex h-full min-h-0 min-w-0 flex-col">{children}</div>
+      {active && !reduceMotion ? (
+        <div
+          aria-hidden
+          className="landing-feature-card-fade pointer-events-none absolute inset-0 z-0"
+        />
+      ) : null}
+      <div
+        data-feature-slide-body
+        className="relative z-10 flex h-full min-h-0 min-w-0 flex-col"
+      >
+        {children}
+      </div>
       <div
         aria-hidden
         className={`pointer-events-none absolute inset-0 z-20 ${latticeCellStrokeClassName}`}
@@ -336,7 +351,9 @@ export function LandingNewFeatureCardsCarousel({
     const apply = () => {
       let tallest = 0
       for (const slide of Array.from(list.children)) {
-        const body = slide.firstElementChild as HTMLElement | null
+        const body = slide.querySelector(
+          "[data-feature-slide-body]",
+        ) as HTMLElement | null
         if (!body) continue
         const prev = body.style.height
         body.style.height = "auto"
@@ -352,7 +369,8 @@ export function LandingNewFeatureCardsCarousel({
     const observer = new ResizeObserver(apply)
     observer.observe(list)
     for (const slide of Array.from(list.children)) {
-      if (slide.firstElementChild) observer.observe(slide.firstElementChild)
+      const body = slide.querySelector("[data-feature-slide-body]")
+      if (body) observer.observe(body)
     }
     const fonts = document.fonts?.ready.then(apply)
     return () => {
@@ -408,6 +426,8 @@ export function LandingNewFeatureCardsCarousel({
           {items.map((item, slideIndex) => (
             <FeatureCarouselSlide
               key={slideIndex}
+              active={slideIndex === index}
+              reduceMotion={reduceMotion}
               width={width}
               height={height}
             >

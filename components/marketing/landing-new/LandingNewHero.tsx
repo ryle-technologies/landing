@@ -42,7 +42,7 @@ const HERO_ROTATING_WORDS = [
 const HERO_CTA_LABEL = "Talk to us"
 
 const HERO_SUBLINE =
-  "Issue assets, move money across borders in seconds, embed wallets and cards in your product. One modular stack, deployed in your cloud. Yours to run."
+  "Issue assets, move money, embed wallets and cards in your product. All with one modular stack, deployed in your cloud."
 
 const { subline: HERO_SUBLINE_DELAY_S, cta: HERO_CTA_DELAY_S } =
   landingHeroIntroDelays(HERO_TITLE, HERO_ROTATING_WORDS[0])

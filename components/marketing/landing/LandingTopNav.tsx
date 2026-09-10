@@ -3,9 +3,6 @@
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import {
-  DOCS_BASE_HREF,
-  LANDING_DOCS_CTA_LABEL,
-  LANDING_DOCS_CTA_LABEL_MOBILE,
   isAlphaShellNavActive,
   landingMarketingCtaAnchorProps,
   LANDING_MARKETING_CONTACT_HREF,
@@ -68,11 +65,6 @@ export function LandingTopNav({
         </div>
       </div>
       <div className="flex shrink-0 items-center gap-x-5 sm:gap-x-6">
-        {/* Full navigation — `/docs` is a Mintlify rewrite, not an app route. */}
-        <a href={DOCS_BASE_HREF} className={topNavDocsLinkClassName}>
-          <span className="sm:hidden">{LANDING_DOCS_CTA_LABEL_MOBILE}</span>
-          <span className="hidden sm:inline">{LANDING_DOCS_CTA_LABEL}</span>
-        </a>
         {ctaUsesPrimaryPill ? (
           <a
             href={ctaHref}
@@ -107,13 +99,6 @@ export function LandingTopNav({
     </nav>
   )
 }
-
-const topNavDocsLinkClassName = [
-  "inline-flex shrink-0 items-center self-center",
-  "font-sans text-[13px] font-semibold leading-none tracking-[-0.01em] text-muted",
-  "underline-offset-2 transition-colors duration-500 ease-out hover:text-foreground hover:underline",
-  "focus-visible:rounded-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-foreground",
-].join(" ")
 
 const topNavTextLinkClassName = [
   "inline-flex shrink-0 items-center self-center",

@@ -10,11 +10,11 @@ import {
   LandingNewFeatureCardsCarousel,
   useIsMobileFeatureCarousel,
 } from "@/components/marketing/landing-new/LandingNewFeatureCardsCarousel"
+import { LandingNewPillarsHeading } from "@/components/marketing/landing-new/LandingNewPillarsHeading"
 import { LandingNewPrivacyCard } from "@/components/marketing/landing-new/LandingNewPrivacyCard"
 import { LatticeCell, LatticeGrid } from "@/components/marketing/landing-new/lattice/LatticeGrid"
 import { LatticePlate } from "@/components/marketing/landing-new/lattice/LatticePlate"
 import { LatticeSection } from "@/components/marketing/landing-new/lattice/LatticeSection"
-import { landingNewLargeDisplayClassName } from "@/lib/landingHeroTypography"
 import { LATTICE_SPACE } from "@/lib/landingLattice"
 import { LANDING_FEATURE_SNAP_STAGGER_MS } from "@/lib/landingSnapMotion"
 
@@ -31,8 +31,6 @@ const FEATURE_CARD_MIN_ROWS = 5
 const kickerClassName =
   "font-mono text-xs uppercase tracking-wide text-muted transition-colors duration-500 ease-out"
 
-const featureTitleClassName = `relative text-left transition-colors duration-500 ease-out ${landingNewLargeDisplayClassName}`
-
 const cardTitleClassName =
   "text-left font-serif text-[22px] font-medium italic leading-snug tracking-[-0.02em] text-foreground transition-colors duration-500 ease-out sm:text-[24px]"
 
@@ -47,8 +45,8 @@ const cardVisualMonitorClassName =
 
 const FEATURE_KICKER = "Platform"
 
-const FEATURE_TITLE = "One backend."
-const FEATURE_TITLE_LINE_TWO = "Plugs into everything you already run."
+const FEATURE_TITLE_PREFIX = "One backend."
+const FEATURE_TITLE_ACCENT = "Plugs into everything you already run"
 
 const EVM_TITLE = "Any EVM network."
 
@@ -65,10 +63,10 @@ const MONITORING_TITLE = "Live monitoring."
 const MONITORING_BODY =
   "Every mint, transfer, disclosure and policy change, as it happens. Attributed. Exportable."
 
-const CLOUD_TITLE = "Deployed in your cloud."
+const CLOUD_TITLE = "Runs in your cloud."
 
 const CLOUD_BODY =
-  "The stack runs in your AWS, GCP or Azure. You keep admin, data and the compliance perimeter. We operate it with you."
+  "The stack runs in your AWS, GCP or Azure. You keep the control."
 
 function FeatureCard({
   title,
@@ -125,7 +123,6 @@ function MonitoringCard() {
       body={MONITORING_BODY}
       visual={
         <LandingNewFeatureEventConsole
-          fadeClassName={CARD_MASK}
           snapDelayMs={LANDING_FEATURE_SNAP_STAGGER_MS}
         />
       }
@@ -225,16 +222,20 @@ export function LandingNewFeatureCards() {
       grid
       gridMask="fadeBottom"
     >
-      <LatticePlate>
-        <p className={kickerClassName}>{FEATURE_KICKER}</p>
-        <h2
-          id="landing-new-features-heading"
-          className={`${featureTitleClassName} mt-3 min-w-0 md:mt-4 md:max-w-[56rem]`}
-        >
-          <span>{FEATURE_TITLE}</span>
-          <br />
-          {FEATURE_TITLE_LINE_TWO}
-        </h2>
+      <LatticePlate inset={false} fill>
+        <div className={LATTICE_SPACE.inset}>
+          <p className={kickerClassName}>{FEATURE_KICKER}</p>
+          <div className="mt-3 min-w-0 md:mt-4 md:max-w-[56rem]">
+            <LandingNewPillarsHeading
+              headingId="landing-new-features-heading"
+              prefix={FEATURE_TITLE_PREFIX}
+              accent={FEATURE_TITLE_ACCENT}
+              accentOnOwnLine
+              accentWrap
+              accentUnderline={false}
+            />
+          </div>
+        </div>
       </LatticePlate>
       {isMobile ? <FeatureCardsMobile /> : <FeatureCardsDesktop />}
     </LatticeSection>
