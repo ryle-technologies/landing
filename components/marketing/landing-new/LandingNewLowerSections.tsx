@@ -16,9 +16,9 @@ import { LatticeSection } from "@/components/marketing/landing-new/lattice/Latti
 import { LATTICE_SPACE } from "@/lib/landingLattice"
 
 const LANDING_PILLARS_SECTION_TITLE_PREFIX =
-  "Launch and run digital assets across your products,"
+  "Launch and run digital assets in your"
 
-const LANDING_PILLARS_SECTION_TITLE_ACCENT = "now and next"
+const LANDING_PILLARS_SECTION_TITLE_ACCENT = "next product"
 
 /** Tiles on the grid at once; the rest of the pool rotates in Cloud-style. */
 const LANDING_PILLARS_SLOTS = 15

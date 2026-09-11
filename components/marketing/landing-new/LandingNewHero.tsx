@@ -33,8 +33,9 @@ const HERO_TITLE_TWO_LINE = HERO_TITLE
 const HERO_ROTATING_WORDS = [
   "stablecoin",
   "wallet",
+  "cross-border",
   "cards",
-  "asset",
+  "digital asset",
   "payments",
   "cashback",
 ] as const
@@ -42,7 +43,7 @@ const HERO_ROTATING_WORDS = [
 const HERO_CTA_LABEL = "Talk to us"
 
 const HERO_SUBLINE =
-  "Issue assets, move money, embed wallets and cards in your product. All with one modular stack, deployed in your cloud."
+  "Ryle builds and runs digital assets & financial infrastructure with companies that want to own it."
 
 const { subline: HERO_SUBLINE_DELAY_S, cta: HERO_CTA_DELAY_S } =
   landingHeroIntroDelays(HERO_TITLE, HERO_ROTATING_WORDS[0])

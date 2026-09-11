@@ -20,13 +20,17 @@ type LandingNewPillarsHeadingProps = {
   headingId: string
   lead?: string
   prefix: string
+  /** Roman words that sit with the accent (e.g. "so" before an italic close). */
+  accentLead?: string
   accent: string
-  /** Start the accent on a new line after the prefix. */
-  accentOnOwnLine?: boolean
+  /** Start the accent on a new line after the prefix. `"mobile"` only below `md`. */
+  accentOnOwnLine?: boolean | "mobile"
   /** Let the accent phrase wrap (long second lines). */
   accentWrap?: boolean
   /** Rainbow shimmer underline on the accent phrase. */
   accentUnderline?: boolean
+  /** Italicize the accent phrase. */
+  accentItalic?: boolean
   /** Overrides the default display scale of the headline. */
   displayClassName?: string
 }
@@ -39,27 +43,48 @@ export function LandingNewPillarsHeading({
   headingId,
   lead,
   prefix,
+  accentLead,
   accent,
   accentOnOwnLine = false,
   accentWrap = false,
   accentUnderline = true,
+  accentItalic = false,
   displayClassName = pillarsDisplayClassName,
 }: LandingNewPillarsHeadingProps) {
-  const prefixWrapClassName = accentOnOwnLine ? "whitespace-nowrap" : "inline"
+  const accentOnOwnLineAlways = accentOnOwnLine === true
+  const prefixWrapClassName =
+    accentOnOwnLineAlways && !accentWrap ? "whitespace-nowrap" : "inline"
+  const accentItalicClassName = accentItalic
+    ? "font-serif font-normal italic tracking-[-0.03em]"
+    : ""
   const accentWrapClassName = [
-    accentOnOwnLine ? "block" : "",
+    accentOnOwnLineAlways ? "block" : "",
+    accentOnOwnLine === "mobile" ? "block md:inline" : "",
     accentWrap ? "" : "whitespace-nowrap",
   ]
     .filter(Boolean)
     .join(" ")
+  const prefixGap =
+    accentOnOwnLine === "mobile" ? (
+      <span className="hidden md:inline"> </span>
+    ) : (
+      " "
+    )
   const reduceMotionPref = useReducedMotion()
   const headingRef = useRef<HTMLHeadingElement>(null)
   const [inView, setInView] = useState(false)
   const [hasMounted, setHasMounted] = useState(false)
   const reduceMotion = hasMounted && reduceMotionPref === true
-  const enterDelay =
-    prefix.trim().split(/\s+/).filter(Boolean).length * HERO_WORD_STAGGER_S
-  const fullTitle = [lead, prefix, `${accent}.`].filter(Boolean).join(" ")
+  const prefixWordCount = prefix.trim().split(/\s+/).filter(Boolean).length
+  const accentLeadWordCount = accentLead
+    ? accentLead.trim().split(/\s+/).filter(Boolean).length
+    : 0
+  const enterDelay = prefixWordCount * HERO_WORD_STAGGER_S
+  const accentEnterDelay =
+    (prefixWordCount + accentLeadWordCount) * HERO_WORD_STAGGER_S
+  const fullTitle = [lead, prefix, accentLead, `${accent}.`]
+    .filter(Boolean)
+    .join(" ")
 
   useEffect(() => {
     setHasMounted(true)
@@ -104,14 +129,17 @@ export function LandingNewPillarsHeading({
       <span aria-hidden className={`${restClassName} ${displayClassName}`}>
         {reduceMotion ? (
           <>
-            <span className={prefixWrapClassName}>{prefix}</span>{" "}
+            <span className={prefixWrapClassName}>{prefix}</span>
+            {prefixGap}
             <span className={accentWrapClassName}>
+              {accentLead ? `${accentLead} ` : null}
               <span
-                className={
-                  accentUnderline
-                    ? "relative inline-block pb-[0.14em]"
-                    : "inline"
-                }
+                className={[
+                  accentUnderline ? "relative inline-block pb-[0.14em]" : "inline",
+                  accentItalicClassName,
+                ]
+                  .filter(Boolean)
+                  .join(" ")}
               >
                 {accent}.
               </span>
@@ -119,8 +147,12 @@ export function LandingNewPillarsHeading({
           </>
         ) : !inView ? (
           <span className="opacity-0">
-            <span className={prefixWrapClassName}>{prefix}</span>{" "}
-            <span className={accentWrapClassName}>{accent}.</span>
+            <span className={prefixWrapClassName}>{prefix}</span>
+            {prefixGap}
+            <span className={accentWrapClassName}>
+              {accentLead ? `${accentLead} ` : null}
+              <span className={accentItalicClassName}>{accent}.</span>
+            </span>
           </span>
         ) : (
           <>
@@ -135,22 +167,41 @@ export function LandingNewPillarsHeading({
               >
                 {prefix}
               </TextEffect>
-            </span>{" "}
+            </span>
+            {prefixGap}
             {/* Period travels with the accent so it can never wrap alone. */}
             <span className={accentWrapClassName}>
+              {accentLead ? (
+                <>
+                  <TextEffect
+                    per="word"
+                    as="span"
+                    preset="blur"
+                    className="inline"
+                    delay={enterDelay}
+                    speedReveal={HERO_TEXT_SPEED_REVEAL}
+                    speedSegment={HERO_TEXT_SPEED_SEGMENT}
+                  >
+                    {accentLead}
+                  </TextEffect>{" "}
+                </>
+              ) : null}
               <span
-                className={
+                className={[
                   accentUnderline
                     ? "relative inline-block pb-[0.14em]"
-                    : "inline"
-                }
+                    : "inline",
+                  accentItalicClassName,
+                ]
+                  .filter(Boolean)
+                  .join(" ")}
               >
                 <TextEffect
                   per="word"
                   as="span"
                   preset="blur"
                   className="inline"
-                  delay={enterDelay}
+                  delay={accentLead ? accentEnterDelay : enterDelay}
                   speedReveal={HERO_TEXT_SPEED_REVEAL}
                   speedSegment={HERO_TEXT_SPEED_SEGMENT}
                 >
