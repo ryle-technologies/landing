@@ -45,8 +45,8 @@ const cardVisualMonitorClassName =
 
 const FEATURE_KICKER = "Ryle Platform"
 
-const FEATURE_TITLE_PREFIX = "A modular architecture."
-const FEATURE_TITLE_ACCENT = "Plugs into the products you already run"
+const FEATURE_TITLE_PREFIX = "A modular platform that plugs into your"
+const FEATURE_TITLE_ACCENT = "existing products"
 
 const EVM_TITLE = "We settle in any EVM."
 

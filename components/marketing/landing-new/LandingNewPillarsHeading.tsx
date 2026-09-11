@@ -16,10 +16,16 @@ const leadClassName =
 
 const restClassName = "relative text-left transition-colors duration-500 ease-out"
 
+function countWords(value: string) {
+  return value.trim().split(/\s+/).filter(Boolean).length
+}
+
 type LandingNewPillarsHeadingProps = {
   headingId: string
   lead?: string
   prefix: string
+  /** Prefix phrases that stack on mobile and sit inline from `md`. */
+  prefixLines?: readonly string[]
   /** Roman words that sit with the accent (e.g. "so" before an italic close). */
   accentLead?: string
   accent: string
@@ -43,6 +49,7 @@ export function LandingNewPillarsHeading({
   headingId,
   lead,
   prefix,
+  prefixLines,
   accentLead,
   accent,
   accentOnOwnLine = false,
@@ -52,6 +59,8 @@ export function LandingNewPillarsHeading({
   displayClassName = pillarsDisplayClassName,
 }: LandingNewPillarsHeadingProps) {
   const accentOnOwnLineAlways = accentOnOwnLine === true
+  const prefixSegments = prefixLines ?? [prefix]
+  const prefixStacksOnMobile = prefixSegments.length > 1
   const prefixWrapClassName =
     accentOnOwnLineAlways && !accentWrap ? "whitespace-nowrap" : "inline"
   const accentItalicClassName = accentItalic
@@ -60,7 +69,11 @@ export function LandingNewPillarsHeading({
   const accentWrapClassName = [
     accentOnOwnLineAlways ? "block" : "",
     accentOnOwnLine === "mobile" ? "block md:inline" : "",
-    accentWrap ? "" : "whitespace-nowrap",
+    accentWrap
+      ? prefixStacksOnMobile
+        ? "whitespace-nowrap md:whitespace-normal"
+        : ""
+      : "whitespace-nowrap",
   ]
     .filter(Boolean)
     .join(" ")
@@ -75,16 +88,58 @@ export function LandingNewPillarsHeading({
   const [inView, setInView] = useState(false)
   const [hasMounted, setHasMounted] = useState(false)
   const reduceMotion = hasMounted && reduceMotionPref === true
-  const prefixWordCount = prefix.trim().split(/\s+/).filter(Boolean).length
-  const accentLeadWordCount = accentLead
-    ? accentLead.trim().split(/\s+/).filter(Boolean).length
-    : 0
+  const prefixWordCount = countWords(prefix)
+  const accentLeadWordCount = accentLead ? countWords(accentLead) : 0
   const enterDelay = prefixWordCount * HERO_WORD_STAGGER_S
   const accentEnterDelay =
     (prefixWordCount + accentLeadWordCount) * HERO_WORD_STAGGER_S
   const fullTitle = [lead, prefix, accentLead, `${accent}.`]
     .filter(Boolean)
     .join(" ")
+
+  const renderPrefixText = (value: string, animated: boolean, delay = 0) =>
+    animated ? (
+      <TextEffect
+        per="word"
+        as="span"
+        preset="blur"
+        className="inline"
+        delay={delay}
+        speedReveal={HERO_TEXT_SPEED_REVEAL}
+        speedSegment={HERO_TEXT_SPEED_SEGMENT}
+      >
+        {value}
+      </TextEffect>
+    ) : (
+      value
+    )
+
+  const renderPrefix = (animated: boolean) => {
+    if (!prefixStacksOnMobile) {
+      return <span className={prefixWrapClassName}>{renderPrefixText(prefix, animated)}</span>
+    }
+
+    return (
+      <>
+        <span className="md:hidden">
+          {prefixSegments.map((line, index) => (
+            <span key={`${index}-${line}`} className="block whitespace-nowrap">
+              {renderPrefixText(
+                line,
+                animated,
+                prefixSegments
+                  .slice(0, index)
+                  .reduce((n, part) => n + countWords(part), 0) * HERO_WORD_STAGGER_S,
+              )}
+            </span>
+          ))}
+        </span>
+        <span className="hidden md:inline">
+          {renderPrefixText(prefix, animated)}
+        </span>
+      </>
+    )
+  }
 
   useEffect(() => {
     setHasMounted(true)
@@ -129,7 +184,7 @@ export function LandingNewPillarsHeading({
       <span aria-hidden className={`${restClassName} ${displayClassName}`}>
         {reduceMotion ? (
           <>
-            <span className={prefixWrapClassName}>{prefix}</span>
+            {renderPrefix(false)}
             {prefixGap}
             <span className={accentWrapClassName}>
               {accentLead ? `${accentLead} ` : null}
@@ -147,7 +202,7 @@ export function LandingNewPillarsHeading({
           </>
         ) : !inView ? (
           <span className="opacity-0">
-            <span className={prefixWrapClassName}>{prefix}</span>
+            {renderPrefix(false)}
             {prefixGap}
             <span className={accentWrapClassName}>
               {accentLead ? `${accentLead} ` : null}
@@ -156,18 +211,7 @@ export function LandingNewPillarsHeading({
           </span>
         ) : (
           <>
-            <span className={prefixWrapClassName}>
-              <TextEffect
-                per="word"
-                as="span"
-                preset="blur"
-                className="inline"
-                speedReveal={HERO_TEXT_SPEED_REVEAL}
-                speedSegment={HERO_TEXT_SPEED_SEGMENT}
-              >
-                {prefix}
-              </TextEffect>
-            </span>
+            {renderPrefix(true)}
             {prefixGap}
             {/* Period travels with the accent so it can never wrap alone. */}
             <span className={accentWrapClassName}>
