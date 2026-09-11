@@ -16,9 +16,20 @@ import { LatticeSection } from "@/components/marketing/landing-new/lattice/Latti
 import { LATTICE_SPACE } from "@/lib/landingLattice"
 
 const LANDING_PILLARS_SECTION_TITLE_PREFIX =
-  "Launch and run digital assets in your"
+  "Launch and run digital assets in"
+
+const LANDING_PILLARS_SECTION_TITLE_PREFIX_LINES = [
+  "Launch and run",
+  "digital assets in",
+] as const
+
+const LANDING_PILLARS_SECTION_TITLE_ACCENT_LEAD = "your"
 
 const LANDING_PILLARS_SECTION_TITLE_ACCENT = "next product"
+
+/** Slightly under the locked-line fill so the three mobile lines sit inside the plate. */
+const LANDING_PILLARS_TITLE_CLASS =
+  "font-sans text-[clamp(36px,9.6vw,46px)] leading-[0.95] tracking-tighter text-foreground md:text-[clamp(36px,7.4vw,76px)] md:leading-none"
 
 /** Tiles on the grid at once; the rest of the pool rotates in Cloud-style. */
 const LANDING_PILLARS_SLOTS = 15
@@ -151,9 +162,14 @@ const LANDING_PILLARS_POOL: readonly LandingNewProductsCarouselItem[] = [
 
 const LANDING_POSSIBILITIES_TITLE_PREFIX = "Your product, at the speed of"
 
+const LANDING_POSSIBILITIES_TITLE_PREFIX_LINES = [
+  "Your product,",
+  "at the speed of",
+] as const
+
 const LANDING_POSSIBILITIES_TITLE_ACCENT = "the internet"
 
-/** Hero face. Floor stays under ~50px so a 5-cell mobile column wraps to 3 lines; 104px max so it still fills the 16-cell column. */
+/** Locked to three lines on mobile; 104px max so it still fills the 16-cell column. */
 const LANDING_POSSIBILITIES_TITLE_CLASS =
   "font-sans text-[clamp(44px,12vw,104px)] leading-none tracking-tighter text-foreground"
 
@@ -176,7 +192,11 @@ export function LandingNewLowerSections() {
           <LandingNewPillarsHeading
             headingId="landing-new-pillars-heading"
             prefix={LANDING_PILLARS_SECTION_TITLE_PREFIX}
+            prefixLines={LANDING_PILLARS_SECTION_TITLE_PREFIX_LINES}
+            accentLead={LANDING_PILLARS_SECTION_TITLE_ACCENT_LEAD}
             accent={LANDING_PILLARS_SECTION_TITLE_ACCENT}
+            accentOnOwnLine="mobile"
+            displayClassName={LANDING_PILLARS_TITLE_CLASS}
           />
         </LatticePlate>
         <LandingNewProductsCarousel
@@ -201,7 +221,9 @@ export function LandingNewLowerSections() {
           <LandingNewPillarsHeading
             headingId="landing-new-possibilities-heading"
             prefix={LANDING_POSSIBILITIES_TITLE_PREFIX}
+            prefixLines={LANDING_POSSIBILITIES_TITLE_PREFIX_LINES}
             accent={LANDING_POSSIBILITIES_TITLE_ACCENT}
+            accentOnOwnLine="mobile"
             displayClassName={LANDING_POSSIBILITIES_TITLE_CLASS}
           />
         </LatticePlate>

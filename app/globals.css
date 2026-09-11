@@ -165,6 +165,29 @@ select,
   }
 }
 
+/* Same fade as LATTICE_GRID_MASKS.fadeTop. Toggled on the wallet canvas when
+ * the section stacks (title above the phone). */
+.lattice-canvas-fade-top {
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    transparent 0%,
+    transparent 128px,
+    black 320px,
+    black 100%
+  );
+  mask-image: linear-gradient(
+    to bottom,
+    transparent 0%,
+    transparent 128px,
+    black 320px,
+    black 100%
+  );
+  -webkit-mask-size: 100% 100%;
+  mask-size: 100% 100%;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+}
+
 /* 1px lattice line — same values as LATTICE_LINE_LIGHT / _DARK for the canvas. */
 .marketing-viewport-bleed {
   --lattice-line: rgba(232, 228, 223, 0.88);

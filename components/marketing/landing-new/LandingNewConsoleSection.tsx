@@ -1,5 +1,6 @@
 "use client"
 
+import { useLayoutEffect } from "react"
 import { LandingNewPillarsHeading } from "@/components/marketing/landing-new/LandingNewPillarsHeading"
 import { LandingNewWalletAssetKicker } from "@/components/marketing/landing-new/LandingNewWalletAssetKicker"
 import { LandingNewWalletSectionActions } from "@/components/marketing/landing-new/LandingNewWalletSectionActions"
@@ -18,6 +19,10 @@ import {
 } from "@/lib/landingLattice"
 
 const WALLET_HEADING_PREFIX = "We've engineered the hard part,"
+const WALLET_HEADING_PREFIX_LINES = [
+  "We've engineered",
+  "the hard part,",
+] as const
 const WALLET_HEADING_ACCENT_LEAD = "so"
 const WALLET_HEADING_ACCENT = "you don't have to"
 
@@ -44,6 +49,23 @@ const WALLET_MIN_COLS = 12
 const WALLET_STACKED_PHONE_COLS = 4
 const WALLET_STACKED_RAIL_COLS = 1
 
+function WalletMobileGridFade({ headingId }: { headingId: string }) {
+  const { stacked } = useLatticeGrid()
+
+  useLayoutEffect(() => {
+    const section = document.getElementById(headingId)?.closest("section")
+    const canvas = section?.querySelector("[data-lattice-canvas]")
+    if (!(canvas instanceof HTMLElement)) return
+
+    canvas.classList.toggle("lattice-canvas-fade-top", stacked)
+    return () => {
+      canvas.classList.remove("lattice-canvas-fade-top")
+    }
+  }, [headingId, stacked])
+
+  return null
+}
+
 /**
  * Copy | phone. The phone is an exact 6×13 lattice rectangle at the top of
  * the section; the copy takes every remaining column and starts two rows
@@ -64,13 +86,19 @@ function WalletCells({ headingId }: { headingId: string }) {
       rows={stacked ? "auto" : phoneRows - (WALLET_COPY_ROW_START - 1)}
       rowStart={WALLET_COPY_ROW_START}
       bodyClassName="justify-center"
+      stroke={stacked ? false : undefined}
     >
-      <div className={`flex min-w-0 flex-col ${LATTICE_SPACE.inset}`}>
+      <div
+        className={`flex min-w-0 flex-col ${
+          stacked ? "py-4" : LATTICE_SPACE.inset
+        }`}
+      >
         <LandingNewWalletAssetKicker className={kickerClassName} />
         <div className="mt-3">
           <LandingNewPillarsHeading
             headingId={headingId}
             prefix={WALLET_HEADING_PREFIX}
+            prefixLines={WALLET_HEADING_PREFIX_LINES}
             accentLead={WALLET_HEADING_ACCENT_LEAD}
             accent={WALLET_HEADING_ACCENT}
             accentOnOwnLine="mobile"
@@ -99,7 +127,10 @@ function WalletCells({ headingId }: { headingId: string }) {
               <LandingNewWalletSectionActions variant="spine" />
             </LatticeCell>
             <LatticeCell
-              cols={Math.min(WALLET_STACKED_PHONE_COLS, Math.max(1, cols - WALLET_STACKED_RAIL_COLS))}
+              cols={Math.min(
+                WALLET_STACKED_PHONE_COLS,
+                Math.max(1, cols - WALLET_STACKED_RAIL_COLS),
+              )}
               rows={phoneRows}
               stroke
               paper
@@ -144,6 +175,7 @@ export function LandingNewConsoleSection({
     >
       <WalletDemoStoreProvider>
         <LatticeGrid minCols={WALLET_MIN_COLS} stroke>
+          <WalletMobileGridFade headingId={headingId} />
           <WalletCells headingId={headingId} />
         </LatticeGrid>
       </WalletDemoStoreProvider>
