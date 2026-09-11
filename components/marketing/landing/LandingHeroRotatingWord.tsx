@@ -25,6 +25,10 @@ const LETTER_EASE = [0.22, 1, 0.36, 1] as const
 /** Gentler than the letters so the slot (and trailing period) travels with the stagger. */
 const WIDTH_EASE = [0.33, 1, 0.68, 1] as const
 
+function letterGlyph(letter: string) {
+  return letter === " " ? "\u00a0" : letter
+}
+
 const letterVariants = {
   hidden: {
     opacity: 0,
@@ -215,7 +219,7 @@ export function LandingHeroRotatingWord({
       >
         {Array.from(displayedWord).map((letter, index) => (
           <span key={`${displayedWord}-${index}`} className="inline-block">
-            {letter}
+            {letterGlyph(letter)}
           </span>
         ))}
       </span>
@@ -255,7 +259,7 @@ export function LandingHeroRotatingWord({
                   className="inline-block"
                   variants={letterVariants}
                 >
-                  {letter}
+                  {letterGlyph(letter)}
                 </motion.span>
               ))}
             </motion.span>

@@ -17,12 +17,13 @@ import {
   phoneRowsForCols,
 } from "@/lib/landingLattice"
 
-const WALLET_HEADING_PREFIX = "Deploy your own"
-const WALLET_HEADING_ACCENT = "wallet in minutes"
+const WALLET_HEADING_PREFIX = "We've engineered the hard part,"
+const WALLET_HEADING_ACCENT_LEAD = "so"
+const WALLET_HEADING_ACCENT = "you don't have to"
 
 const WALLET_CONTENT = {
   subtitle:
-    "Give customers a place to hold, send, and receive. Fully branded, inside the app they already use.",
+    "Give your customers a place to send, receive, hold and pay within your products.",
 } as const
 
 const kickerClassName =
@@ -70,7 +71,10 @@ function WalletCells({ headingId }: { headingId: string }) {
           <LandingNewPillarsHeading
             headingId={headingId}
             prefix={WALLET_HEADING_PREFIX}
+            accentLead={WALLET_HEADING_ACCENT_LEAD}
             accent={WALLET_HEADING_ACCENT}
+            accentOnOwnLine="mobile"
+            accentWrap
           />
         </div>
         <p className={`mt-5 ${sectionSubtitleClassName}`}>{WALLET_CONTENT.subtitle}</p>

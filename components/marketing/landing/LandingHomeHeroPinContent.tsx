@@ -163,7 +163,7 @@ export function LandingHomeHeroPinContent({
               delay={sublineDelay}
               className="mt-4 max-w-[56rem] sm:mt-5"
             >
-              <p className="text-left font-serif text-[21px] font-normal italic leading-snug tracking-[-0.02em] text-muted transition-colors duration-500 ease-out sm:text-[24px]">
+              <p className="text-left font-serif text-[24px] font-normal italic leading-snug tracking-[-0.02em] text-muted transition-colors duration-500 ease-out sm:text-[28px]">
                 {subline}
               </p>
             </LandingHomeHeroFadeUp>

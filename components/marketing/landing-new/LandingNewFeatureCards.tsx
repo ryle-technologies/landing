@@ -43,22 +43,22 @@ const cardVisualConsoleClassName =
 const cardVisualMonitorClassName =
   "relative h-32 w-full min-w-0 overflow-hidden"
 
-const FEATURE_KICKER = "Platform"
+const FEATURE_KICKER = "Ryle Platform"
 
-const FEATURE_TITLE_PREFIX = "One backend."
-const FEATURE_TITLE_ACCENT = "Plugs into everything you already run"
+const FEATURE_TITLE_PREFIX = "A modular architecture."
+const FEATURE_TITLE_ACCENT = "Plugs into the products you already run"
 
-const EVM_TITLE = "Any EVM network."
+const EVM_TITLE = "We settle in any EVM."
 
 const EVM_BODY =
   "Ethereum, Base, Arbitrum, Polygon and more. One API, every network you already use."
 
-const DEVELOPERS_TITLE = "Built for devs & AI."
+const DEVELOPERS_TITLE = "Seamless integration."
 
 const DEVELOPERS_BODY =
   "Integrate in days. Works from your codebase and from the AI tools your team already uses."
 
-const MONITORING_TITLE = "Live monitoring."
+const MONITORING_TITLE = "Built-in monitoring."
 
 const MONITORING_BODY =
   "Every mint, transfer, disclosure and policy change, as it happens. Attributed. Exportable."
@@ -224,7 +224,7 @@ export function LandingNewFeatureCards() {
     >
       <LatticePlate fill>
         <p className={kickerClassName}>{FEATURE_KICKER}</p>
-        <div className="mt-3 min-w-0 md:mt-4 md:max-w-[56rem]">
+        <div className="mt-3 min-w-0 md:mt-4">
           <LandingNewPillarsHeading
             headingId="landing-new-features-heading"
             prefix={FEATURE_TITLE_PREFIX}
