@@ -45,7 +45,12 @@ const cardVisualMonitorClassName =
 
 const FEATURE_KICKER = "Ryle Platform"
 
-const FEATURE_TITLE_PREFIX = "A modular platform that plugs into your"
+const FEATURE_TITLE_PREFIX = "A modular platform that plugs"
+const FEATURE_TITLE_PREFIX_LINES = [
+  "A modular platform",
+  "that plugs into your",
+] as const
+const FEATURE_TITLE_ACCENT_LEAD = "into your"
 const FEATURE_TITLE_ACCENT = "existing products"
 
 const EVM_TITLE = "We settle in any EVM."
@@ -208,10 +213,10 @@ function FeatureCardsMobile() {
 
 /**
  * Three equal cards (first row indented one cell), then a 2/3 privacy cell
- * and a 1/3 cloud cell. Two `LatticeGrid`s so each row shares one bottom
+ * and a 1/3 cloud cell. Separate `LatticeGrid`s so each row shares one bottom
  * line; the cells carry the stroke and the paper.
  *
- * Below `md`, those five cards become a single horizontal carousel.
+ * Below `md`, the five cards become a single horizontal carousel.
  */
 export function LandingNewFeatureCards() {
   const isMobile = useIsMobileFeatureCarousel()
@@ -228,9 +233,11 @@ export function LandingNewFeatureCards() {
           <LandingNewPillarsHeading
             headingId="landing-new-features-heading"
             prefix={FEATURE_TITLE_PREFIX}
+            prefixLines={FEATURE_TITLE_PREFIX_LINES}
+            accentLead={FEATURE_TITLE_ACCENT_LEAD}
+            accentLeadFrom="md"
             accent={FEATURE_TITLE_ACCENT}
             accentOnOwnLine
-            accentWrap
             accentUnderline={false}
           />
         </div>

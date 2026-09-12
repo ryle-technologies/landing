@@ -28,6 +28,8 @@ type LandingNewPillarsHeadingProps = {
   prefixLines?: readonly string[]
   /** Roman words that sit with the accent (e.g. "so" before an italic close). */
   accentLead?: string
+  /** Hide `accentLead` below `md` when those words already live in `prefixLines`. */
+  accentLeadFrom?: "md"
   accent: string
   /** Start the accent on a new line after the prefix. `"mobile"` only below `md`. */
   accentOnOwnLine?: boolean | "mobile"
@@ -51,6 +53,7 @@ export function LandingNewPillarsHeading({
   prefix,
   prefixLines,
   accentLead,
+  accentLeadFrom,
   accent,
   accentOnOwnLine = false,
   accentWrap = false,
@@ -63,6 +66,8 @@ export function LandingNewPillarsHeading({
   const prefixStacksOnMobile = prefixSegments.length > 1
   const prefixWrapClassName =
     accentOnOwnLineAlways && !accentWrap ? "whitespace-nowrap" : "inline"
+  const accentLeadClassName =
+    accentLeadFrom === "md" ? "hidden md:inline" : "inline"
   const accentItalicClassName = accentItalic
     ? "font-serif font-normal italic tracking-[-0.03em]"
     : ""
@@ -134,7 +139,7 @@ export function LandingNewPillarsHeading({
             </span>
           ))}
         </span>
-        <span className="hidden md:inline">
+        <span className={`hidden md:inline ${prefixWrapClassName}`}>
           {renderPrefixText(prefix, animated)}
         </span>
       </>
@@ -187,7 +192,9 @@ export function LandingNewPillarsHeading({
             {renderPrefix(false)}
             {prefixGap}
             <span className={accentWrapClassName}>
-              {accentLead ? `${accentLead} ` : null}
+              {accentLead ? (
+                <span className={accentLeadClassName}>{accentLead} </span>
+              ) : null}
               <span
                 className={[
                   accentUnderline ? "relative inline-block pb-[0.14em]" : "inline",
@@ -205,7 +212,9 @@ export function LandingNewPillarsHeading({
             {renderPrefix(false)}
             {prefixGap}
             <span className={accentWrapClassName}>
-              {accentLead ? `${accentLead} ` : null}
+              {accentLead ? (
+                <span className={accentLeadClassName}>{accentLead} </span>
+              ) : null}
               <span className={accentItalicClassName}>{accent}.</span>
             </span>
           </span>
@@ -216,7 +225,7 @@ export function LandingNewPillarsHeading({
             {/* Period travels with the accent so it can never wrap alone. */}
             <span className={accentWrapClassName}>
               {accentLead ? (
-                <>
+                <span className={accentLeadClassName}>
                   <TextEffect
                     per="word"
                     as="span"
@@ -228,7 +237,7 @@ export function LandingNewPillarsHeading({
                   >
                     {accentLead}
                   </TextEffect>{" "}
-                </>
+                </span>
               ) : null}
               <span
                 className={[

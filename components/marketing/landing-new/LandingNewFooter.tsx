@@ -14,13 +14,16 @@ import { landingViewportBleedClassName } from "@/lib/landingLayout"
 import { LATTICE_SPACE } from "@/lib/landingLattice"
 import { FOOTER_DOCS_COLUMNS } from "@/lib/siteNav"
 
-const CELL_PAD = LATTICE_SPACE.inset
+const CELL_PAD =
+  "px-4 py-3 md:p-8 [&_ul]:mt-2 [&_ul]:gap-2 md:[&_ul]:mt-3 md:[&_ul]:gap-2.5"
 
 /** Same 5-cell cards as the platform feature row when two fit. */
 const FOOTER_CARD_COLS = 5
 /** Two columns of 2 cells; 5-cell mobile stays two-up instead of stacking. */
 const FOOTER_ROW_MIN_COLS = 4
 const FOOTER_CARD_MIN_ROWS = 5
+/** Phone two-up: hug the link list instead of matching the 5-row desktop cards. */
+const FOOTER_CARD_MIN_ROWS_COMPACT = 3
 
 const FOOTER_MARQUEE_WORDS = ["Issue", "Move", "Lend", "Yours"] as const
 
@@ -39,9 +42,11 @@ function FooterCard({ index, children }: { index: number; children: ReactNode })
   const { cols } = useLatticeGrid()
   const cardCols = footerCardCols(cols, index)
   const colStart = index === 0 && cols >= FOOTER_CARD_COLS * 3 + 1 ? 2 : undefined
+  const compact = cols < FOOTER_CARD_COLS * 2
+  const minRows = compact ? FOOTER_CARD_MIN_ROWS_COMPACT : FOOTER_CARD_MIN_ROWS
 
   return (
-    <LatticeCell cols={cardCols} minRows={FOOTER_CARD_MIN_ROWS} colStart={colStart}>
+    <LatticeCell cols={cardCols} minRows={minRows} colStart={colStart}>
       {children}
     </LatticeCell>
   )
@@ -62,8 +67,15 @@ export function LandingNewFooter() {
       snap={false}
       className={LATTICE_SPACE.sectionTop}
     >
-      <nav aria-label="Site">
-        <LatticeGrid minCols={FOOTER_ROW_MIN_COLS} stroke equalRows>
+      <nav
+        aria-label="Site"
+        className={`${landingViewportBleedClassName} md:left-auto md:w-full md:max-w-none md:translate-x-0`}
+      >
+        <LatticeGrid
+          minCols={FOOTER_ROW_MIN_COLS}
+          stroke
+          className="max-md:![grid-template-columns:repeat(auto-fill,minmax(64px,1fr))]"
+        >
           {FOOTER_DOCS_COLUMNS.map((column, index) => (
             <FooterCard key={column.heading} index={index}>
               <FooterSitemapColumn column={column} className={CELL_PAD} />

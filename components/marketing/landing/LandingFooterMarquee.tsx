@@ -7,12 +7,14 @@ const footerStatementClassName =
 
 const sizeClassName = {
   default: "text-[clamp(3.05rem,10.7vw,5.25rem)]",
-  display: "text-[clamp(7rem,26vw,16rem)]",
+  display:
+    "text-[clamp(4.5rem,22vw,16rem)] md:text-[clamp(7rem,26vw,16rem)]",
 } as const;
 
 const frameClassName = {
   default: "h-[clamp(6.2rem,19vw,10.5rem)]",
-  display: "h-[clamp(7.5rem,22vw,13.5rem)]",
+  display:
+    "h-[clamp(5.25rem,18vw,13.5rem)] md:h-[clamp(7.5rem,22vw,13.5rem)]",
 } as const;
 
 const cropClassName = {
