@@ -122,7 +122,7 @@ export function LandingFooterRights({
     <div
       className={
         stacked
-          ? `flex h-full min-w-0 flex-col items-start justify-between gap-6 text-left ${className}`
+          ? `flex h-full min-w-0 flex-col items-start justify-start gap-4 text-left ${className}`
           : `flex min-w-0 flex-nowrap items-center justify-between gap-3 text-left ${className}`
       }
     >
@@ -136,7 +136,7 @@ export function LandingFooterRights({
       <span
         className={
           stacked
-            ? "text-left text-xs font-normal leading-none tracking-[-0.01em] text-muted/60"
+            ? "text-left text-[11px] font-normal leading-none tracking-[-0.01em] text-muted/60 md:text-xs"
             : "shrink-0 text-right text-xs font-normal leading-none tracking-[-0.01em] text-muted/60"
         }
       >

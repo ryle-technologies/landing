@@ -10,10 +10,10 @@ import {
 } from "@/lib/siteNav"
 
 const footerLinkClassName =
-  "text-[15px] font-normal leading-snug tracking-[-0.01em] text-muted underline-offset-2 transition-colors duration-500 ease-out hover:text-foreground hover:underline focus-visible:rounded-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-foreground"
+  "text-[13px] font-normal leading-snug tracking-[-0.01em] text-muted underline-offset-2 transition-colors duration-500 ease-out hover:text-foreground hover:underline focus-visible:rounded-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-foreground md:text-[15px]"
 
 const footerHeadingClassName =
-  "text-xs font-medium tracking-[-0.01em] text-muted/65 transition-colors duration-500 ease-out"
+  "text-[11px] font-medium tracking-[-0.01em] text-muted/65 transition-colors duration-500 ease-out md:text-xs"
 
 function FooterNavAnchor({ link }: { link: FooterNavLink }) {
   const externalProps =
