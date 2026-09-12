@@ -65,7 +65,7 @@ export function LandingNewPillarsHeading({
   const prefixSegments = prefixLines ?? [prefix]
   const prefixStacksOnMobile = prefixSegments.length > 1
   const prefixWrapClassName =
-    accentOnOwnLineAlways && !accentWrap ? "whitespace-nowrap" : "inline"
+    accentOnOwnLineAlways && !accentWrap ? "whitespace-nowrap" : ""
   const accentLeadClassName =
     accentLeadFrom === "md" ? "hidden md:inline" : "inline"
   const accentItalicClassName = accentItalic
@@ -139,7 +139,11 @@ export function LandingNewPillarsHeading({
             </span>
           ))}
         </span>
-        <span className={`hidden md:inline ${prefixWrapClassName}`}>
+        <span
+          className={["max-md:hidden md:inline", prefixWrapClassName]
+            .filter(Boolean)
+            .join(" ")}
+        >
           {renderPrefixText(prefix, animated)}
         </span>
       </>
@@ -186,7 +190,10 @@ export function LandingNewPillarsHeading({
           {lead}
         </span>
       ) : null}
-      <span aria-hidden className={`${restClassName} ${displayClassName}`}>
+      <span
+        aria-hidden
+        className={`${restClassName} ${displayClassName} [&_.sr-only]:hidden`}
+      >
         {reduceMotion ? (
           <>
             {renderPrefix(false)}
