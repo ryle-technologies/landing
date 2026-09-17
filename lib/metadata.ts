@@ -57,17 +57,24 @@ export const DEFAULT_SITE_TITLE =
 export const DEFAULT_SITE_DESCRIPTION =
   "Modular financial infrastructure for companies: stablecoins, wallets, cross-border payments and cards, live in weeks. Runs in your cloud. Private by default.";
 
+/** Alt text for the static default share card (`app/opengraph-image.png`). */
+export const DEFAULT_OG_IMAGE_ALT = "Ryle — Build and scale digital assets";
+
 /**
  * Shared root metadata merged in [`app/layout.tsx`](app/layout.tsx) with `icons`.
  *
- * Share images come from the App Router file convention (`app/opengraph-image.png`
- * + `app/twitter-image.png` and their `.alt.txt` siblings). Do not set
- * `openGraph.images` / `twitter.images` here — that would pin crawlers to an
- * unhashed `/opengraph-image.png` URL and keep WhatsApp/Slack on a stale card.
+ * `openGraph.images` must be set here. Exporting `openGraph` without `images`
+ * overrides the App Router file convention and drops `og:image` from HTML.
  */
 export function buildRootMetadata(): Metadata {
   const metadataBase = getMetadataBaseUrl();
   const googleTokens = googleVerificationTokens();
+  const shareImage = {
+    url: "/opengraph-image.png",
+    width: 1200,
+    height: 630,
+    alt: DEFAULT_OG_IMAGE_ALT,
+  };
 
   return {
     metadataBase,
@@ -87,9 +94,11 @@ export function buildRootMetadata(): Metadata {
       type: "website",
       locale: "en_US",
       siteName: "Ryle",
+      images: [shareImage],
     },
     twitter: {
       card: "summary_large_image",
+      images: [{ url: "/twitter-image.png", alt: DEFAULT_OG_IMAGE_ALT }],
     },
     appleWebApp: {
       capable: true,
