@@ -17,6 +17,7 @@ import {
   HERO_UNDERLINE_PAUSE_S,
   landingHeroLettersDoneS,
 } from "@/lib/landingHeroIntro"
+import { usePageVisible } from "@/lib/usePageVisible"
 
 const LETTER_STAGGER_S = HERO_LETTER_STAGGER_S
 const LETTER_DURATION_S = HERO_LETTER_DURATION_S
@@ -84,10 +85,14 @@ export function LandingHeroRotatingWord({
   remeasureKey,
 }: LandingHeroRotatingWordProps) {
   const reduceMotion = useReducedMotion()
+  const pageVisible = usePageVisible()
   const sizerRef = useRef<HTMLSpanElement>(null)
   const latestWordRef = useRef(word)
+  const skipEnterRef = useRef(false)
+  const wasVisibleRef = useRef(true)
   const [hasShown, setHasShown] = useState(false)
   const [displayedWord, setDisplayedWord] = useState(word)
+  const [presenceEpoch, setPresenceEpoch] = useState(0)
   const [underlineReady, setUnderlineReady] = useState(false)
   const underlineRight = useMotionValue(0)
   const underlineClipPath = useTransform(
@@ -107,6 +112,43 @@ export function LandingHeroRotatingWord({
   useLayoutEffect(() => {
     latestWordRef.current = word
   }, [word])
+
+  /*
+   * Background tabs pause Motion/WAAPI. AnimatePresence `mode="wait"` can
+   * then sit on a never-finishing exit (`onExitComplete` never runs, the
+   * slot stays empty) or leave the next word at `opacity: 0`. Drop the
+   * stuck presence tree when the page is shown again and paint the current
+   * word immediately.
+   */
+  useLayoutEffect(() => {
+    const becameVisible = pageVisible && !wasVisibleRef.current
+    wasVisibleRef.current = pageVisible
+    if (!becameVisible) {
+      return
+    }
+    skipEnterRef.current = true
+    setDisplayedWord(latestWordRef.current)
+    setHasShown(true)
+    setPresenceEpoch((epoch) => epoch + 1)
+  }, [pageVisible])
+
+  useLayoutEffect(() => {
+    skipEnterRef.current = false
+  }, [presenceEpoch])
+
+  useLayoutEffect(() => {
+    if (presenceEpoch === 0) {
+      return
+    }
+    const node = sizerRef.current
+    if (!node) {
+      return
+    }
+    const nextWidth = Math.ceil(node.getBoundingClientRect().width)
+    if (nextWidth > 0) {
+      slotWidth.set(nextWidth)
+    }
+  }, [presenceEpoch, slotWidth])
 
   useLayoutEffect(() => {
     const node = sizerRef.current
@@ -228,6 +270,7 @@ export function LandingHeroRotatingWord({
         style={{ clipPath: "inset(-0.55em -0.4em)", width: slotWidth }}
       >
         <AnimatePresence
+          key={presenceEpoch}
           mode="wait"
           onExitComplete={() => setDisplayedWord(latestWordRef.current)}
         >
@@ -235,7 +278,7 @@ export function LandingHeroRotatingWord({
             <motion.span
               key={displayedWord}
               className="whitespace-nowrap"
-              initial="hidden"
+              initial={skipEnterRef.current ? false : "hidden"}
               animate="show"
               exit="exit"
               onAnimationComplete={() => setHasShown(true)}

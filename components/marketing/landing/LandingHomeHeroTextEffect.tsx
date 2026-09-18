@@ -14,6 +14,7 @@ import {
   landingHeroPrefixEnterDelayS,
 } from "@/lib/landingHeroIntro"
 import { useReducedMotion } from "motion/react"
+import { usePageVisible } from "@/lib/usePageVisible"
 
 const SM_MIN_PX = 640
 const FIT_SAMPLE_PX = 100
@@ -137,6 +138,7 @@ export function LandingHomeHeroTextEffect({
     className ?? landingHeroH1ClassName
   }`
   const reduceMotion = useReducedMotion()
+  const pageVisible = usePageVisible()
   const [wordIndex, setWordIndex] = useState(0)
   const rotatingWord = rotatingWords?.[wordIndex] ?? null
   const enterDelay = landingHeroPrefixEnterDelayS(title)
@@ -153,7 +155,7 @@ export function LandingHomeHeroTextEffect({
   const fitStyle = fontPx != null ? { fontSize: fontPx } : undefined
 
   useEffect(() => {
-    if (!rotatingWords || rotatingWords.length < 2) {
+    if (!rotatingWords || rotatingWords.length < 2 || !pageVisible) {
       return
     }
 
@@ -167,7 +169,7 @@ export function LandingHomeHeroTextEffect({
     }, waitMs)
 
     return () => window.clearTimeout(id)
-  }, [firstMorphWaitMs, reduceMotion, rotatingWords, wordIndex])
+  }, [firstMorphWaitMs, pageVisible, reduceMotion, rotatingWords, wordIndex])
 
   const fullTitle = rotatingWord ? `${title} ${rotatingWord}.` : title
   const fitSizer = rotatingWord ? (
