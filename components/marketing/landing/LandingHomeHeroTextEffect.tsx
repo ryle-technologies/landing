@@ -18,10 +18,10 @@ import { usePageVisible } from "@/lib/usePageVisible"
 
 const SM_MIN_PX = 640
 const FIT_SAMPLE_PX = 100
-/** Matches `sm:text-[clamp(72px,14vw,120px)]` — ceiling before shrinking to fit. */
-const DISPLAY_FIT_MIN_PX = 72
-const DISPLAY_FIT_MAX_PX = 120
-const DISPLAY_FIT_VW = 0.14
+/** Matches `sm:text-[88px]` — ceiling before shrinking to fit. */
+const DISPLAY_FIT_MIN_PX = 40
+const DISPLAY_FIT_MAX_PX = 88
+const DISPLAY_FIT_VW = 0.12
 const DISPLAY_FIT_SAFETY = 0.98
 
 function desiredDisplayPx(viewportWidth: number) {
@@ -119,19 +119,34 @@ type LandingHomeHeroTextEffectProps = {
    * cycles through these verbs (x.ai-style letter morph).
    */
   rotatingWords?: readonly string[]
+  /** Second line inside the same `<h1>` (supporting sentence). */
+  subtitle?: string
+  /** Seconds before the subtitle blur reveal. */
+  subtitleDelay?: number
   /** Overrides the default serif h1 scale (home lattice display type). */
   className?: string
 }
 
 /**
+ * Second h1 line: same display face, stepped down under the rotating title.
+ * Full column width below `sm` (normal wrap). `text-balance` only from `sm`,
+ * where the line is long enough that balancing does not pull it in from the title.
+ */
+const HERO_SUBTITLE_CLASS =
+  "mt-[0.55em] block w-full whitespace-normal text-[clamp(20px,4.2vw,32px)] leading-[1.12] tracking-tighter sm:text-balance sm:text-[clamp(24px,2.6vw,36px)]"
+
+/**
  * Hero headline: per-word blur on `sm+`. Below `sm` with rotating words,
  * two nowrap lines (prefix / word) sized to the column; otherwise `titleTwoLine`.
  * Single `<h1>` for SEO — responsive variants are inner spans only.
+ * Optional `subtitle` is a second block line under the title animation.
  */
 export function LandingHomeHeroTextEffect({
   title,
   titleTwoLine,
   rotatingWords,
+  subtitle,
+  subtitleDelay = 0,
   className,
 }: LandingHomeHeroTextEffectProps) {
   const heroH1ClassName = `relative text-left text-foreground ${
@@ -152,7 +167,7 @@ export function LandingHomeHeroTextEffect({
     fitLines,
     Boolean(rotatingWord),
   )
-  const fitStyle = fontPx != null ? { fontSize: fontPx } : undefined
+  const titleFitStyle = fontPx != null ? { fontSize: fontPx } : undefined
 
   useEffect(() => {
     if (!rotatingWords || rotatingWords.length < 2 || !pageVisible) {
@@ -172,6 +187,7 @@ export function LandingHomeHeroTextEffect({
   }, [firstMorphWaitMs, pageVisible, reduceMotion, rotatingWords, wordIndex])
 
   const fullTitle = rotatingWord ? `${title} ${rotatingWord}.` : title
+  const accessibleTitle = subtitle ? `${fullTitle} ${subtitle}` : fullTitle
   const fitSizer = rotatingWord ? (
     <span
       ref={sizerRef}
@@ -187,23 +203,48 @@ export function LandingHomeHeroTextEffect({
     </span>
   ) : null
 
+  const subtitleLine = subtitle ? (
+    reduceMotion ? (
+      <span aria-hidden className={HERO_SUBTITLE_CLASS}>
+        {subtitle}
+      </span>
+    ) : (
+      <span aria-hidden className="block w-full">
+        <TextEffect
+          per="word"
+          as="span"
+          preset="blur"
+          className={HERO_SUBTITLE_CLASS}
+          delay={subtitleDelay}
+          speedReveal={HERO_TEXT_SPEED_REVEAL}
+          speedSegment={HERO_TEXT_SPEED_SEGMENT}
+        >
+          {subtitle}
+        </TextEffect>
+      </span>
+    )
+  ) : null
+
   if (!rotatingWord) {
     if (reduceMotion) {
       return (
-        <h1 className={heroH1ClassName} aria-label={title}>
-          <span className="whitespace-pre-line sm:hidden">{titleTwoLine}</span>
+        <h1 className={heroH1ClassName} aria-label={accessibleTitle}>
+          <span className="block whitespace-pre-line sm:hidden">
+            {titleTwoLine}
+          </span>
           <span className="hidden sm:block">{title}</span>
+          {subtitleLine}
         </h1>
       )
     }
 
     return (
-      <h1 className={heroH1ClassName} aria-label={title}>
+      <h1 className={heroH1ClassName} aria-label={accessibleTitle}>
         <TextEffect
           per="line"
           as="span"
           preset="blur"
-          className={`block sm:hidden`}
+          className="block sm:hidden"
           speedReveal={HERO_TEXT_SPEED_REVEAL}
           speedSegment={HERO_TEXT_SPEED_SEGMENT}
         >
@@ -213,38 +254,38 @@ export function LandingHomeHeroTextEffect({
           per="word"
           as="span"
           preset="blur"
-          className={`hidden sm:block`}
+          className="hidden sm:block"
           speedReveal={HERO_TEXT_SPEED_REVEAL}
           speedSegment={HERO_TEXT_SPEED_SEGMENT}
         >
           {title}
         </TextEffect>
+        {subtitleLine}
       </h1>
     )
   }
 
   if (reduceMotion) {
     return (
-      <h1 ref={h1Ref} className={heroH1ClassName} style={fitStyle}>
-        <span className="sr-only">{fullTitle}</span>
-        <span aria-hidden className="block whitespace-nowrap sm:hidden">
-          {title}
+      <h1 ref={h1Ref} className={heroH1ClassName}>
+        <span className="sr-only">{accessibleTitle}</span>
+        <span aria-hidden className="block" style={titleFitStyle}>
+          <span className="block whitespace-nowrap sm:hidden">{title}</span>
+          <span className="block whitespace-nowrap sm:hidden">
+            {`${rotatingWord}.`}
+          </span>
+          <span className="hidden sm:block">{fullTitle}</span>
         </span>
-        <span aria-hidden className="block whitespace-nowrap sm:hidden">
-          {`${rotatingWord}.`}
-        </span>
-        <span aria-hidden className="hidden sm:inline">
-          {fullTitle}
-        </span>
+        {subtitleLine}
         {fitSizer}
       </h1>
     )
   }
 
   return (
-    <h1 ref={h1Ref} className={heroH1ClassName} style={fitStyle}>
-      <span className="sr-only">{fullTitle}</span>
-      <span aria-hidden>
+    <h1 ref={h1Ref} className={heroH1ClassName}>
+      <span className="sr-only">{accessibleTitle}</span>
+      <span aria-hidden className="block" style={titleFitStyle}>
         <span className="block whitespace-nowrap sm:hidden">
           <TextEffect
             per="word"
@@ -266,7 +307,7 @@ export function LandingHomeHeroTextEffect({
           />
           .
         </span>
-        <span className="hidden sm:inline">
+        <span className="hidden sm:block">
           <TextEffect
             per="word"
             as="span"
@@ -286,6 +327,7 @@ export function LandingHomeHeroTextEffect({
           .
         </span>
       </span>
+      {subtitleLine}
       {fitSizer}
     </h1>
   )

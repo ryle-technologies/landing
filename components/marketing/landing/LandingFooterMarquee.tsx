@@ -28,7 +28,7 @@ type LandingFooterMarqueeProps = {
   className?: string;
   /** Marquee words (defaults to Instant / Private / Verifiable). */
   words?: readonly string[];
-  /** `display` is the closing statement on `/`. Defaults keep `/old-landing` unchanged. */
+  /** `display` is the large closing statement on `/`. */
   size?: keyof typeof sizeClassName;
   /** Sit the words on the container's bottom edge (no downward crop). */
   flush?: boolean;

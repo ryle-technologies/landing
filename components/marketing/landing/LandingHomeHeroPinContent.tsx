@@ -34,6 +34,8 @@ type LandingHomeHeroPinContentProps = {
   eyebrow?: string
   /** Optional smaller line directly under the headline. */
   subline?: string
+  /** When true, `subline` is rendered inside the `<h1>` instead of a sibling `<p>`. */
+  sublineInH1?: boolean
   /** Seconds before the subline fade-up. */
   sublineDelay?: number
   /** Primary CTA label (defaults to {@link LANDING_MARKETING_CTA_LABEL}). */
@@ -54,6 +56,8 @@ type LandingHomeHeroPinContentProps = {
   topBar?: boolean
   /** Wrap the headline in a lattice-snapped paper plate (new landing). */
   headlinePlate?: boolean
+  /** Copy inset inside the headline plate. Off so type sits on the column edge. */
+  plateInset?: boolean
   /** Default pill CTA inside the plate. Off when the new landing draws its own. */
   showCta?: boolean
   /** Supported-networks cluster beside the pill. */
@@ -82,7 +86,7 @@ export function LandingHomeHeroTopBar({
         href="/"
         aria-label="Ryle — go to home"
         className={[
-          "relative z-10 inline-flex items-baseline gap-1 self-baseline py-2 sm:gap-1.5 sm:py-2.5",
+          "relative z-10 inline-flex items-baseline gap-1 py-2 sm:gap-1.5 sm:py-2.5",
           "no-underline transition-opacity duration-500 ease-out hover:opacity-80 focus-visible:rounded-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-foreground",
         ].join(" ")}
       >
@@ -110,6 +114,7 @@ export function LandingHomeHeroPinContent({
   heroTitleTwoLine,
   eyebrow,
   subline,
+  sublineInH1 = false,
   sublineDelay = 0,
   ctaLabel = LANDING_MARKETING_CTA_LABEL,
   rotatingWords,
@@ -120,6 +125,7 @@ export function LandingHomeHeroPinContent({
   ctaRowClassName = "mt-10 flex w-full min-w-0 items-start justify-start text-left sm:mt-12",
   topBar = true,
   headlinePlate = false,
+  plateInset = true,
   showCta = true,
   showNetworks = true,
   afterPlate,
@@ -151,14 +157,19 @@ export function LandingHomeHeroPinContent({
             {eyebrow}
           </p>
         ) : null}
-        <Plate className={plateClassName}>
+        <Plate
+          className={plateClassName}
+          {...(headlinePlate ? { inset: plateInset } : {})}
+        >
           <LandingHomeHeroTextEffect
             title={heroTitle}
             titleTwoLine={heroTitleTwoLine}
             rotatingWords={rotatingWords}
             className={heroTitleClassName}
+            subtitle={sublineInH1 ? subline : undefined}
+            subtitleDelay={sublineInH1 ? sublineDelay : 0}
           />
-          {subline ? (
+          {subline && !sublineInH1 ? (
             <LandingHomeHeroFadeUp
               delay={sublineDelay}
               className="mt-4 max-w-[56rem] sm:mt-5"

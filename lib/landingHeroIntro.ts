@@ -12,11 +12,8 @@ export const HERO_UNDERLINE_EASE = [0.22, 1, 0.36, 1] as const
 export const HERO_FIRST_RAINBOW_S = 1
 /** Hold each rotating word before morphing to the next. */
 export const HERO_ROTATING_WORD_HOLD_MS = 3000
-/** Subtitle fade starts just after the first word change. */
-export const HERO_SUBLINE_AFTER_MORPH_S = 0.2
-/** Matches `LandingHomeHeroFadeUp` duration, plus a beat before the CTA. */
-export const HERO_SUBLINE_FADE_S = 0.6
-export const HERO_CTA_AFTER_SUBLINE_S = 0.2
+/** Subtitle, CTA, and supported networks start this long after the h1 reveal. */
+export const HERO_AFTER_HEADLINE_S = 0.5
 
 export function landingHeroPrefixEnterDelayS(prefix: string): number {
   return prefix.trim().split(/\s+/).filter(Boolean).length * HERO_WORD_STAGGER_S
@@ -45,8 +42,9 @@ export function landingHeroIntroDelays(prefix: string, firstWord: string) {
   const underlineStart = lettersDone + HERO_UNDERLINE_PAUSE_S
   const underlineDone = underlineStart + HERO_UNDERLINE_DURATION_S
   const firstMorph = underlineDone + HERO_FIRST_RAINBOW_S
-  const subline = firstMorph + HERO_SUBLINE_AFTER_MORPH_S
-  const cta = subline + HERO_SUBLINE_FADE_S + HERO_CTA_AFTER_SUBLINE_S
+  const afterHeadline = underlineDone + HERO_AFTER_HEADLINE_S
+  const subline = afterHeadline
+  const cta = afterHeadline
 
   return {
     enterDelay,

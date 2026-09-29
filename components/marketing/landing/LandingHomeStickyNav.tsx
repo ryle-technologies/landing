@@ -49,7 +49,7 @@ export function LandingHomeNavFadeOutMarker() {
   )
 }
 
-/** Top scroll fade — same pattern as {@link LandingHomeBanksConsole} (vertical: solid top → transparent bottom). */
+/** Top scroll fade — solid at the top, transparent at the bottom. */
 const landingNavTopScrollFadeStyle = {
   WebkitMaskImage: "linear-gradient(to bottom, black, transparent)",
   maskImage: "linear-gradient(to bottom, black, transparent)",

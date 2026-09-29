@@ -7,12 +7,14 @@ export const landingHeroH1ClassName =
   "font-serif font-normal italic leading-snug tracking-normal text-[28px] sm:text-[36px]"
 
 /**
- * Giant display type for the home landing h1.
- * Below `sm` the headline is two nowrap lines, so the floor is lower and
- * `LandingHomeHeroTextEffect` shrinks further to the lattice column.
+ * Home landing h1 — 88px display type.
+ * Sized so the longest rotating line ("ship your own cross-border.")
+ * stays on one line inside the 1024px lattice column.
+ * Below `sm`, `LandingHomeHeroTextEffect` may shrink further so nowrap
+ * lines still fit the column.
  */
 export const landingNewHeroDisplayClassName =
-  "font-sans text-[clamp(36px,11vw,72px)] leading-none tracking-tighter text-foreground sm:text-[clamp(72px,14vw,120px)]"
+  "font-sans text-[clamp(40px,12vw,88px)] leading-none tracking-tighter text-foreground sm:text-[88px]"
 
 /** Section-scale display type — same face and tracking as the h1, stepped down. */
 export const landingNewSectionDisplayClassName =
