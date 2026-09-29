@@ -43,12 +43,12 @@ export default function robots(): MetadataRoute.Robots {
       {
         userAgent: "*",
         allow: ["/"],
-        disallow: ["/api/", "/old-landing"],
+        disallow: ["/api/"],
       },
       {
         userAgent: aiAgents,
         allow: ["/"],
-        disallow: ["/api/", "/old-landing"],
+        disallow: ["/api/"],
       },
     ],
     sitemap: `${origin}/sitemap.xml`,

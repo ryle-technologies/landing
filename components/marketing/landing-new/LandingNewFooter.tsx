@@ -1,7 +1,7 @@
 "use client"
 
 import type { ReactNode } from "react"
-import { LandingFooterRights } from "@/components/marketing/landing/LandingHomeBuildingNewBlock"
+import { LandingFooterRights } from "@/components/marketing/landing/LandingFooterRights"
 import { LandingFooterMarquee } from "@/components/marketing/landing/LandingFooterMarquee"
 import { FooterSitemapColumn } from "@/components/marketing/landing/LandingFooterSitemap"
 import {

@@ -132,11 +132,12 @@ cell edges are all on lines by construction.
 6. **Copy inset:** `LATTICE_SPACE.inset` (`p-6 md:p-8`) inside cells;
    `LatticePlate` handles its own. Display type is 72px+ so plates have no
    horizontal inset on the 5-cell mobile column.
-7. **Don't put the lattice on `/`.** The shared components
-   (`LandingHomeHeroPinContent`, `LandingHomeStickyNav`,
-   `LandingHomeBuildingNewBlock`, `LandingFooterSitemap`) take opt-in props
-   (`headlinePlate`, `sentinelInFlow`, `sitemapInColumn`, `contentClassName`)
-   whose defaults keep the original landing unchanged.
+7. **Keep lattice props opt-in on shared components.**
+   `LandingHomeHeroPinContent`, `LandingHomeStickyNav`, and
+   `LandingFooterSitemap` live under `components/marketing/landing/` and are
+   shared. Lattice behavior (`headlinePlate`, `sentinelInFlow`,
+   `contentClassName`) stays opt-in so those defaults do not assume a lattice
+   parent.
 8. **Motion stays on the lattice.** A card may tween between sizes, but every
    rest pose (full cell or the 64×64 block) has edges ≡ 0 (mod 64) from the
    cell origin. Pin the mini block with snapped `top`/`left` in cell multiples

@@ -25,7 +25,7 @@ const LandingNewLowerSections = dynamic(
     ),
 )
 
-const HERO_TITLE = "Ship your own"
+const HERO_TITLE = "ship your own"
 
 /** Mobile: line 1 is the prefix; the rotating word sits on line 2. */
 const HERO_TITLE_TWO_LINE = HERO_TITLE
@@ -43,7 +43,7 @@ const HERO_ROTATING_WORDS = [
 const HERO_CTA_LABEL = "Talk to us"
 
 const HERO_SUBLINE =
-  "Ryle builds and runs digital assets & financial infrastructure with companies that want to own it."
+  "digital assets & financial infra for the internet economy."
 
 const { subline: HERO_SUBLINE_DELAY_S, cta: HERO_CTA_DELAY_S } =
   landingHeroIntroDelays(HERO_TITLE, HERO_ROTATING_WORDS[0])
@@ -74,12 +74,14 @@ export function LandingNewHero() {
           heroTitleClassName={landingNewHeroDisplayClassName}
           rotatingWords={HERO_ROTATING_WORDS}
           subline={HERO_SUBLINE}
+          sublineInH1
           sublineDelay={HERO_SUBLINE_DELAY_S}
           ctaLabel={HERO_CTA_LABEL}
           heroVisual={null}
           topBar={false}
           headlinePlate
-          plateClassName="mt-16"
+          plateInset={false}
+          plateClassName="mt-32"
           showCta={false}
           showNetworks={false}
           afterPlate={
