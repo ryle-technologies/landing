@@ -165,6 +165,20 @@ select,
   }
 }
 
+/* Below `md`, `--lattice-mask-mobile` wins. Set from LatticeSection when
+ * `gridMaskMobile` is passed (the phone hero uses the pillars fade). */
+.lattice-mask-responsive {
+  -webkit-mask-image: var(--lattice-mask-mobile);
+  mask-image: var(--lattice-mask-mobile);
+}
+
+@media (min-width: 768px) {
+  .lattice-mask-responsive {
+    -webkit-mask-image: var(--lattice-mask);
+    mask-image: var(--lattice-mask);
+  }
+}
+
 /* Same fade as LATTICE_GRID_MASKS.fadeTop. Toggled on the wallet canvas when
  * the section stacks (title above the phone). */
 .lattice-canvas-fade-top {
