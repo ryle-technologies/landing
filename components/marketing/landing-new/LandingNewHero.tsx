@@ -42,8 +42,11 @@ const HERO_ROTATING_WORDS = [
 
 const HERO_CTA_LABEL = "Talk to us"
 
-const HERO_SUBLINE =
+const HERO_EYEBROW =
   "digital assets & financial infra for the internet economy."
+
+const HERO_SUBLINE =
+  "Issue assets, move money in seconds, and put payments and cards inside your product."
 
 const { subline: HERO_SUBLINE_DELAY_S, cta: HERO_CTA_DELAY_S } =
   landingHeroIntroDelays(HERO_TITLE, HERO_ROTATING_WORDS[0])
@@ -65,7 +68,14 @@ export function LandingNewHero() {
         className="relative z-10 h-16"
         padClassName={landingNewColumnHorizontalPadClass}
       />
-      <LatticeSection as="div" grid gridMask="hero" pad={false} className="pb-16 md:pb-32">
+      <LatticeSection
+        as="div"
+        grid
+        gridMask="hero"
+        gridMaskMobile="fadeTopBottom"
+        pad={false}
+        className="pb-16 md:pb-32"
+      >
         <LandingHomeHeroPinContent
           contactHref={LANDING_MARKETING_CONTACT_HREF}
           homeHeroCtaClassName={landingHeroPrimaryCtaClassName}
@@ -73,6 +83,7 @@ export function LandingNewHero() {
           heroTitleTwoLine={HERO_TITLE_TWO_LINE}
           heroTitleClassName={landingNewHeroDisplayClassName}
           rotatingWords={HERO_ROTATING_WORDS}
+          eyebrow={HERO_EYEBROW}
           subline={HERO_SUBLINE}
           sublineInH1
           sublineDelay={HERO_SUBLINE_DELAY_S}
@@ -80,7 +91,6 @@ export function LandingNewHero() {
           heroVisual={null}
           topBar={false}
           headlinePlate
-          plateInset={false}
           plateClassName="mt-32"
           showCta={false}
           showNetworks={false}

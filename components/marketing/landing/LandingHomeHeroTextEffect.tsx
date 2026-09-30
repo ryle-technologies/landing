@@ -18,7 +18,7 @@ import { usePageVisible } from "@/lib/usePageVisible"
 
 const SM_MIN_PX = 640
 const FIT_SAMPLE_PX = 100
-/** Matches `sm:text-[88px]` — ceiling before shrinking to fit. */
+/** Ceiling for the two-line phone fit, before shrinking to the column. */
 const DISPLAY_FIT_MIN_PX = 40
 const DISPLAY_FIT_MAX_PX = 88
 const DISPLAY_FIT_VW = 0.12

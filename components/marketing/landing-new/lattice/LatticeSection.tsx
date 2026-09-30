@@ -65,6 +65,12 @@ type LatticeSectionProps = {
   grid?: boolean
   gridMask?: LatticeGridMask
   /**
+   * Replaces `gridMask` below `md`. The desktop mask stays on `gridMask`.
+   * Used when a short phone section needs the cell-based fade another
+   * section already uses, without changing the percentage mask above `md`.
+   */
+  gridMaskMobile?: LatticeGridMask
+  /**
    * Wash the bottom of the section so cards and lattice dissolve into the page.
    * One cell on small screens; a full card row from `md`.
    */
@@ -90,6 +96,7 @@ export function LatticeSection({
   columnClassName = "",
   grid = true,
   gridMask = "solid",
+  gridMaskMobile,
   contentFade,
   pad = true,
   snap = true,
@@ -127,20 +134,32 @@ export function LatticeSection({
     }
   }, [snap])
 
-  const mask =
-    gridMask in LATTICE_GRID_MASKS
-      ? LATTICE_GRID_MASKS[gridMask as keyof typeof LATTICE_GRID_MASKS]
-      : gridMask
-  const maskStyle: CSSProperties | undefined = mask
-    ? {
-        maskImage: mask,
-        WebkitMaskImage: mask,
-        maskSize: "100% 100%",
-        WebkitMaskSize: "100% 100%",
-        maskRepeat: "no-repeat",
-        WebkitMaskRepeat: "no-repeat",
-      }
-    : undefined
+  const resolveMask = (key: LatticeGridMask | undefined) =>
+    key == null
+      ? undefined
+      : key in LATTICE_GRID_MASKS
+        ? LATTICE_GRID_MASKS[key as keyof typeof LATTICE_GRID_MASKS]
+        : key
+  const mask = resolveMask(gridMask)
+  const maskMobile = resolveMask(gridMaskMobile)
+  const maskStyle: CSSProperties | undefined =
+    mask || maskMobile
+      ? {
+          ...(maskMobile
+            ? {
+                ["--lattice-mask" as string]: mask ?? "none",
+                ["--lattice-mask-mobile" as string]: maskMobile,
+              }
+            : {
+                maskImage: mask,
+                WebkitMaskImage: mask,
+              }),
+          maskSize: "100% 100%",
+          WebkitMaskSize: "100% 100%",
+          maskRepeat: "no-repeat",
+          WebkitMaskRepeat: "no-repeat",
+        }
+      : undefined
 
   return (
     <Tag
@@ -152,7 +171,7 @@ export function LatticeSection({
       {grid ? (
         <div
           aria-hidden
-          className="pointer-events-none absolute inset-0 z-0 overflow-hidden"
+          className={`pointer-events-none absolute inset-0 z-0 overflow-hidden${maskMobile ? " lattice-mask-responsive" : ""}`}
           data-lattice-canvas=""
           style={maskStyle}
         >

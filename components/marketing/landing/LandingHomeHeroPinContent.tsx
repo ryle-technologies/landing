@@ -152,15 +152,15 @@ export function LandingHomeHeroPinContent({
           </div>
         ) : null}
 
-        {eyebrow ? (
-          <p className="mb-4 font-mono text-xs uppercase tracking-wide text-muted transition-colors duration-500 ease-out sm:mb-5">
-            {eyebrow}
-          </p>
-        ) : null}
         <Plate
           className={plateClassName}
           {...(headlinePlate ? { inset: plateInset } : {})}
         >
+          {eyebrow ? (
+            <p className="mb-4 w-full whitespace-normal font-sans text-[clamp(17px,3.6vw,28px)] font-normal leading-[1.12] tracking-tighter text-muted transition-colors duration-500 ease-out sm:mb-5 sm:text-balance sm:text-[clamp(20px,2.2vw,30px)]">
+              {eyebrow}
+            </p>
+          ) : null}
           <LandingHomeHeroTextEffect
             title={heroTitle}
             titleTwoLine={heroTitleTwoLine}
