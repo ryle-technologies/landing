@@ -1,0 +1,1952 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Ryle · Infraestructura financiera para la economía de activos digitales</title>
+  <style>
+    @font-face {
+      font-family: "Geist";
+      src: url("/fonts/geist-sans/Geist-Regular.woff2") format("woff2");
+      font-weight: 400;
+      font-style: normal;
+      font-display: swap;
+    }
+    @font-face {
+      font-family: "Geist";
+      src: url("/fonts/geist-sans/Geist-Medium.woff2") format("woff2");
+      font-weight: 500;
+      font-style: normal;
+      font-display: swap;
+    }
+    @font-face {
+      font-family: "Geist";
+      src: url("/fonts/geist-sans/Geist-SemiBold.woff2") format("woff2");
+      font-weight: 600;
+      font-style: normal;
+      font-display: swap;
+    }
+
+    :root {
+      --page-backdrop: #f5f2ee;
+      --marketing-surface: #f5f2ee;
+      --foreground: #141210;
+      --surface: #ffffff;
+      --muted: #867d73;
+      --muted-light: #a0988e;
+      --border: #e8e4df;
+      --border-strong: #ddd8d2;
+      --background: #ffffff;
+      --ok: #2f5d3a;
+      --warn: #8a4b2a;
+      --font-sans: "Geist", ui-sans-serif, system-ui, sans-serif;
+      --font-serif: "New York", "New York Small", ui-serif, Georgia, "Times New Roman", serif;
+      --slide-w: 1280px;
+      --slide-h: 720px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: #141210;
+      color: var(--foreground);
+      font-family: var(--font-sans);
+      font-size: 16px;
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .deck {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 24px;
+      padding: 32px 16px 64px;
+    }
+
+    .slide {
+      width: var(--slide-w);
+      height: var(--slide-h);
+      background: var(--marketing-surface);
+      color: var(--foreground);
+      position: relative;
+      overflow: hidden;
+      flex-shrink: 0;
+      page-break-after: always;
+      break-after: page;
+    }
+
+    .slide > * { position: relative; z-index: 1; }
+
+    .pad {
+      padding: 48px 60px;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .brand {
+      display: inline-flex;
+      align-items: baseline;
+      gap: 8px;
+      font-family: var(--font-serif);
+      font-size: 24px;
+      font-style: italic;
+      font-weight: 400;
+      line-height: 1;
+      letter-spacing: -0.04em;
+      color: color-mix(in srgb, var(--foreground) 90%, transparent);
+    }
+    .brand .delta { color: var(--muted); }
+
+    .eyebrow {
+      color: var(--muted);
+      font-size: 15px;
+      font-weight: 400;
+    }
+
+    h1, h2 {
+      font-family: var(--font-serif);
+      font-weight: 400;
+      font-style: italic;
+      line-height: 1.15;
+      letter-spacing: -0.03em;
+    }
+    h1 { font-size: 44px; max-width: 920px; }
+    h2 { font-size: 36px; }
+
+    .lede {
+      color: var(--muted);
+      font-family: var(--font-serif);
+      font-style: italic;
+      font-size: 20px;
+      line-height: 1.35;
+      letter-spacing: -0.02em;
+      max-width: none;
+      margin-top: 12px;
+      white-space: nowrap;
+    }
+
+    .footer-bar {
+      margin-top: auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-top: 18px;
+      border-top: none;
+      color: var(--muted);
+      font-size: 12px;
+      letter-spacing: -0.01em;
+    }
+    .footer-bar-plain {
+      border-top: none;
+      padding-top: 18px;
+    }
+
+    /* -- Cover -- */
+    .cover { justify-content: space-between; }
+    .cover .hero-block { margin-top: 72px; }
+    .cover .tagline {
+      margin-top: 18px;
+      font-family: var(--font-serif);
+      font-style: italic;
+      font-size: 22px;
+      color: var(--muted);
+      max-width: 920px;
+      letter-spacing: -0.02em;
+      line-height: 1.3;
+    }
+    .cover .meta {
+      display: flex;
+      gap: 28px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    /* -- What we've built: 4 columns -- */
+    .pillars {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      margin-top: 16px;
+      flex: 1;
+      min-height: 0;
+      align-content: stretch;
+    }
+    .pillar {
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 0;
+      background: color-mix(in srgb, var(--foreground) 3.5%, var(--marketing-surface));
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
+      overflow: hidden;
+    }
+    .pillar .pillar-media {
+      flex: 1 1 auto;
+      width: 100%;
+      height: auto;
+      min-height: 180px;
+      max-height: none;
+      aspect-ratio: auto;
+      margin: 0;
+      box-sizing: border-box;
+      border: none;
+      border-radius: 0;
+      display: block;
+      object-fit: cover;
+      object-position: center top;
+      background: color-mix(in srgb, var(--foreground) 3.5%, var(--marketing-surface));
+    }
+    .pillar .pillar-body {
+      padding: 12px 14px 14px;
+      display: flex;
+      flex-direction: column;
+      flex: 0 0 auto;
+      min-height: 0;
+      box-sizing: border-box;
+    }
+    .pillar .ptitle {
+      font-family: var(--font-serif);
+      font-style: italic;
+      font-size: 17px;
+      font-weight: 500;
+      letter-spacing: -0.02em;
+      margin-bottom: 6px;
+      line-height: 1.2;
+    }
+    .pillar p {
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.4;
+      letter-spacing: -0.01em;
+    }
+    .pillar .meta {
+      margin-top: auto;
+      padding-top: 10px;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 500;
+      letter-spacing: -0.01em;
+      line-height: 1.35;
+    }
+    .tag {
+      border: 1px solid color-mix(in srgb, var(--foreground) 25%, transparent);
+      border-radius: 999px;
+      padding: 5px 10px;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+      line-height: 1;
+    }
+
+    /* -- Advantages -- */
+    .adv-stats {
+      display: flex;
+      gap: 40px;
+      flex: 1;
+      align-items: center;
+      min-height: 0;
+    }
+    .adv-stat .num {
+      font-family: var(--font-serif);
+      font-style: italic;
+      font-size: 56px;
+      line-height: 0.95;
+      letter-spacing: -0.04em;
+    }
+    .adv-stat .cap {
+      margin-top: 6px;
+      color: var(--muted);
+      font-size: 14px;
+      max-width: 220px;
+      letter-spacing: -0.01em;
+      line-height: 1.35;
+    }
+    .adv-bottom {
+      margin-top: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+      flex-shrink: 0;
+    }
+    .compare {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      overflow: hidden;
+      height: auto;
+      align-self: stretch;
+    }
+    .compare > div { padding: 20px 24px; }
+    .compare .bad {
+      background: color-mix(in srgb, var(--warn) 6%, var(--marketing-surface));
+      border-right: 1px solid var(--border);
+    }
+    .compare .good {
+      background: color-mix(in srgb, var(--ok) 6%, var(--marketing-surface));
+    }
+    .compare h3 {
+      font-family: var(--font-serif);
+      font-style: italic;
+      font-size: 20px;
+      font-weight: 500;
+      margin-bottom: 14px;
+      letter-spacing: -0.02em;
+    }
+    ul.checks, ul.crosses {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 9px;
+    }
+    ul.checks li, ul.crosses li {
+      display: flex;
+      gap: 10px;
+      font-size: 14px;
+      letter-spacing: -0.01em;
+      line-height: 1.35;
+    }
+    ul.checks li::before {
+      content: "✓";
+      color: var(--ok);
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+    ul.crosses li::before {
+      content: "×";
+      color: var(--warn);
+      font-weight: 700;
+      flex-shrink: 0;
+      font-size: 15px;
+    }
+    .timeline {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: 14px;
+      padding-top: 14px;
+      border-top: 1px solid var(--border);
+      gap: 24px;
+    }
+    .timeline .label {
+      font-size: 13px;
+      color: var(--muted);
+      letter-spacing: -0.01em;
+    }
+    .timeline .pair {
+      display: flex;
+      gap: 32px;
+      align-items: baseline;
+    }
+    .timeline .old {
+      font-size: 15px;
+      color: var(--muted);
+      text-decoration: line-through;
+    }
+    .timeline .new {
+      font-family: var(--font-serif);
+      font-style: italic;
+      font-size: 28px;
+      letter-spacing: -0.03em;
+    }
+
+    /* -- Dark content slide (pricing-style) -- */
+    .slide-dark {
+      background: #141210;
+      color: #f5f2ee;
+      --foreground: #f5f2ee;
+      --muted: #b5aea6;
+      --border: #2a2825;
+      --border-strong: #3a3733;
+      --marketing-surface: #141210;
+      --surface: #1c1a18;
+    }
+    .slide-dark .card {
+      background: var(--surface);
+      border-color: var(--border);
+    }
+    .slide-dark .card .title {
+      color: var(--foreground);
+    }
+    .slide-dark .card p {
+      color: var(--muted);
+    }
+    .slide-dark .lede {
+      color: var(--muted);
+    }
+    .opp-stack {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 22px;
+      min-height: 0;
+      margin-top: 18px;
+    }
+    .opp-block .opp-kicker {
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+      margin-bottom: 10px;
+    }
+    .opp-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+    }
+    .opp-grid.opp-grid-5 {
+      grid-template-columns: repeat(5, 1fr);
+      gap: 10px;
+    }
+    .opp-grid.opp-grid-5 .card {
+      padding: 14px 12px 16px;
+    }
+    .opp-grid.opp-grid-5 .card .title {
+      font-size: 16px;
+    }
+    .opp-grid.opp-grid-5 .card p {
+      font-size: 11px;
+      line-height: 1.35;
+    }
+    .opp-grid .card {
+      padding: 16px 16px 18px;
+    }
+    .opp-grid .card .label {
+      font-size: 12px;
+      margin-bottom: 6px;
+    }
+    .opp-grid .card .title {
+      font-size: 18px;
+      margin-bottom: 8px;
+    }
+    .opp-grid .card p {
+      font-size: 12px;
+      line-height: 1.4;
+    }
+    .opp-grid .opp-icon {
+      width: 28px;
+      height: 28px;
+      margin-bottom: 10px;
+      color: var(--foreground);
+      opacity: 0.85;
+    }
+    .opp-grid .opp-icon i,
+    .opp-grid .opp-icon svg {
+      display: block;
+      width: 28px;
+      height: 28px;
+      stroke-width: 1.5;
+    }
+    .opp-grid.opp-grid-products .card {
+      min-height: 0;
+    }
+
+    /* -- Section dividers -- */
+    .divider-slide {
+      background: #141210;
+      color: #f5f2ee;
+      --foreground: #f5f2ee;
+      --muted: #b5aea6;
+      --border: #2a2825;
+      --marketing-surface: #141210;
+    }
+    .divider-slide .pad {
+      justify-content: center;
+    }
+    .divider-slide h1 {
+      font-size: 56px;
+      letter-spacing: -0.04em;
+    }
+
+    /* -- Integration three-up -- */
+    .three-up {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 18px;
+      margin-top: 28px;
+      flex: 1;
+      align-content: start;
+    }
+    .three-up .card {
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 22px;
+    }
+    .three-up .card .label {
+      color: var(--muted);
+      font-size: 13px;
+      margin-bottom: 10px;
+    }
+    .three-up .card .title {
+      font-family: var(--font-serif);
+      font-style: italic;
+      font-size: 22px;
+      font-weight: 500;
+      letter-spacing: -0.02em;
+      margin-bottom: 10px;
+      line-height: 1.2;
+    }
+    .three-up .card p {
+      font-size: 14px;
+      color: var(--muted);
+      line-height: 1.45;
+      letter-spacing: -0.01em;
+    }
+
+    /* -- White label integration -- */
+    .wl-grid {
+      display: grid;
+      grid-template-columns: 1.05fr 1fr 1fr;
+      gap: 16px;
+      margin-top: 24px;
+      flex: 1;
+      min-height: 0;
+    }
+    .wl-grid.wl-grid-4 {
+      grid-template-columns: 1.05fr repeat(3, 1fr);
+    }
+    .wl-hero {
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 22px;
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
+    }
+    .wl-col {
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
+      gap: 0;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 0;
+      overflow: hidden;
+      background: color-mix(in srgb, var(--foreground) 3.5%, var(--marketing-surface));
+    }
+    .wl-hero .title {
+      font-family: var(--font-serif);
+      font-style: italic;
+      font-size: 24px;
+      letter-spacing: -0.02em;
+      margin: 10px 0 12px;
+      line-height: 1.2;
+    }
+    .wl-hero p, .wl-col li, .wl-col .wl-card > p {
+      font-size: 14px;
+      color: var(--muted);
+      line-height: 1.45;
+      letter-spacing: -0.01em;
+    }
+    .wl-col .wl-card {
+      border: none;
+      border-radius: 0;
+      padding: 22px;
+      flex: 1;
+      min-height: 0;
+      background: color-mix(in srgb, var(--foreground) 3.5%, var(--marketing-surface));
+    }
+    .wl-hero-list {
+      margin-top: auto;
+      padding-top: 18px;
+      border-top: 1px solid var(--border);
+    }
+    .wl-hero-list .label {
+      color: var(--foreground);
+      font-weight: 600;
+      font-size: 14px;
+      margin-bottom: 12px;
+      letter-spacing: -0.01em;
+    }
+    .wl-hero-list ul {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .wl-hero-list li {
+      padding-left: 14px;
+      position: relative;
+      font-size: 14px;
+      color: var(--foreground);
+      line-height: 1.45;
+      letter-spacing: -0.01em;
+    }
+    .wl-hero-list li::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 7px;
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: var(--foreground);
+      opacity: 0.55;
+    }
+    .wl-col .label {
+      color: var(--foreground);
+      font-weight: 600;
+      font-size: 14px;
+      margin-bottom: 12px;
+      letter-spacing: -0.01em;
+    }
+    .wl-col .idx {
+      font-family: var(--font-serif);
+      font-style: italic;
+      font-size: 16px;
+      color: var(--muted);
+      margin-bottom: 8px;
+    }
+    .wl-col ul {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .wl-col li {
+      padding-left: 14px;
+      position: relative;
+      color: var(--foreground);
+    }
+    .wl-col li::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 7px;
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: var(--foreground);
+      opacity: 0.55;
+    }
+    .wl-col .img-ph,
+    .wl-col .wl-media {
+      flex: 0 0 auto;
+      width: calc(100% - 24px);
+      height: auto;
+      max-height: none;
+      border: none;
+      border-radius: 16px;
+      margin: 12px;
+      display: block;
+      object-fit: contain;
+      object-position: center;
+      background: transparent;
+    }
+    .wl-col .img-ph {
+      min-height: 120px;
+      aspect-ratio: 2 / 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 500;
+      letter-spacing: -0.01em;
+      box-sizing: border-box;
+      background:
+        repeating-linear-gradient(
+          -45deg,
+          transparent,
+          transparent 6px,
+          color-mix(in srgb, var(--foreground) 5%, transparent) 6px,
+          color-mix(in srgb, var(--foreground) 5%, transparent) 7px
+        );
+    }
+    .wl-col .wl-media {
+      background: color-mix(in srgb, var(--foreground) 3.5%, var(--marketing-surface));
+    }
+    .wl-col.wl-col-flush .wl-media {
+      width: 100%;
+      margin: 0;
+      box-sizing: border-box;
+      border: none;
+      border-bottom: 1px solid var(--border);
+      border-radius: 0 0 16px 16px;
+      background: color-mix(in srgb, var(--foreground) 3.5%, var(--marketing-surface));
+    }
+
+    /* -- Module detail: Features / Benefits / Integrations -- */
+    .module-intro {
+      margin-top: 10px;
+      font-size: 15px;
+      color: var(--muted);
+      line-height: 1.45;
+      letter-spacing: -0.01em;
+      max-width: 980px;
+    }
+    .module-cols {
+      display: grid;
+      grid-template-columns: 1.15fr 1fr 0.95fr;
+      gap: 20px;
+      margin-top: 28px;
+      flex: 1;
+      min-height: 0;
+    }
+    .module-cols .col {
+      border-top: 1px solid var(--border);
+      padding-top: 14px;
+    }
+    .module-cols .col h3 {
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+      margin-bottom: 14px;
+      color: var(--muted);
+    }
+    .module-cols ul {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 11px;
+    }
+    .module-cols li {
+      display: flex;
+      gap: 10px;
+      font-size: 14px;
+      letter-spacing: -0.01em;
+      line-height: 1.35;
+    }
+    .module-cols li::before {
+      content: "";
+      width: 5px;
+      height: 5px;
+      margin-top: 6px;
+      border-radius: 50%;
+      background: var(--foreground);
+      opacity: 0.55;
+      flex-shrink: 0;
+    }
+
+    /* -- Suite cards -- */
+    .suite-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 16px;
+      margin-top: 24px;
+      flex: 1;
+      min-height: 0;
+      align-items: stretch;
+    }
+    .suite-grid.suite-grid-4 {
+      grid-template-columns: repeat(4, 1fr);
+    }
+    .suite-card {
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
+      height: 100%;
+      overflow: hidden;
+      background: color-mix(in srgb, var(--foreground) 3.5%, var(--marketing-surface));
+    }
+    .suite-card .img-ph,
+    .suite-card .suite-media {
+      flex: 0 0 auto;
+      width: 100%;
+      height: auto;
+      min-height: 0;
+      margin: 0;
+      box-sizing: border-box;
+      border: none;
+      border-bottom: 1px solid var(--border);
+      border-radius: 0 0 16px 16px;
+      display: block;
+      object-fit: contain;
+      object-position: center;
+      background: color-mix(in srgb, var(--foreground) 3.5%, var(--marketing-surface));
+    }
+    .suite-card .img-ph {
+      aspect-ratio: 1 / 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 500;
+      letter-spacing: -0.01em;
+      background:
+        repeating-linear-gradient(
+          -45deg,
+          transparent,
+          transparent 6px,
+          color-mix(in srgb, var(--foreground) 5%, transparent) 6px,
+          color-mix(in srgb, var(--foreground) 5%, transparent) 7px
+        );
+    }
+    .suite-card .suite-media {
+      background: color-mix(in srgb, var(--foreground) 3.5%, var(--marketing-surface));
+    }
+    .suite-grid.suite-grid-4 .suite-card .img-ph {
+      aspect-ratio: 1 / 1;
+    }
+    .suite-card .suite-body {
+      padding: 16px 18px 18px;
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      min-height: 0;
+      box-sizing: border-box;
+      border-top: none;
+      background: color-mix(in srgb, var(--foreground) 3.5%, var(--marketing-surface));
+    }
+    .suite-grid.suite-grid-4 .suite-card .suite-body {
+      flex: 1;
+    }
+    .suite-card .suite-body p {
+      flex: 1;
+    }
+    .suite-card .idx {
+      font-family: var(--font-serif);
+      font-style: italic;
+      font-size: 16px;
+      color: var(--muted);
+      margin-bottom: 8px;
+    }
+    .suite-card h3 {
+      font-family: var(--font-serif);
+      font-style: italic;
+      font-size: 22px;
+      font-weight: 400;
+      letter-spacing: -0.03em;
+      line-height: 1.2;
+      margin-bottom: 8px;
+    }
+    .suite-grid.suite-grid-4 .suite-card h3 {
+      font-size: 20px;
+    }
+    .suite-card p {
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.4;
+      letter-spacing: -0.01em;
+    }
+    .suite-card .tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 12px;
+    }
+
+    /* -- Closing / next -- */
+    .grid-3 {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 16px;
+      margin-top: 28px;
+    }
+    .grid-4 {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 14px;
+      margin-top: 28px;
+    }
+    .grid-5 {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 12px;
+      margin-top: 28px;
+    }
+    .next-steps-main,
+    .engagement-main,
+    .opportunities-main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      min-height: 0;
+    }
+    .next-steps-main .grid-3,
+    .next-steps-main .grid-4,
+    .next-steps-main .grid-5,
+    .opportunities-main .grid-4,
+    .engagement-main .phases-wrap {
+      flex: 0 0 auto;
+    }
+    .card {
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 22px;
+    }
+    .grid-4 .card {
+      padding: 22px 18px;
+    }
+    .grid-5 .card {
+      padding: 18px 14px;
+    }
+    .card .label { color: var(--muted); font-size: 14px; margin-bottom: 10px; }
+    .card .title {
+      font-family: var(--font-serif);
+      font-style: italic;
+      font-size: 22px;
+      letter-spacing: -0.02em;
+      margin-bottom: 10px;
+      line-height: 1.2;
+    }
+    .grid-4 .card .title {
+      font-size: 22px;
+      margin-bottom: 12px;
+    }
+    .grid-5 .card .title {
+      font-size: 18px;
+      margin-bottom: 10px;
+    }
+    .card p {
+      font-size: 14px;
+      color: var(--muted);
+      line-height: 1.45;
+      letter-spacing: -0.01em;
+    }
+    .grid-4 .card p {
+      font-size: 14px;
+      line-height: 1.45;
+    }
+    .grid-5 .card p {
+      font-size: 12px;
+      line-height: 1.4;
+    }
+    .cta {
+      margin-top: 32px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      align-self: flex-start;
+      width: fit-content;
+      background: var(--foreground);
+      color: var(--marketing-surface);
+      padding: 10px 18px;
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+      border-radius: 999px;
+      text-decoration: none;
+      line-height: 1;
+    }
+    .closing {
+      justify-content: flex-start;
+    }
+    .closing-main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: flex-start;
+      min-height: 0;
+    }
+    .closing .footer-bar {
+      margin-top: 0;
+      width: 100%;
+    }
+
+    .phases-wrap {
+      margin-top: 28px;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      overflow: hidden;
+      background: color-mix(in srgb, var(--foreground) 3.5%, var(--marketing-surface));
+    }
+    .phases {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 0;
+    }
+    .phase {
+      padding: 22px 20px 20px;
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
+      border-right: 1px solid var(--border);
+      background: var(--surface);
+    }
+    .phase:last-child { border-right: none; }
+    .phase .n {
+      font-family: var(--font-serif);
+      font-style: italic;
+      font-size: 26px;
+      color: var(--muted);
+      margin-bottom: 6px;
+      line-height: 1;
+    }
+    .phase .t {
+      font-weight: 600;
+      font-size: 15px;
+      margin-bottom: 4px;
+      letter-spacing: -0.01em;
+    }
+    .phase .when {
+      color: var(--muted);
+      font-size: 12px;
+      margin-bottom: 14px;
+      letter-spacing: -0.01em;
+    }
+    .phase ul {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+      flex: 1;
+    }
+    .phase li {
+      position: relative;
+      padding-left: 12px;
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.4;
+      letter-spacing: -0.01em;
+    }
+    .phase li::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 6px;
+      width: 4px;
+      height: 4px;
+      border-radius: 50%;
+      background: var(--foreground);
+      opacity: 0.45;
+    }
+    .phase .who {
+      margin-top: 16px;
+      padding-top: 12px;
+      border-top: 1px solid var(--border);
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+      color: var(--foreground);
+      line-height: 1.35;
+    }
+    .phase .who .who-label {
+      display: block;
+      color: var(--muted);
+      font-weight: 500;
+      margin-bottom: 4px;
+    }
+
+    @page { size: 13.333in 7.5in; margin: 0; }
+
+    @media print {
+      html, body { background: white; width: 13.333in; margin: 0; padding: 0; }
+      .deck { padding: 0; gap: 0; display: block; }
+      .slide {
+        width: 13.333in;
+        height: 7.5in;
+        page-break-after: always;
+        break-after: page;
+        break-inside: avoid;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+      .slide:last-child { page-break-after: auto; }
+    }
+
+    /* -- Problem pains -- */
+    .pain-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-top: 28px;
+      flex: 1;
+      min-height: 0;
+      align-content: stretch;
+    }
+    .pain-card {
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 22px 24px;
+      background: color-mix(in srgb, var(--foreground) 3.5%, var(--marketing-surface));
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
+    }
+    .pain-card .ptitle {
+      font-family: var(--font-serif);
+      font-style: italic;
+      font-size: 22px;
+      font-weight: 500;
+      letter-spacing: -0.02em;
+      margin-bottom: 10px;
+      line-height: 1.2;
+    }
+    .pain-card p {
+      font-size: 14px;
+      color: var(--muted);
+      line-height: 1.45;
+      letter-spacing: -0.01em;
+    }
+
+    /* -- Services bundles (from pricing) -- */
+    .bundle-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      margin-top: 28px;
+      flex: 1;
+      min-height: 0;
+    }
+    .bundle {
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 24px;
+      background: color-mix(in srgb, var(--foreground) 3.5%, var(--marketing-surface));
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
+    }
+    .bundle.featured {
+      background: color-mix(in srgb, var(--foreground) 10%, var(--marketing-surface));
+      color: var(--foreground);
+      border-color: color-mix(in srgb, var(--foreground) 22%, var(--border));
+    }
+    .bundle.featured .label,
+    .bundle.featured p,
+    .bundle.featured li {
+      color: var(--muted);
+    }
+    .bundle.featured h3,
+    .bundle.featured .price,
+    .bundle.featured li {
+      color: var(--foreground);
+    }
+    .bundle.featured li::before {
+      background: var(--foreground);
+      opacity: 0.55;
+    }
+    .bundle .label {
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 500;
+      margin-bottom: 10px;
+      letter-spacing: -0.01em;
+    }
+    .bundle h3 {
+      font-family: var(--font-serif);
+      font-style: italic;
+      font-size: 26px;
+      font-weight: 400;
+      letter-spacing: -0.03em;
+      margin-bottom: 10px;
+      line-height: 1.15;
+    }
+    .bundle > p {
+      font-size: 14px;
+      color: var(--muted);
+      line-height: 1.45;
+      letter-spacing: -0.01em;
+      margin-bottom: 18px;
+    }
+    .bundle ul {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      flex: 1;
+    }
+    .bundle li {
+      display: flex;
+      gap: 10px;
+      font-size: 14px;
+      letter-spacing: -0.01em;
+      line-height: 1.35;
+    }
+    .bundle li::before {
+      content: "";
+      width: 5px;
+      height: 5px;
+      margin-top: 7px;
+      border-radius: 50%;
+      background: var(--foreground);
+      opacity: 0.55;
+      flex-shrink: 0;
+    }
+    .bundle .price {
+      margin-top: 22px;
+      padding-top: 0;
+      border-top: none;
+      font-family: var(--font-serif);
+      font-style: italic;
+      font-size: 40px;
+      letter-spacing: -0.03em;
+    }
+    .bundle .price span {
+      display: block;
+      margin-top: 8px;
+      font-family: var(--font-sans);
+      font-style: normal;
+      font-size: 13px;
+      letter-spacing: -0.01em;
+      opacity: 0.75;
+    }
+    .bundle .optional {
+      margin-top: 22px;
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 500;
+      letter-spacing: -0.01em;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="deck">
+
+    <!-- 1. Cover -->
+    <section class="slide">
+      <div class="pad cover">
+        <div class="brand"><span class="delta">δ</span> Ryle</div>
+        <div class="hero-block">
+          <p class="eyebrow">Infraestructura para activos digitales</p>
+          <h1 style="margin-top:12px">Estancia San Joaquín</h1>
+          <p class="tagline">Emitir, distribuir y operar con control, cumplimiento y privacidad — sin construir el stack desde cero.</p>
+        </div>
+        <div class="meta">
+          <span>ryle.sh</span>
+          <span>Infraestructura financiera</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- 2. Problem -->
+    <section class="slide">
+      <div class="pad">
+        <h2>El desafío para San Joaquín</h2>
+        <p class="lede">No es solo software: es tiempo, complejidad y capacidad organizacional.</p>
+        <div class="pain-grid">
+          <div class="pain-card">
+            <div class="ptitle">Tiempo de llegada al mercado</div>
+            <p>Un build interno típico lleva 18–24 meses. Mientras tanto, el caso de uso pierde prioridad, el presupuesto se diluye y la ventana competitiva se cierra.</p>
+          </div>
+          <div class="pain-card">
+            <div class="ptitle">Complejidad tecnológica</div>
+            <p>Redes, wallets, identidad, políticas, reporting y privacidad deben encajar. Cada capa suma riesgo de integración y deuda operativa.</p>
+          </div>
+          <div class="pain-card">
+            <div class="ptitle">Equipos y proveedores</div>
+            <p>Hace falta un equipo multidisciplinario difícil de armar — y, en la práctica, varios vendors que no comparten el mismo modelo. El resultado: fricción, retrabajo y dependencia.</p>
+          </div>
+          <div class="pain-card">
+            <div class="ptitle">Control y exposición</div>
+            <p>Operar en infraestructura pública exige control institucional: quién ve qué, bajo qué reglas, con qué auditoría. La transparencia total no es aceptable para el negocio.</p>
+          </div>
+        </div>
+        <div class="footer-bar">
+          <span>ryle.sh</span>
+          <span>Infraestructura financiera</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3. What you get -->
+    <section class="slide">
+      <div class="pad">
+        <h2>Colaboración Ryle × San Joaquín</h2>
+        <p class="lede">Un programa de infraestructura para activos digitales — con control, cumplimiento y solo las capacidades que el caso requiere.</p>
+        <div class="pillars">
+          <div class="pillar">
+            <img class="pillar-media" src="/presentations/built-360.png" alt="Plataforma completa" />
+            <div class="pillar-body">
+              <div class="ptitle">Plataforma completa</div>
+              <p>Emitir, distribuir y operar activos digitales en un solo entorno — sin ensamblar una cadena de proveedores.</p>
+              <div class="meta">Lista para entornos regulados</div>
+            </div>
+          </div>
+          <div class="pillar">
+            <img class="pillar-media" src="/presentations/built-modular.png" alt="Adopción modular" />
+            <div class="pillar-body">
+              <div class="ptitle">Adopción modular</div>
+              <p>Infraestructura, wallet, confidencialidad y back office se pueden incorporar de forma independiente, cuando el caso lo requiera.</p>
+              <div class="meta">Interoperable · Personalizable</div>
+            </div>
+          </div>
+          <div class="pillar">
+            <img class="pillar-media" src="/presentations/built-compliance.png" alt="Control y cumplimiento" />
+            <div class="pillar-body">
+              <div class="ptitle">Control y cumplimiento</div>
+              <p>Roles, políticas, trazabilidad de auditoría y divulgación controlada — alineados a marcos exigentes, incluido mapeo MiCA.</p>
+              <div class="meta">Auditoría · Divulgación bajo control</div>
+            </div>
+          </div>
+          <div class="pillar">
+            <img class="pillar-media" src="/presentations/built-fast.png" alt="Camino corto a producción" />
+            <div class="pillar-body">
+              <div class="ptitle">Camino corto a producción</div>
+              <p>De meses de desarrollo a medida a días en entorno de prueba y semanas hasta un piloto listo para el partner.</p>
+              <div class="meta">Metodología de acompañamiento</div>
+            </div>
+          </div>
+        </div>
+        <div class="footer-bar">
+          <span>ryle.sh</span>
+          <span>Infraestructura financiera</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- 4. Advantages -->
+    <section class="slide">
+      <div class="pad">
+        <h2>Por qué Ryle</h2>
+        <div class="adv-stats">
+          <div class="adv-stat">
+            <div class="num">−75%</div>
+            <div class="cap">Menos tiempo de salida al mercado vs un desarrollo a medida típico de 18–24 meses</div>
+          </div>
+          <div class="adv-stat">
+            <div class="num">−60%</div>
+            <div class="cap">Menor coste de implementación vs ensamblar múltiples proveedores</div>
+          </div>
+          <div class="adv-stat">
+            <div class="num">−90%</div>
+            <div class="cap">Menor esfuerzo relativo que construir y mantener este stack por cuenta propia</div>
+          </div>
+        </div>
+        <div class="adv-bottom">
+          <div class="compare">
+            <div class="bad">
+              <h3>Enfoque tradicional</h3>
+              <ul class="crosses">
+                <li>Poco conocimiento operativo en activos digitales</li>
+                <li>Equipos multidisciplinarios difíciles de armar y retener</li>
+                <li>Múltiples proveedores e integraciones incompatibles</li>
+                <li>Integración compleja con sistemas core existentes</li>
+                <li>Desarrollo a medida para cada capacidad requerida</li>
+              </ul>
+            </div>
+            <div class="good">
+              <h3>Con Ryle</h3>
+              <ul class="checks">
+                <li>Acompañamiento especializado de producto y onboarding del partner</li>
+                <li>Soporte técnico desde el entorno de prueba hasta producción</li>
+                <li>Una plataforma para infraestructura, wallet y confidencialidad</li>
+                <li>Conexión a los sistemas que ya opera su organización</li>
+                <li>Módulos listos: adopte solo lo que el programa necesita</li>
+              </ul>
+            </div>
+          </div>
+          <div class="timeline">
+            <span class="label">Diseñado para acortar el camino de piloto a producción</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 5. PRODUCTS divider -->
+    <section class="slide divider-slide">
+      <div class="pad">
+        <p class="eyebrow">Suite</p>
+        <h1 style="margin-top:12px">Productos</h1>
+        <div class="footer-bar">
+          <span>ryle.sh</span>
+          <span>Infraestructura financiera</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- 6. Suite overview -->
+    <section class="slide">
+      <div class="pad">
+        <h2>La suite de Ryle</h2>
+        <p class="lede">Cuatro productos. Una plataforma. Se adoptan juntos o por separado.</p>
+        <div class="suite-grid suite-grid-4">
+          <div class="suite-card">
+            <img class="suite-media" src="/presentations/suite-blockchain.png" alt="Infraestructura blockchain" />
+            <div class="suite-body">
+              <div class="idx">01</div>
+              <h3>Infraestructura blockchain</h3>
+              <p>Emita y opere RWAs, stablecoins y activos digitales sobre redes públicas compatibles.</p>
+              <div class="tags">
+                <span class="tag">Emisión</span>
+                <span class="tag">Reservas</span>
+              </div>
+            </div>
+          </div>
+          <div class="suite-card">
+            <img class="suite-media" src="/presentations/suite-wallet.png" alt="Wallet white-label" />
+            <div class="suite-body">
+              <div class="idx">02</div>
+              <h3>Wallet white-label</h3>
+              <p>Wallet con su marca para el cliente final: tenencias y transferencias sin complejidad crypto.</p>
+              <div class="tags">
+                <span class="tag">Tu marca</span>
+                <span class="tag">Integrada</span>
+              </div>
+            </div>
+          </div>
+          <div class="suite-card">
+            <img class="suite-media" src="/presentations/suite-confidential.png" alt="Confidencialidad onchain" />
+            <div class="suite-body">
+              <div class="idx">03</div>
+              <h3>Confidencialidad onchain</h3>
+              <p>Saldos y transferencias privados en redes públicas, con divulgación y auditoría cuando corresponda.</p>
+              <div class="tags">
+                <span class="tag">Divulgación selectiva</span>
+                <span class="tag">Auditoría</span>
+              </div>
+            </div>
+          </div>
+          <div class="suite-card">
+            <img class="suite-media" src="/presentations/suite-backoffice.png" alt="Back office" />
+            <div class="suite-body">
+              <div class="idx">04</div>
+              <h3>Back office</h3>
+              <p>Panel de control para gestionar el programa: roles, reporting y trazabilidad de auditoría.</p>
+              <div class="tags">
+                <span class="tag">Panel de control</span>
+                <span class="tag">Operaciones</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="footer-bar">
+          <span>ryle.sh</span>
+          <span>Infraestructura financiera</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- 7. Blockchain Infra -->
+    <section class="slide">
+      <div class="pad">
+        <h2>Infraestructura blockchain</h2>
+        <p class="lede">La base del programa: emitir y operar el activo de punta a punta.</p>
+        <div class="wl-grid">
+          <div class="wl-hero">
+            <div class="label eyebrow">Producto 01</div>
+            <div class="title">Emita, gestione y opere RWAs, stablecoins y activos digitales sobre infraestructura pública.</div>
+            <p>Ryle opera la infraestructura del programa: Panel de control para operaciones, APIs para equipos de producto.</p>
+            <div class="wl-hero-list">
+              <div class="label">Casos de uso</div>
+              <ul>
+                <li>Tokenización de activos inmobiliarios</li>
+                <li>Emisión de valores digitales</li>
+                <li>Tokenización de deuda y préstamos</li>
+                <li>Stablecoins respaldadas por activos</li>
+              </ul>
+            </div>
+          </div>
+          <div class="wl-col wl-col-flush">
+            <img class="wl-media" src="/presentations/bc-infra-features.png" alt="Treasury vs supply" />
+            <div class="wl-card">
+              <div class="label">Características</div>
+              <ul>
+                <li>Ciclo de vida del activo: lanzamiento, emisión, redención, pausa y cierre</li>
+                <li>Conciliación de suministro y reservas</li>
+                <li>Políticas de quién puede operar, límites y listas de control</li>
+                <li>APIs y webhooks para conectar su producto</li>
+                <li>Liquidación en Ethereum, Polygon, Base y más</li>
+              </ul>
+            </div>
+          </div>
+          <div class="wl-col wl-col-flush">
+            <img class="wl-media" src="/presentations/bc-infra-benefits.png" alt="Create assets and connect custody" />
+            <div class="wl-card">
+              <div class="label">Beneficios</div>
+              <ul>
+                <li>Lance sin armar una infraestructura propia</li>
+                <li>Mismo modelo operativo en Panel de control y APIs</li>
+                <li>Entorno de prueba y producción con las mismas capacidades</li>
+                <li>Camino más corto de piloto a producción</li>
+                <li>Control institucional sin ensamblar la infraestructura por cuenta propia</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        <div class="footer-bar">
+          <span>ryle.sh</span>
+          <span>Infraestructura financiera</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- 8. White Label Wallet -->
+    <section class="slide">
+      <div class="pad">
+        <h2>Wallet white-label</h2>
+        <p class="lede">Wallet con su marca para el cliente final — sin complejidad crypto que construir.</p>
+        <div class="wl-grid">
+          <div class="wl-hero">
+            <div class="label eyebrow">Producto 02</div>
+            <div class="title">Distribuya activos digitales bajo su marca, configurado desde el Panel de control.</div>
+            <p>Bancos, fintechs y plataformas ofrecen tenencias y transferencias con su imagen, con el mismo modelo de políticas y auditoría que el resto de la plataforma.</p>
+            <div class="wl-hero-list">
+              <div class="label">Distribución</div>
+              <ul>
+                <li>Web (integrada o independiente)</li>
+                <li>Apps nativas iOS y Android</li>
+                <li>App Store y Google Play</li>
+              </ul>
+            </div>
+          </div>
+          <div class="wl-col wl-col-flush">
+            <img class="wl-media" src="/presentations/wl-features.png" alt="White label wallet balance" />
+            <div class="wl-card">
+              <div class="label">Características</div>
+              <ul>
+                <li>Wallet por usuario desde el primer acceso (gestión desde el Panel de control)</li>
+                <li>Sin seed phrases para usuarios finales</li>
+                <li>Branding y onboarding configurables para sus clientes</li>
+              </ul>
+            </div>
+          </div>
+          <div class="wl-col wl-col-flush">
+            <img class="wl-media" src="/presentations/wl-benefits.png" alt="White label account switcher" />
+            <div class="wl-card">
+              <div class="label">Beneficios</div>
+              <ul>
+                <li>Lance su wallet en semanas</li>
+                <li>Experiencia simple para el cliente; operación clara para su equipo</li>
+                <li>Políticas y auditoría desde el Panel de control</li>
+                <li>Opcional: puede incorporarse en cualquier momento</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        <div class="footer-bar">
+          <span>ryle.sh</span>
+          <span>Infraestructura financiera</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- 9. Confidentiality — peer product, not flagship -->
+    <section class="slide">
+      <div class="pad">
+        <h2>Confidencialidad onchain</h2>
+        <p class="lede">Privacidad operativa en redes públicas, sin renunciar a la auditoría.</p>
+        <div class="wl-grid">
+          <div class="wl-hero">
+            <div class="label eyebrow">Producto 03</div>
+            <div class="title">Privado por defecto. Visible por política. Siempre auditable.</div>
+            <p>Un módulo de la suite: añada confidencialidad a un activo nuevo, a uno existente o a un activo de terceros que su organización soporte.</p>
+            <div class="wl-hero-list">
+              <div class="label">Casos de uso</div>
+              <ul>
+                <li>Stablecoins confidenciales y pagos B2B</li>
+                <li>Tesorería corporativa sin exposición pública</li>
+                <li>Flujos bancarios y de pagos sin libro público</li>
+                <li>Movimientos de tesorería entre entidades</li>
+                <li>Divulgación regulatoria bajo control</li>
+              </ul>
+            </div>
+          </div>
+          <div class="wl-col wl-col-flush">
+            <img class="wl-media" src="/presentations/confidential-features.png" alt="Shield confidential amount" />
+            <div class="wl-card">
+              <div class="label">Características</div>
+              <ul>
+                <li>Saldos, montos y contrapartes encriptados</li>
+                <li>Transferencias válidas sin revelar la información sensible</li>
+                <li>Divulgación selectiva: con alcance, plazo y registro</li>
+                <li>Prueba de reservas sin exponer a los titulares</li>
+                <li>Registro de auditoría inmutable y atribuido</li>
+              </ul>
+            </div>
+          </div>
+          <div class="wl-col wl-col-flush">
+            <img class="wl-media" src="/presentations/confidential-benefits.png" alt="Generating proof for private balance" />
+            <div class="wl-card">
+              <div class="label">Beneficios</div>
+              <ul>
+                <li>Redes públicas sin exposición financiera pública</li>
+                <li>Conserva liquidez e interoperabilidad</li>
+                <li>Responde a auditores sin publicar el libro</li>
+                <li>Privado por defecto, visible por política</li>
+                <li>Adoptable solo cuando el caso de uso lo requiera</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        <div class="footer-bar">
+          <span>ryle.sh</span>
+          <span>Infraestructura financiera</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- 10. Back Office -->
+    <section class="slide">
+      <div class="pad">
+        <h2>Back office</h2>
+        <p class="lede">El Panel de control de Ryle: el centro operativo del programa de activos digitales.</p>
+        <div class="wl-grid">
+          <div class="wl-hero">
+            <div class="label eyebrow">Producto 04</div>
+            <div class="title">Configuración, emisión y redención, reporting y roles — en un solo lugar.</div>
+            <p>Operaciones, tesorería, compliance y dirección gestionan el programa desde un panel, con visibilidad en tiempo real y trazabilidad de auditoría completa.</p>
+            <div class="wl-hero-list">
+              <div class="label">Integraciones</div>
+              <ul>
+                <li>Sistemas de core banking y contabilidad</li>
+                <li>Sistemas de reporting regulatorio</li>
+                <li>Herramientas de analytics y BI</li>
+              </ul>
+            </div>
+          </div>
+          <div class="wl-col wl-col-flush">
+            <img class="wl-media" src="/presentations/backoffice-features.png" alt="Limits and economics" />
+            <div class="wl-card">
+              <div class="label">Características</div>
+              <ul>
+                <li>Parametrización de productos y servicios de activos digitales</li>
+                <li>Emisión, redención, transferencias y divulgaciones centralizadas</li>
+                <li>Conciliación de suministro frente a reservas</li>
+                <li>Panel multi-usuario con roles y permisos</li>
+                <li>Trazabilidad de auditoría y atribución de transacciones</li>
+              </ul>
+            </div>
+          </div>
+          <div class="wl-col wl-col-flush">
+            <img class="wl-media" src="/presentations/backoffice-benefits.png" alt="Mint status" />
+            <div class="wl-card">
+              <div class="label">Beneficios</div>
+              <ul>
+                <li>Operación diaria más clara y eficiente</li>
+                <li>Visibilidad completa de la salud del programa</li>
+                <li>Alineación con FATF, MiCA y expectativas locales</li>
+                <li>Menos errores y menor coste operativo por automatización</li>
+                <li>Decisiones basadas en datos vivos y atribuidos</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        <div class="footer-bar">
+          <span>ryle.sh</span>
+          <span>Infraestructura financiera</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- 11. Integration divider -->
+    <section class="slide divider-slide">
+      <div class="pad">
+        <p class="eyebrow">Conexión</p>
+        <h1 style="margin-top:12px">Integración</h1>
+        <div class="footer-bar">
+          <span>ryle.sh</span>
+          <span>Infraestructura financiera</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- 12. Integration surfaces -->
+    <section class="slide">
+      <div class="pad">
+        <h2>Cómo se integra</h2>
+        <p class="lede">Tres formas de conectar — misma lógica en panel, sistemas y automatización.</p>
+        <div class="wl-grid wl-grid-4">
+          <div class="wl-hero">
+            <div class="label eyebrow">Integración</div>
+            <div class="title">APIs, SDKs y MCP: un solo modelo entre el Panel de control y su stack.</div>
+            <p>Adopte módulos de forma independiente, conecte el KYC y los sistemas que ya utiliza, y mantenga una trazabilidad de auditoría unificada.</p>
+          </div>
+          <div class="wl-col wl-col-flush">
+            <img class="wl-media" src="/presentations/api-gateway.png" alt="API" />
+            <div class="wl-card">
+              <div class="idx">01</div>
+              <div class="label">API</div>
+              <p>Conexión a sus sistemas existentes para emisión, cuentas, transferencias y divulgaciones — con control de acceso y registro.</p>
+            </div>
+          </div>
+          <div class="wl-col wl-col-flush">
+            <img class="wl-media" src="/presentations/flexible-deployment.png" alt="SDK" />
+            <div class="wl-card">
+              <div class="idx">02</div>
+              <div class="label">SDK</div>
+              <p>Acelere la integración en su producto con las mismas capacidades que la API, listas para entorno de prueba y producción.</p>
+            </div>
+          </div>
+          <div class="wl-col wl-col-flush">
+            <img class="wl-media" src="/presentations/external-connectivity.png" alt="MCP" />
+            <div class="wl-card">
+              <div class="idx">03</div>
+              <div class="label">MCP</div>
+              <p>Permita que agentes de IA consulten y operen el programa bajo las políticas que usted define.</p>
+            </div>
+          </div>
+        </div>
+        <div class="footer-bar">
+          <span>ryle.sh</span>
+          <span>Infraestructura financiera</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- 13. Services -->
+    <section class="slide">
+      <div class="pad">
+        <h2>Custom Software Services</h2>
+        <div class="wl-grid">
+          <div class="wl-hero">
+            <div class="label eyebrow">A medida</div>
+            <div class="title">Desarrollos específicos para su programa — más allá de la plataforma estándar.</div>
+            <p>Cuando el caso de uso pide algo propio: integraciones, flujos o superficies que no vienen en el producto base.</p>
+            <div class="wl-hero-list">
+              <div class="label">Para qué</div>
+              <ul>
+                <li>Flujos y módulos propios de San Joaquín</li>
+                <li>Integraciones con sistemas que ya opera</li>
+                <li>Extensiones de marca y experiencia</li>
+              </ul>
+            </div>
+          </div>
+          <div class="bundle featured">
+            <div class="label">Opción 01</div>
+            <h3>Forward Deployed Engineer</h3>
+            <p>Un ingeniero de Ryle embebido con su equipo para diseñar y entregar esos desarrollos a medida.</p>
+            <ul>
+              <li>Puede desplegarse onsite, en cualquier país</li>
+              <li>Trabaja en su oficina, donde esté</li>
+              <li>Opera en su stack, con su equipo</li>
+              <li>Discovery, build, go-live y evolutivos</li>
+            </ul>
+            <div class="optional">Bonificado con nuestros productos</div>
+          </div>
+          <div class="bundle">
+            <div class="label">Opción 02</div>
+            <h3>Custom Software Services</h3>
+            <p>Alcance cerrado para software específico: lo que el programa necesita y la plataforma no cubre sola.</p>
+            <ul>
+              <li>Integraciones y módulos a medida</li>
+              <li>UX de marca y extensiones de flujo</li>
+              <li>Herramientas de datos, ops y migración</li>
+              <li>Alcance, hitos y entrega definidos</li>
+            </ul>
+            <div class="optional">Bonificado con nuestros productos</div>
+          </div>
+        </div>
+        <div class="footer-bar">
+          <span>ryle.sh</span>
+          <span>Infraestructura financiera</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- 14. Engagement -->
+    <section class="slide">
+      <div class="pad">
+        <div class="engagement-main">
+          <h2>Cómo trabajamos juntos</h2>
+          <p class="lede">Del primer caso de uso a producción — con acompañamiento técnico hasta el lanzamiento.</p>
+          <div class="phases-wrap">
+            <div class="phases">
+              <div class="phase">
+                <div class="n">1</div>
+                <div class="t">Inmersión</div>
+                <div class="when">Semanas 1–2</div>
+                <ul>
+                  <li>Alinear caso de uso y módulos</li>
+                  <li>Recorrido del Panel de control y las APIs</li>
+                  <li>Entorno de prueba: primeros flujos</li>
+                  <li>Mapear proveedores, KYC y roles</li>
+                </ul>
+                <div class="who">
+                  <span class="who-label">Equipo necesario:</span>
+                  Equipo de Producto Ryle + Su equipo de liderazgo
+                </div>
+              </div>
+              <div class="phase">
+                <div class="n">2</div>
+                <div class="t">Lanzamiento asistido</div>
+                <div class="when">Semanas 3–6</div>
+                <ul>
+                  <li>Checklist de producción</li>
+                  <li>Vinculación de proveedores y KYB</li>
+                  <li>Firmantes, reservas y endpoints</li>
+                  <li>Primeros flujos en producción, en paralelo</li>
+                </ul>
+                <div class="who">
+                  <span class="who-label">Equipo necesario:</span>
+                  Equipo de Ingeniería y Producto de Ryle + Su equipo operativo
+                </div>
+              </div>
+              <div class="phase">
+                <div class="n">3</div>
+                <div class="t">Acompañamiento</div>
+                <div class="when">Primeros meses en producción</div>
+                <ul>
+                  <li>Soporte de operación día a día</li>
+                  <li>Revisiones y refuerzo</li>
+                  <li>Traspaso de runbooks</li>
+                  <li>Estabilizar antes de expandir</li>
+                </ul>
+                <div class="who">
+                  <span class="who-label">Equipo necesario:</span>
+                  Su equipo operativo + Ryle en soporte
+                </div>
+              </div>
+              <div class="phase">
+                <div class="n">4</div>
+                <div class="t">Escala</div>
+                <div class="when">Siguiente etapa</div>
+                <ul>
+                  <li>Asesorar la siguiente etapa del programa</li>
+                  <li>Ampliar módulos y activos</li>
+                  <li>Nuevos casos de uso y mercados</li>
+                  <li>Camino comercial al siguiente nivel</li>
+                </ul>
+                <div class="who">
+                  <span class="who-label">Equipo necesario:</span>
+                  Equipo de Producto de Ryle + Su equipo de liderazgo
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="footer-bar">
+          <span>ryle.sh</span>
+          <span>Infraestructura financiera</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- 14. Next steps -->
+    <section class="slide">
+      <div class="pad">
+        <div class="next-steps-main">
+          <h2>Próximos pasos</h2>
+          <p class="lede">Del acuerdo comercial a la puesta en producción.</p>
+          <div class="grid-5">
+            <div class="card">
+              <div class="label">01</div>
+              <div class="title">Primer caso de uso</div>
+              <p>Elegir qué activar primero — real estate, rentas, cultivos, comunidad u otros — y acotar el alcance inicial.</p>
+            </div>
+            <div class="card">
+              <div class="label">02</div>
+              <div class="title">Propuesta</div>
+              <p>Acordar alcance, módulos, pricing y plazo. Definir criterios de éxito y un contacto técnico de referencia.</p>
+            </div>
+            <div class="card">
+              <div class="label">03</div>
+              <div class="title">Entorno de prueba</div>
+              <p>Cerrar el mix de productos, habilitar el entorno de prueba y recorrer los primeros flujos de activo con su equipo.</p>
+            </div>
+            <div class="card">
+              <div class="label">04</div>
+              <div class="title">Integración</div>
+              <p>Conectar APIs y webhooks a su stack, vincular KYC y sistemas existentes, y configurar roles y políticas en el Panel de control.</p>
+            </div>
+            <div class="card">
+              <div class="label">05</div>
+              <div class="title">Producción</div>
+              <p>Completar KYB, activar endpoints de producción, definir firmantes y reservas, y ejecutar el checklist de salida en vivo.</p>
+            </div>
+          </div>
+        </div>
+        <div style="display:flex; justify-content:space-between; margin-top:0; padding-top:24px">
+          <div>
+            <p class="eyebrow">Contacto</p>
+            <p style="font-weight:600; margin-top:6px; letter-spacing:-0.01em">martin@ryle.sh</p>
+          </div>
+          <div style="text-align:right">
+            <p class="eyebrow">Agenda</p>
+            <p style="font-weight:600; margin-top:6px; letter-spacing:-0.01em">calendly.com/martin-ryle/30min</p>
+          </div>
+        </div>
+        <div class="footer-bar">
+          <span>ryle.sh</span>
+          <span>Infraestructura financiera</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- 15. Closing -->
+    <section class="slide">
+      <div class="pad closing">
+        <div class="closing-main">
+          <div class="brand" style="margin-bottom:36px"><span class="delta">δ</span> Ryle</div>
+          <h1>Activos digitales con control<br />institucional — sin armar el stack.</h1>
+          <p class="lede">Con control y auditoría. Del piloto a producción con acompañamiento.</p>
+          <a class="cta" href="https://calendly.com/martin-ryle/30min">Agendar una conversación</a>
+        </div>
+        <div class="footer-bar">
+          <span>ryle.sh</span>
+          <span>Infraestructura financiera</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- 16. Opportunities (closing emphasis) -->
+    <section class="slide slide-dark">
+      <div class="pad">
+        <h2>Ryle × Estancia San Joaquín — Oportunidades</h2>
+        <div class="opp-stack">
+          <div class="opp-block">
+            <div class="opp-kicker">Casos de uso</div>
+            <div class="opp-grid opp-grid-5">
+              <div class="card">
+                <div class="opp-icon" aria-hidden="true"><i data-lucide="building-2"></i></div>
+                <div class="label">01</div>
+                <div class="title">Real estate</div>
+                <p>Tokenización de lotes y tierra — activo con avalúo e ingresos, primer componente a poner en marcha.</p>
+              </div>
+              <div class="card">
+                <div class="opp-icon" aria-hidden="true"><i data-lucide="circle-dollar-sign"></i></div>
+                <div class="label">02</div>
+                <div class="title">Rentas a tenedores</div>
+                <p>Distribución onchain de rentas o rendimientos a holders cuando los lotes generan ingresos.</p>
+              </div>
+              <div class="card">
+                <div class="opp-icon" aria-hidden="true"><i data-lucide="leaf"></i></div>
+                <div class="label">03</div>
+                <div class="title">Trazabilidad de cultivos</div>
+                <p>Limón, cacao y café en blockchain, con trazabilidad asociada y atributos de sustentabilidad.</p>
+              </div>
+              <div class="card">
+                <div class="opp-icon" aria-hidden="true"><i data-lucide="users"></i></div>
+                <div class="label">04</div>
+                <div class="title">Loyalty / comunidad</div>
+                <p>Token de identidad y participación comunitaria — vínculo con la comunidad local y programas de afiliación.</p>
+              </div>
+              <div class="card">
+                <div class="opp-icon" aria-hidden="true"><i data-lucide="heart-pulse"></i></div>
+                <div class="label">05</div>
+                <div class="title">Casos futuros</div>
+                <p>Historial clínico para la clínica de longevidad, e instrumentos para financiar investigación con la universidad.</p>
+              </div>
+            </div>
+          </div>
+          <div class="opp-block">
+            <div class="opp-kicker">Qué podemos brindarles</div>
+            <div class="opp-grid opp-grid-products">
+              <div class="card">
+                <div class="label">01</div>
+                <div class="title">Infraestructura blockchain</div>
+                <p>Emitir y operar el fideicomiso tokenizado — lotes, tierra y cuotas parte — y habilitar la distribución de rentas a tenedores.</p>
+              </div>
+              <div class="card">
+                <div class="label">02</div>
+                <div class="title">Wallet white-label</div>
+                <p>App y web propias para que inversores y la comunidad vean, compren y transfieran tokens, con mercado secundario bajo su marca.</p>
+              </div>
+              <div class="card">
+                <div class="label">03</div>
+                <div class="title">Back office</div>
+                <p>Panel para parametrizar activos, emitir y redimir, repartir rentas, gestionar roles y dejar trazabilidad de auditoría del programa.</p>
+              </div>
+              <div class="card">
+                <div class="label">04</div>
+                <div class="title">Integración y distribución</div>
+                <p>Conectar identidad, sistemas y canales de distribución para abrir inversores locales e internacionales, y sumar trazabilidad de cultivos y casos futuros.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="footer-bar">
+          <span>ryle.sh</span>
+          <span>Infraestructura financiera</span>
+        </div>
+      </div>
+    </section>
+
+  </div>
+  <script src="https://unpkg.com/lucide@0.469.0"></script>
+  <script>lucide.createIcons();</script>
+</body>
+</html>
