@@ -51,14 +51,23 @@ function googleVerificationTokens(): string[] | undefined {
 
 /** Default document title (homepage and fallback). */
 export const DEFAULT_SITE_TITLE =
-  "Ryle · Issue, move and spend money onchain";
+  "Ryle · Digital assets and financial infrastructure";
 
 /** Default meta description (≤155 chars for SERP snippets). */
 export const DEFAULT_SITE_DESCRIPTION =
+  "Ryle structures tokenized assets with the institutions that issue them and runs the infrastructure that issues, settles and distributes them.";
+
+/** `/client-services` title (the product landing that used to be `/`). */
+export const CLIENT_SERVICES_TITLE =
+  "Ryle Client Services · Your own stablecoin, wallet, payments and cards";
+
+/** `/client-services` meta description (≤155 chars for SERP snippets). */
+export const CLIENT_SERVICES_DESCRIPTION =
   "Modular financial infrastructure for companies: stablecoins, wallets, cross-border payments and cards, live in weeks. Runs in your cloud. Private by default.";
 
 /** Alt text for the static default share card (`app/opengraph-image.png`). */
-export const DEFAULT_OG_IMAGE_ALT = "Ryle — Build and scale digital assets";
+export const DEFAULT_OG_IMAGE_ALT =
+  "Ryle — Digital assets and financial infrastructure for the internet economy";
 
 /**
  * Shared root metadata merged in [`app/layout.tsx`](app/layout.tsx) with `icons`.

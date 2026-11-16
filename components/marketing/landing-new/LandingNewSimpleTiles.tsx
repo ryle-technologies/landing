@@ -18,7 +18,7 @@ const tileTitleClassName =
   "text-left text-base font-normal leading-6 text-foreground transition-colors duration-500 ease-out sm:leading-7"
 
 const tileBodyClassName =
-  "mt-3 text-left font-serif text-xl font-medium italic leading-snug tracking-[-0.02em] text-foreground transition-colors duration-500 ease-out min-[640px]:text-[22px] lg:text-[24px]"
+  "mt-3 text-left font-serif text-xl font-medium leading-snug tracking-[-0.02em] text-foreground transition-colors duration-500 ease-out min-[640px]:text-[22px] lg:text-[24px]"
 
 const footerLineClassName =
   "mt-8 text-left text-base font-normal leading-6 text-muted transition-colors duration-500 ease-out sm:mt-10 sm:leading-7"

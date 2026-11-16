@@ -1,11 +1,12 @@
 import { getMetadataBaseUrl } from "@/lib/metadata";
+import { CLIENT_SERVICES_HREF } from "@/lib/siteNav";
 
 /** Marketing pages sitemap (referenced by the /sitemap.xml index). */
 export function GET(): Response {
   const origin = getMetadataBaseUrl().origin;
   const lastmod = new Date().toISOString();
 
-  const urls = [`${origin}/`];
+  const urls = [`${origin}/`, `${origin}${CLIENT_SERVICES_HREF}`];
 
   const body = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">

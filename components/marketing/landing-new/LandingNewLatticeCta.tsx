@@ -12,10 +12,7 @@ import { useLayoutEffect, useRef, useState } from "react"
 import { LandingHomeChainsMarquee } from "@/components/marketing/landing/LandingHomeChainsMarquee"
 import { LandingHomeHeroFadeUp } from "@/components/marketing/landing/LandingHomeHeroFadeUp"
 import { LatticePlate } from "@/components/marketing/landing-new/lattice/LatticePlate"
-import {
-  HOME_ACTION_CHIP_SURFACE_STYLE,
-  MOVEMENT_ACTION_ICONS,
-} from "@/components/marketing/wallet-demo/ui/primitives"
+import { MOVEMENT_ACTION_ICONS } from "@/components/marketing/wallet-demo/ui/primitives"
 import { LATTICE_CELL_PX } from "@/lib/landingLattice"
 import {
   landingMarketingCtaAnchorProps,
@@ -29,8 +26,23 @@ const SUPPORTED_NETWORKS_LABEL = "Supported Networks: "
 
 const SendIcon = MOVEMENT_ACTION_ICONS.send
 
+/** Raised white chip (hero) or flat cream chip (sits on the lattice paper). */
+export type LatticeCtaTone = "raised" | "cream"
+
 const CHIP_SURFACE_CLASS =
-  "flex w-fit flex-row items-center gap-2 rounded-2xl border border-transparent px-5 text-left text-foreground shadow-[0_1px_3px_rgba(0,0,0,0.075)] [background-clip:padding-box,border-box] [background-origin:padding-box,border-box] [corner-shape:squircle] [transform:translateZ(0)]"
+  "flex w-fit flex-row items-center gap-2 rounded-2xl border border-transparent px-5 text-left text-foreground [background-clip:padding-box,border-box] [background-origin:padding-box,border-box] [corner-shape:squircle] [transform:translateZ(0)]"
+
+const CHIP_RAISED_CLASS = "shadow-[0_1px_3px_rgba(0,0,0,0.075)]"
+
+function chipSurfaceStyle(tone: LatticeCtaTone) {
+  if (tone === "cream") {
+    return { backgroundColor: "var(--marketing-surface)" }
+  }
+  return {
+    backgroundImage:
+      "linear-gradient(var(--surface), var(--surface)), var(--home-action-chip-stroke)",
+  }
+}
 
 const CTA_LETTER_STAGGER_S = 0.02
 const CTA_LETTER_EASE = [0.22, 1, 0.36, 1] as const
@@ -179,10 +191,13 @@ export function LandingNewLatticeCta({
   label,
   href = LANDING_MARKETING_CONTACT_HREF,
   className = "",
+  tone = "raised",
 }: {
   label: string
   href?: string
   className?: string
+  /** `raised` is the hero chip (white, shadow). `cream` is the same chip on paper. */
+  tone?: LatticeCtaTone
 }) {
   const reduceMotion = useReducedMotion()
   const [cycle, setCycle] = useState(0)
@@ -214,8 +229,8 @@ export function LandingNewLatticeCta({
       {...landingMarketingCtaAnchorProps(href)}
     >
       <span
-        className={`relative ${CHIP_SURFACE_CLASS}`}
-        style={{ ...HOME_ACTION_CHIP_SURFACE_STYLE, height: LATTICE_CELL_PX }}
+        className={`relative ${CHIP_SURFACE_CLASS} ${tone === "raised" ? CHIP_RAISED_CLASS : ""}`}
+        style={{ ...chipSurfaceStyle(tone), height: LATTICE_CELL_PX }}
       >
         {reduceMotion ? (
           <>
@@ -245,14 +260,16 @@ export function LandingNewLatticeCtaCell({
   label,
   href,
   className = "",
+  tone = "raised",
 }: {
   label: string
   href?: string
   className?: string
+  tone?: LatticeCtaTone
 }) {
   return (
     <div className={className}>
-      <LandingNewLatticeCta label={label} href={href} />
+      <LandingNewLatticeCta label={label} href={href} tone={tone} />
     </div>
   )
 }

@@ -12,7 +12,7 @@ import {
 import { LatticeSection } from "@/components/marketing/landing-new/lattice/LatticeSection"
 import { landingViewportBleedClassName } from "@/lib/landingLayout"
 import { LATTICE_SPACE } from "@/lib/landingLattice"
-import { FOOTER_DOCS_COLUMNS } from "@/lib/siteNav"
+import { FOOTER_DOCS_COLUMNS, type FooterNavColumn } from "@/lib/siteNav"
 
 const CELL_PAD =
   "px-4 py-3 md:p-8 [&_ul]:mt-2 [&_ul]:gap-2 md:[&_ul]:mt-3 md:[&_ul]:gap-2.5"
@@ -25,7 +25,7 @@ const FOOTER_CARD_MIN_ROWS = 5
 /** Phone two-up: hug the link list instead of matching the 5-row desktop cards. */
 const FOOTER_CARD_MIN_ROWS_COMPACT = 3
 
-const FOOTER_MARQUEE_WORDS = ["Issue", "Move", "Lend", "Yours"] as const
+const FOOTER_MARQUEE_WORDS: readonly string[] = ["Issue", "Move", "Lend", "Yours"]
 
 function splitAcross(cols: number, parts: number) {
   const base = Math.floor(cols / parts)
@@ -56,7 +56,15 @@ function FooterCard({ index, children }: { index: number; children: ReactNode })
  * Closing sitemap on the lattice: each nav group is a stroked cell, same
  * rhythm as the "One backend" feature cards.
  */
-export function LandingNewFooter() {
+export function LandingNewFooter({
+  columns = FOOTER_DOCS_COLUMNS,
+  marqueeWords = FOOTER_MARQUEE_WORDS,
+}: {
+  /** Sitemap groups, one stroked cell each. */
+  columns?: readonly FooterNavColumn[]
+  /** Words in the closing display marquee. */
+  marqueeWords?: readonly string[]
+} = {}) {
   return (
     <LatticeSection
       as="footer"
@@ -76,18 +84,18 @@ export function LandingNewFooter() {
           stroke
           className="max-md:![grid-template-columns:repeat(auto-fill,minmax(64px,1fr))]"
         >
-          {FOOTER_DOCS_COLUMNS.map((column, index) => (
+          {columns.map((column, index) => (
             <FooterCard key={column.heading} index={index}>
               <FooterSitemapColumn column={column} className={CELL_PAD} />
             </FooterCard>
           ))}
-          <FooterCard index={FOOTER_DOCS_COLUMNS.length}>
+          <FooterCard index={columns.length}>
             <LandingFooterRights orientation="stack" className={CELL_PAD} />
           </FooterCard>
         </LatticeGrid>
       </nav>
       <LandingFooterMarquee
-        words={FOOTER_MARQUEE_WORDS}
+        words={marqueeWords}
         size="display"
         className={`${landingViewportBleedClassName} ${LATTICE_SPACE.blockTight}`}
       />

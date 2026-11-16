@@ -52,6 +52,10 @@ export const LATTICE_SPACE = {
    * mobile column the copy sits on the column edge; half a cell from `md`.
    */
   plateInset: "py-4 md:p-8",
+  /** Same plate inset, with the copy on the column's left edge from `md`. */
+  plateInsetFlushLeft: "py-4 md:py-8 md:pr-8",
+  /** Hero title: no top or left inset from `md`. Right and bottom stay a half cell. */
+  plateInsetFlushTopLeft: "py-4 md:pt-0 md:pr-8 md:pb-8",
 } as const
 
 /** 1px lattice line colour — mirrored in `--lattice-line` (globals.css). */

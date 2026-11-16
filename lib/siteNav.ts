@@ -18,6 +18,37 @@ export function landingMarketingCtaAnchorProps(
 /** Landing footer link — X (Twitter). */
 export const LANDING_MARKETING_X_HREF = "https://x.com/__ryle" as const
 
+/** Direct contact shown beside the closing CTA. */
+export const LANDING_CONTACT_EMAIL = "martin@ryle.sh" as const
+
+/** Ryle Client Services (the product landing that used to be `/`). */
+export const CLIENT_SERVICES_HREF = "/client-services" as const
+
+/**
+ * In-page anchors on the institutional home (`/`). Section ids live in
+ * `components/marketing/institutional`.
+ */
+export const HOME_SECTION_HREFS = {
+  whatWeDo: "/#what-we-do",
+  issuance: "/#issuance",
+  solutions: "/#solutions",
+  whyRyle: "/#why-ryle",
+} as const
+
+export type SiteNavLink = {
+  label: string
+  href: string
+}
+
+/** Primary navigation, shared by `/` and `/client-services`. */
+export const SITE_NAV_LINKS: readonly SiteNavLink[] = [
+  { label: "Issuance", href: HOME_SECTION_HREFS.issuance },
+  { label: "Client Services", href: CLIENT_SERVICES_HREF },
+]
+
+/** Primary CTA label in the site navigation. */
+export const SITE_NAV_CTA_LABEL = "Talk to us" as const
+
 /** Docs site base path (proxied via Next.js rewrites). */
 export const DOCS_BASE_HREF = "/docs" as const
 
@@ -158,6 +189,40 @@ export const FOOTER_DOCS_COLUMNS_SECONDARY: FooterNavColumn[] = [
 export const FOOTER_DOCS_COLUMNS: FooterNavColumn[] = [
   ...FOOTER_DOCS_COLUMNS_PRIMARY,
   ...FOOTER_DOCS_COLUMNS_SECONDARY,
+]
+
+/**
+ * Site footer for `/` and `/client-services`: the firm first, then
+ * the same docs links the previous footer carried (Company and Build are
+ * merged into Developers so the grid stays at five columns plus the rights
+ * cell).
+ */
+export const FOOTER_SITE_COLUMNS: FooterNavColumn[] = [
+  {
+    heading: "Ryle",
+    headingHref: "/",
+    links: [
+      { label: "What we do", href: HOME_SECTION_HREFS.whatWeDo },
+      { label: "Ryle Issuance", href: HOME_SECTION_HREFS.issuance },
+      { label: "Ryle Client Services", href: CLIENT_SERVICES_HREF },
+    ],
+  },
+  FOOTER_DOCS_COLUMNS_PRIMARY[2],
+  FOOTER_DOCS_COLUMNS_PRIMARY[1],
+  FOOTER_DOCS_COLUMNS_PRIMARY[0],
+  {
+    heading: "Developers",
+    headingHref: DOCS_BASE_HREF,
+    links: [
+      { label: "Documentation", href: DOCS_BASE_HREF },
+      ...FOOTER_DOCS_COLUMNS_SECONDARY[1].links,
+      {
+        label: "Frequently asked questions",
+        href: `${DOCS_BASE_HREF}/reference/faq`,
+      },
+      { label: "Glossary", href: `${DOCS_BASE_HREF}/reference/glossary` },
+    ],
+  },
 ]
 
 /** In-app routes that belong to the "Alpha test" shell (pilot). */

@@ -18,6 +18,7 @@ import {
 import { LandingTopNav } from "@/components/marketing/landing/LandingTopNav"
 import { useMarketingScrollContainer } from "@/components/marketing/MarketingThemeProvider"
 import { landingColumnHorizontalPadClass } from "@/lib/landingLayout"
+import type { SiteNavLink } from "@/lib/siteNav"
 
 /** Ref to the closing-section scroll marker (see {@link LandingHomeNavFadeOutMarker}). */
 const LandingNavFadeOutContext =
@@ -62,8 +63,14 @@ const landingNavTopScrollFadeStyle = {
 export function LandingHomeStickyNav({
   padClassName = landingColumnHorizontalPadClass,
   sentinelInFlow = true,
+  links,
+  ctaLabel,
 }: {
   padClassName?: string
+  /** Section links for {@link LandingTopNav}. Omit for the wordmark + CTA bar. */
+  links?: readonly SiteNavLink[]
+  /** Overrides the CTA label of {@link LandingTopNav}. */
+  ctaLabel?: string
   /**
    * The reveal sentinel is 25dvh tall. In flow it doubles as spacing below
    * the hero; off, it is absolutely positioned so it adds no height (the
@@ -134,7 +141,7 @@ export function LandingHomeStickyNav({
           style={landingNavTopScrollFadeStyle}
         />
         <div className="relative z-10">
-          <LandingTopNav />
+          <LandingTopNav links={links} ctaLabel={ctaLabel} />
         </div>
       </motion.div>
     </>

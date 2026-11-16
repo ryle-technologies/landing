@@ -1,15 +1,15 @@
 /** Serif styles for the hero subline / lead (muted color applied where used). */
 export const landingHeroHeadlineClassName =
-  "font-serif font-normal italic leading-snug tracking-[-0.03em] text-[32px]"
+  "font-serif font-normal leading-snug tracking-[-0.03em] text-[32px]"
 
 /** Serif styles for the hero `h1` (narrower base size than section titles). */
 export const landingHeroH1ClassName =
-  "font-serif font-normal italic leading-snug tracking-normal text-[28px] sm:text-[36px]"
+  "font-serif font-normal leading-snug tracking-normal text-[28px] sm:text-[36px]"
 
 /**
  * Home landing h1.
  * From `sm` the line is one row at 82px so the longest rotating line
- * ("ship your own cross-border.") fits the lattice column after the
+ * ("Ship your own cross-border.") fits the lattice column after the
  * plate inset. Below `sm`, `LandingHomeHeroTextEffect` may shrink
  * further so the two nowrap lines still fit the column.
  */
@@ -26,19 +26,19 @@ export const landingNewLargeDisplayClassName =
 
 /** Serif styles for section titles (e.g. building-new) matching hero scale from `sm`. */
 export const landingHeroTitleClassName =
-  "font-serif font-normal italic leading-snug tracking-[-0.03em] text-[22px] sm:text-[36px]"
+  "font-serif font-normal leading-snug tracking-[-0.03em] text-[22px] sm:text-[36px]"
 
 /**
  * Wallet login splash headline — fixed scale at all breakpoints (no growth on large viewports).
  */
 export const loginSplashBuildingTitleClassName =
-  "font-serif font-normal italic leading-snug tracking-[-0.03em] text-[27px] text-foreground"
+  "font-serif font-normal leading-snug tracking-[-0.03em] text-[27px] text-foreground"
 
 /**
  * Login splash top row — δur · Beta … shared serif scale (δur and badge use the same size).
  */
 export const loginSplashWordmarkRowTextClassName =
-  "font-serif text-[1.375rem] font-normal italic leading-none tracking-[-0.04em] text-muted transition-colors duration-500 ease-out";
+  "font-serif text-[1.375rem] font-normal leading-none tracking-[-0.04em] text-muted transition-colors duration-500 ease-out";
 
 /** Standalone δur wordmark — same scale as {@link loginSplashWordmarkRowTextClassName} + `select-none`. */
 export const loginSplashDeltaMarkClassName =
@@ -46,7 +46,7 @@ export const loginSplashDeltaMarkClassName =
 
 /** Splash subtitle under the headline — serif to match title, muted; fixed scale everywhere. */
 export const loginSplashSubtitleClassName =
-  "font-serif font-normal italic leading-snug tracking-[-0.025em] text-[18px] text-muted"
+  "font-serif font-normal leading-snug tracking-[-0.025em] text-[18px] text-muted"
 
 /** Primary filled pill (marketing “Build on Sur”, wallet Google CTA). */
 export const landingHeroPrimaryCtaClassName =

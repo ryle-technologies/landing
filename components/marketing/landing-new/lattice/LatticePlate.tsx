@@ -1,7 +1,7 @@
 "use client"
 
 import { useLayoutEffect, useRef, useState, type ReactNode } from "react"
-import { ceilToLattice, LATTICE_SPACE } from "@/lib/landingLattice"
+import { ceilToLattice, cellsPx, LATTICE_SPACE } from "@/lib/landingLattice"
 
 /**
  * Paper plate for copy that sits directly on the lattice (headings, stats).
@@ -14,14 +14,26 @@ export function LatticePlate({
   children,
   className = "",
   inset = true,
+  flushLeft = false,
+  flushTopLeft = false,
   fill = false,
+  extraCols = 0,
 }: {
   children: ReactNode
   className?: string
   /** Copy inset ({@link LATTICE_SPACE.plateInset}). Off for content that carries its own padding. */
   inset?: boolean
+  /** From `md`, drop the left inset so the copy starts on the column edge. */
+  flushLeft?: boolean
+  /** From `md`, drop the top and left inset so the copy starts on the plate corner. */
+  flushTopLeft?: boolean
   /** Span the parent cell instead of shrink-wrapping width. Height still ceils to a line. */
   fill?: boolean
+  /**
+   * Cells added after the content snaps, so the plate is wider than its copy.
+   * Clamped to the column.
+   */
+  extraCols?: number
 }) {
   const wrapRef = useRef<HTMLDivElement>(null)
   const innerRef = useRef<HTMLDivElement>(null)
@@ -41,9 +53,9 @@ export function LatticePlate({
       wrap.style.minHeight = ""
       const r = inner.getBoundingClientRect()
       if (r.width < 1 || r.height < 1) return
-      const width = fill
-        ? ceilToLattice(maxWidth)
-        : Math.min(ceilToLattice(r.width), ceilToLattice(maxWidth))
+      const cap = ceilToLattice(maxWidth)
+      const snapped = fill ? cap : Math.min(ceilToLattice(r.width), cap)
+      const width = fill ? cap : Math.min(snapped + cellsPx(extraCols), cap)
       const height = ceilToLattice(r.height)
       wrap.style.width = fill ? "100%" : `${width}px`
       wrap.style.minHeight = `${height}px`
@@ -61,7 +73,15 @@ export function LatticePlate({
       ro.disconnect()
       void fonts
     }
-  }, [fill])
+  }, [extraCols, fill])
+
+  const insetClassName = !inset
+    ? ""
+    : flushTopLeft
+      ? LATTICE_SPACE.plateInsetFlushTopLeft
+      : flushLeft
+        ? LATTICE_SPACE.plateInsetFlushLeft
+        : LATTICE_SPACE.plateInset
 
   return (
     <div
@@ -81,7 +101,7 @@ export function LatticePlate({
       ) : null}
       <div
         ref={innerRef}
-        className={`relative z-10 max-w-full ${fill ? "w-full" : "w-fit"} ${inset ? LATTICE_SPACE.plateInset : ""}`}
+        className={`relative z-10 max-w-full ${fill ? "w-full" : "w-fit"} ${insetClassName}`}
       >
         {children}
       </div>
