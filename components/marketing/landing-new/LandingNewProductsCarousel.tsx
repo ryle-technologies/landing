@@ -66,6 +66,11 @@ type LandingNewProductsCarouselProps = {
   slots?: number
   /** Base gap between ambient swaps. 0 disables rotation. */
   rotateDelayMs?: number
+  /**
+   * Every tile stays expanded. No collapse, swap, or autoplay — the open
+   * plate, packed on the lattice.
+   */
+  allOpen?: boolean
 }
 
 /**
@@ -89,6 +94,8 @@ const BODY_CHAR_PX = 6.6
 const SHAPE_PX = 32
 const SNAP_EASE = "cubic-bezier(0.65, 0, 0.35, 1)"
 const COPY_CLASS_NAME = "min-w-0 shrink-0 -mt-2 -ml-1.5 pr-4 pb-4 pl-16"
+/** Open plates with no shape: title and body share the same inset. */
+const PLAIN_COPY_CLASS_NAME = "min-w-0 shrink-0 px-4 pt-2 pb-4"
 
 /* Ambient rotation — same rhythm as the Cloud masonry. */
 const ROTATE_FIRST_MS = 2600
@@ -200,9 +207,12 @@ function carouselMinRows(
 const cardChromeClassName =
   "rounded-2xl bg-[var(--surface)] shadow-[inset_0_0_0_1px_var(--border)]"
 
-/** Single line: the plate is one cell tall, so the title may ellipsize but never wrap. */
+/** Single line on an idle plate, so the title may ellipsize but never wrap. */
 const cardTitleClassName =
   "min-w-0 flex-1 truncate text-left font-sans text-[16px] font-medium leading-snug tracking-tight text-foreground transition-colors duration-500 ease-out sm:text-[17px]"
+
+/** Open plates can grow, so a long title wraps instead of being cut off. */
+const openTitleClassName = cardTitleClassName.replace(" truncate", "")
 
 const cardBadgeClassName =
   "mb-2.5 block text-left font-mono text-[10px] uppercase leading-snug tracking-wide text-muted transition-colors duration-500 ease-out"
@@ -216,14 +226,16 @@ const cardCtaClassName =
 function UseCaseCardCopy({
   item,
   live = true,
+  plain = false,
   style,
 }: {
   item: LandingNewProductsCarouselItem
   live?: boolean
+  plain?: boolean
   style?: CSSProperties
 }) {
   return (
-    <div className={COPY_CLASS_NAME} style={style} aria-hidden={!live}>
+    <div className={plain ? PLAIN_COPY_CLASS_NAME : COPY_CLASS_NAME} style={style} aria-hidden={!live}>
       {item.badge ? <span className={cardBadgeClassName}>{item.badge}</span> : null}
       {item.visual ? (
         <div
@@ -256,21 +268,32 @@ function UseCaseCardHeader({
   height,
   shape,
   style,
+  wrapTitle = false,
+  hideShape = false,
 }: {
   item: LandingNewProductsCarouselItem
   height: number
   shape?: ReactNode
   style?: CSSProperties
+  wrapTitle?: boolean
+  hideShape?: boolean
 }) {
   return (
-    <div className="flex shrink-0 items-center pr-4" style={{ height, ...style }}>
-      <div
-        className="landing-new-use-case-shape-slot pointer-events-none flex shrink-0 items-center justify-center overflow-visible"
-        style={{ width: CELL, minWidth: CELL, height: CELL }}
-      >
-        {shape ?? <div style={{ width: SHAPE_PX, height: SHAPE_PX }} />}
-      </div>
-      <h3 className={`${cardTitleClassName} -ml-1.5`}>{item.label}</h3>
+    <div
+      className={hideShape ? "flex shrink-0 items-center px-4 pt-4" : "flex shrink-0 items-center pr-4"}
+      style={hideShape ? style : wrapTitle ? { minHeight: height, ...style } : { height, ...style }}
+    >
+      {hideShape ? null : (
+        <div
+          className="landing-new-use-case-shape-slot pointer-events-none flex shrink-0 items-center justify-center overflow-visible"
+          style={{ width: CELL, minWidth: CELL, height: CELL }}
+        >
+          {shape ?? <div style={{ width: SHAPE_PX, height: SHAPE_PX }} />}
+        </div>
+      )}
+      <h3 className={`${wrapTitle ? openTitleClassName : cardTitleClassName} ${hideShape ? "" : "-ml-1.5"}`}>
+        {item.label}
+      </h3>
     </div>
   )
 }
@@ -279,15 +302,24 @@ function UseCaseOpenProbe({
   item,
   width,
   idleHeight,
+  wrapTitle = false,
+  hideShape = false,
 }: {
   item: LandingNewProductsCarouselItem
   width: number
   idleHeight: number
+  wrapTitle?: boolean
+  hideShape?: boolean
 }) {
   return (
     <div className="flex flex-col items-stretch" style={{ width }}>
-      <UseCaseCardHeader item={item} height={idleHeight} />
-      <UseCaseCardCopy item={item} live={false} />
+      <UseCaseCardHeader
+        item={item}
+        height={idleHeight}
+        wrapTitle={wrapTitle}
+        hideShape={hideShape}
+      />
+      <UseCaseCardCopy item={item} live={false} plain={hideShape} />
     </div>
   )
 }
@@ -305,6 +337,7 @@ function measureTitleBox(title: HTMLElement | null) {
 function useOpenRowSpans(
   items: readonly LandingNewProductsCarouselItem[],
   avail: number,
+  wrapTitles = false,
 ) {
   const probeRef = useRef<HTMLDivElement>(null)
   const [rows, setRows] = useState(() =>
@@ -361,7 +394,7 @@ function useOpenRowSpans(
       window.removeEventListener("resize", apply)
       void fonts
     }
-  }, [items, avail])
+  }, [items, avail, wrapTitles])
 
   const probes = (
     <div
@@ -376,6 +409,8 @@ function useOpenRowSpans(
             item={item}
             width={openColsForLabel(item.label, avail) * CELL}
             idleHeight={IDLE_ROWS * CELL}
+            wrapTitle={wrapTitles}
+            hideShape={wrapTitles}
           />
         )
       })}
@@ -906,6 +941,62 @@ function UseCaseMasonry({
   )
 }
 
+/** Every item expanded at once. Height is the dense pack of those open plates. */
+function allOpenRows(
+  items: readonly { label: string }[],
+  avail: number,
+  openRows: readonly number[],
+  idleCols?: readonly number[],
+) {
+  if (items.length === 0) return 0
+  const pieces = items.map((item, index) => {
+    const span = tileSpan(
+      item.label,
+      avail,
+      true,
+      openRows[index] ?? MIN_OPEN_ROWS,
+      idleCols?.[index],
+    )
+    return { cols: span.cols, rows: span.rows }
+  })
+  return packDenseRows(pieces, avail)
+}
+
+function OpenUseCaseMasonry({
+  items,
+  openRows,
+  idleCols,
+}: {
+  items: readonly LandingNewProductsCarouselItem[]
+  openRows: readonly number[]
+  idleCols: readonly number[]
+}) {
+  const { cols: gridCols } = useLatticeGrid()
+  const avail = Math.max(1, gridCols)
+
+  return items.map((item, index) => {
+    const span = tileSpan(
+      item.label,
+      avail,
+      true,
+      openRows[index] ?? MIN_OPEN_ROWS,
+      idleCols[index],
+    )
+    return (
+      <LatticeCell key={item.label} cols={span.cols} rows={span.rows} paper={false}>
+        <article
+          className={`h-full w-full overflow-hidden text-left ${cardChromeClassName}`}
+        >
+          <div className="flex h-full min-h-0 w-full flex-col items-stretch">
+            <UseCaseCardHeader item={item} height={CELL} wrapTitle hideShape />
+            <UseCaseCardCopy item={item} live plain />
+          </div>
+        </article>
+      </LatticeCell>
+    )
+  })
+}
+
 function initialSlots(count: number) {
   return Array.from({ length: count }, (_, index) => index)
 }
@@ -918,11 +1009,12 @@ export function LandingNewProductsCarousel({
   flatShapes = false,
   slots,
   rotateDelayMs = ROTATE_DEFAULT_MS,
+  allOpen = false,
 }: LandingNewProductsCarouselProps) {
   const ref = useRef<HTMLDivElement>(null)
   const [cols, setCols] = useState(LATTICE_COLUMN_MAX_COLS)
   const { capture, play } = useLatticeNeighborShift(ref)
-  const { rows: openRows, idleCols, probes } = useOpenRowSpans(items, cols)
+  const { rows: openRows, idleCols, probes } = useOpenRowSpans(items, cols, allOpen)
   const slotCount = slotCountForCols(
     Math.max(1, Math.min(items.length, slots ?? items.length)),
     cols,
@@ -963,7 +1055,9 @@ export function LandingNewProductsCarousel({
   const rowsNow =
     items.length === 0
       ? 0
-      : carouselMinRows(visible, cols, slotOpenRows, slotIdleCols)
+      : allOpen
+        ? allOpenRows(items, cols, openRows, idleCols)
+        : carouselMinRows(visible, cols, slotOpenRows, slotIdleCols)
   const minHeight = useLatticeHeightLock(cols, rowsNow)
 
   if (items.length === 0) return null
@@ -978,19 +1072,23 @@ export function LandingNewProductsCarousel({
     >
       {probes}
       <LatticeGrid className="overflow-visible" dense minCols={1}>
-        <UseCaseMasonry
-          items={items}
-          slotItems={slotItems}
-          onSlotItemsChange={handleSlotItemsChange}
-          openRows={openRows}
-          idleCols={idleCols}
-          autoplayDelayMs={autoplayDelayMs}
-          rotateDelayMs={rotateDelayMs}
-          flatShapes={flatShapes}
-          captureShift={capture}
-          playShift={play}
-          inView={inView}
-        />
+        {allOpen ? (
+          <OpenUseCaseMasonry items={items} openRows={openRows} idleCols={idleCols} />
+        ) : (
+          <UseCaseMasonry
+            items={items}
+            slotItems={slotItems}
+            onSlotItemsChange={handleSlotItemsChange}
+            openRows={openRows}
+            idleCols={idleCols}
+            autoplayDelayMs={autoplayDelayMs}
+            rotateDelayMs={rotateDelayMs}
+            flatShapes={flatShapes}
+            captureShift={capture}
+            playShift={play}
+            inView={inView}
+          />
+        )}
       </LatticeGrid>
     </div>
   )

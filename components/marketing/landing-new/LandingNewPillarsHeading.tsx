@@ -12,7 +12,7 @@ const pillarsDisplayClassName =
   "font-sans text-[clamp(36px,7.4vw,76px)] leading-none tracking-tighter text-foreground"
 
 const leadClassName =
-  "block font-serif text-[18px] font-normal italic leading-snug tracking-[-0.03em] text-muted sm:text-[28px]"
+  "block font-serif text-[18px] font-normal leading-snug tracking-[-0.03em] text-muted sm:text-[28px]"
 
 const restClassName = "relative text-left transition-colors duration-500 ease-out"
 
@@ -26,7 +26,7 @@ type LandingNewPillarsHeadingProps = {
   prefix: string
   /** Prefix phrases that stack on mobile and sit inline from `md`. */
   prefixLines?: readonly string[]
-  /** Roman words that sit with the accent (e.g. "so" before an italic close). */
+  /** Words that sit with the accent (e.g. "so" before the closing phrase). */
   accentLead?: string
   /** Hide `accentLead` below `md` when those words already live in `prefixLines`. */
   accentLeadFrom?: "md"
@@ -37,7 +37,7 @@ type LandingNewPillarsHeadingProps = {
   accentWrap?: boolean
   /** Rainbow shimmer underline on the accent phrase. */
   accentUnderline?: boolean
-  /** Italicize the accent phrase. */
+  /** Set the accent phrase in serif. */
   accentItalic?: boolean
   /** Overrides the default display scale of the headline. */
   displayClassName?: string
@@ -69,7 +69,7 @@ export function LandingNewPillarsHeading({
   const accentLeadClassName =
     accentLeadFrom === "md" ? "hidden md:inline" : "inline"
   const accentItalicClassName = accentItalic
-    ? "font-serif font-normal italic tracking-[-0.03em]"
+    ? "font-serif font-normal tracking-[-0.03em]"
     : ""
   const accentWrapClassName = [
     accentOnOwnLineAlways ? "block" : "",

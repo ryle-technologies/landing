@@ -92,7 +92,8 @@ export function LatticeGrid({
     const el = ref.current
     if (!el) return
     const apply = () => {
-      const next = Math.max(1, floorCells(el.getBoundingClientRect().width))
+      // A column can measure a fraction under its cell count (64rem → 1023.98px).
+      const next = Math.max(1, floorCells(el.getBoundingClientRect().width + 1))
       setCols((prev) => (prev === next ? prev : next))
     }
     apply()

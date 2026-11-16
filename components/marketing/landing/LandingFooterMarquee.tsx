@@ -3,7 +3,7 @@ const FOOTER_MARQUEE_WORDS = ["Instant", "Private", "Verifiable"] as const;
 const FOOTER_MARQUEE_REPEATS = Array.from({ length: 4 }, (_, index) => index);
 
 const footerStatementClassName =
-  "select-none whitespace-nowrap font-serif font-normal italic leading-[0.78] tracking-normal text-[color-mix(in_srgb,var(--muted)_32%,var(--marketing-surface))] transition-colors duration-500 ease-out";
+  "select-none whitespace-nowrap font-serif font-normal leading-[0.78] tracking-normal text-[color-mix(in_srgb,var(--muted)_32%,var(--marketing-surface))] transition-colors duration-500 ease-out";
 
 const sizeClassName = {
   default: "text-[clamp(3.05rem,10.7vw,5.25rem)]",

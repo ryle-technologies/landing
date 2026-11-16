@@ -32,7 +32,7 @@ const kickerClassName =
   "font-mono text-xs uppercase tracking-wide text-muted transition-colors duration-500 ease-out"
 
 const cardTitleClassName =
-  "text-left font-serif text-[22px] font-medium italic leading-snug tracking-[-0.02em] text-foreground transition-colors duration-500 ease-out sm:text-[24px]"
+  "text-left font-serif text-[22px] font-medium leading-snug tracking-[-0.02em] text-foreground transition-colors duration-500 ease-out sm:text-[24px]"
 
 const cardBodyClassName =
   "mt-2 text-left text-[14px] font-normal leading-[1.5] text-muted transition-colors duration-500 ease-out sm:text-[15px]"

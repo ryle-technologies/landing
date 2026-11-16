@@ -34,6 +34,10 @@ type LandingHomeHeroPinContentProps = {
   eyebrow?: string
   /** Optional smaller line directly under the headline. */
   subline?: string
+  /** Foreground clause that opens `subline` (homepage lead treatment). */
+  sublineLead?: string
+  /** Replaces the default serif styles on the subline paragraph. */
+  sublineClassName?: string
   /** When true, `subline` is rendered inside the `<h1>` instead of a sibling `<p>`. */
   sublineInH1?: boolean
   /** Seconds before the subline fade-up. */
@@ -70,9 +74,12 @@ type LandingHomeHeroPinContentProps = {
 export function LandingHomeHeroTopBar({
   className = "",
   padClassName = landingColumnHorizontalPadClass,
+  trailing,
 }: {
   className?: string
   padClassName?: string
+  /** Right-hand content (site links, CTA). Omit for the wordmark alone. */
+  trailing?: ReactNode
 }) {
   return (
     <div
@@ -100,6 +107,7 @@ export function LandingHomeHeroTopBar({
           Ryle
         </span>
       </Link>
+      {trailing}
     </div>
   )
 }
@@ -114,6 +122,8 @@ export function LandingHomeHeroPinContent({
   heroTitleTwoLine,
   eyebrow,
   subline,
+  sublineLead,
+  sublineClassName,
   sublineInH1 = false,
   sublineDelay = 0,
   ctaLabel = LANDING_MARKETING_CTA_LABEL,
@@ -172,9 +182,22 @@ export function LandingHomeHeroPinContent({
           {subline && !sublineInH1 ? (
             <LandingHomeHeroFadeUp
               delay={sublineDelay}
-              className="mt-4 max-w-[56rem] sm:mt-5"
+              className={
+                sublineLead
+                  ? "mt-6 max-w-[46rem] md:mt-8"
+                  : "mt-4 max-w-[56rem] sm:mt-5"
+              }
             >
-              <p className="text-left font-serif text-[24px] font-normal italic leading-snug tracking-[-0.02em] text-muted transition-colors duration-500 ease-out sm:text-[28px]">
+              <p
+                className={
+                  sublineClassName ??
+                  "text-left font-serif text-[24px] font-normal leading-snug tracking-[-0.02em] text-muted transition-colors duration-500 ease-out sm:text-[28px]"
+                }
+              >
+                {sublineLead ? (
+                  <span className="text-foreground">{sublineLead}</span>
+                ) : null}
+                {sublineLead ? " " : null}
                 {subline}
               </p>
             </LandingHomeHeroFadeUp>

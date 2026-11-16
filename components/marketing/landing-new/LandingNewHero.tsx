@@ -9,6 +9,9 @@ import {
   LandingHomeNavScrollScope,
   LandingHomeStickyNav,
 } from "@/components/marketing/landing/LandingHomeStickyNav"
+import { LandingSiteNav } from "@/components/marketing/landing/LandingSiteNav"
+import { heroLeadClassName } from "@/components/marketing/institutional/styles"
+
 import {
   landingHeroPrimaryCtaClassName,
   landingNewHeroDisplayClassName,
@@ -16,7 +19,11 @@ import {
 import { landingNewColumnHorizontalPadClass } from "@/lib/landingLayout"
 import { LATTICE_ROOT_ATTR } from "@/lib/landingLattice"
 import { landingHeroIntroDelays } from "@/lib/landingHeroIntro"
-import { LANDING_MARKETING_CONTACT_HREF } from "@/lib/siteNav"
+import {
+  LANDING_MARKETING_CONTACT_HREF,
+  SITE_NAV_CTA_LABEL,
+  SITE_NAV_LINKS,
+} from "@/lib/siteNav"
 
 const LandingNewLowerSections = dynamic(
   () =>
@@ -25,7 +32,7 @@ const LandingNewLowerSections = dynamic(
     ),
 )
 
-const HERO_TITLE = "ship your own"
+const HERO_TITLE = "Ship your own"
 
 /** Mobile: line 1 is the prefix; the rotating word sits on line 2. */
 const HERO_TITLE_TWO_LINE = HERO_TITLE
@@ -42,8 +49,12 @@ const HERO_ROTATING_WORDS = [
 
 const HERO_CTA_LABEL = "Talk to us"
 
-const HERO_EYEBROW =
-  "digital assets & financial infra for the internet economy."
+/**
+ * Opens the subtitle in the foreground color, the same lead treatment as
+ * the homepage paragraph under the h1.
+ */
+const HERO_SUBLINE_LEAD =
+  "Ryle Client Services. Digital-asset products for companies."
 
 const HERO_SUBLINE =
   "Issue assets, move money in seconds, and put payments and cards inside your product."
@@ -52,21 +63,26 @@ const { subline: HERO_SUBLINE_DELAY_S, cta: HERO_CTA_DELAY_S } =
   landingHeroIntroDelays(HERO_TITLE, HERO_ROTATING_WORDS[0])
 
 /**
- * Home landing. `<main>` is the lattice root (row 0); every child is a
+ * Ryle Client Services (`/client-services`), the product landing that used to
+ * be the home. `<main>` is the lattice root (row 0); every child is a
  * `LatticeSection`, so section tops stay on 64px lines all the way down.
  */
 export function LandingNewHero() {
   return (
     <main
-      id="landing-home"
-      aria-label="Home"
+      id="client-services"
+      aria-label="Ryle Client Services"
       className="w-full min-w-0 scroll-mt-6"
       {...{ [LATTICE_ROOT_ATTR]: "" }}
     >
-      {/* One lattice row: the top bar is full-width like the sticky nav it hands off to. */}
+      {/*
+        One lattice row: the top bar is full-width like the sticky nav it hands
+        off to. Above the hero so the mobile menu can open over it.
+      */}
       <LandingHomeHeroTopBar
-        className="relative z-10 h-16"
+        className="relative z-30 h-16"
         padClassName={landingNewColumnHorizontalPadClass}
+        trailing={<LandingSiteNav links={SITE_NAV_LINKS} />}
       />
       <LatticeSection
         as="div"
@@ -83,9 +99,9 @@ export function LandingNewHero() {
           heroTitleTwoLine={HERO_TITLE_TWO_LINE}
           heroTitleClassName={landingNewHeroDisplayClassName}
           rotatingWords={HERO_ROTATING_WORDS}
-          eyebrow={HERO_EYEBROW}
           subline={HERO_SUBLINE}
-          sublineInH1
+          sublineLead={HERO_SUBLINE_LEAD}
+          sublineClassName={heroLeadClassName}
           sublineDelay={HERO_SUBLINE_DELAY_S}
           ctaLabel={HERO_CTA_LABEL}
           heroVisual={null}
@@ -108,6 +124,8 @@ export function LandingNewHero() {
           <LandingHomeStickyNav
             padClassName={landingNewColumnHorizontalPadClass}
             sentinelInFlow={false}
+            links={SITE_NAV_LINKS}
+            ctaLabel={SITE_NAV_CTA_LABEL}
           />
           <LandingNewLowerSections />
         </div>

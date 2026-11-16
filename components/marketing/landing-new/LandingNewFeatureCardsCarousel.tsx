@@ -213,18 +213,22 @@ function FeatureCarouselChevrons({
   onNext,
   canPrev,
   canNext,
+  prevLabel,
+  nextLabel,
 }: {
   onPrev: () => void
   onNext: () => void
   canPrev: boolean
   canNext: boolean
+  prevLabel: string
+  nextLabel: string
 }) {
   const size = LATTICE_CELL_PX
   return (
     <div className="flex shrink-0" style={{ width: cellsPx(2), height: size }}>
       <button
         type="button"
-        aria-label="Previous feature"
+        aria-label={prevLabel}
         disabled={!canPrev}
         className={chevronButtonClassName}
         style={{ width: size, height: size }}
@@ -234,7 +238,7 @@ function FeatureCarouselChevrons({
       </button>
       <button
         type="button"
-        aria-label="Next feature"
+        aria-label={nextLabel}
         disabled={!canNext}
         className={chevronButtonClassName}
         style={{ width: size, height: size }}
@@ -252,21 +256,37 @@ function FeatureCarouselSlide({
   height,
   active,
   reduceMotion,
+  rounded,
 }: {
   children: ReactNode
   width: number
   height: number
   active: boolean
   reduceMotion: boolean
+  /** 16px radius, white-to-cream fill, border fading to transparent downward. */
+  rounded: boolean
 }) {
   return (
     <div
       data-feature-slide
       role="listitem"
-      className="relative shrink-0 touch-pan-y bg-[var(--marketing-surface)]"
-      style={{ width, height }}
+      className={`relative shrink-0 touch-pan-y ${
+        rounded
+          ? "overflow-hidden rounded-2xl border border-transparent [background-clip:padding-box,border-box] [background-origin:padding-box,border-box]"
+          : "bg-[var(--marketing-surface)]"
+      }`}
+      style={{
+        width,
+        height,
+        ...(rounded
+          ? {
+              backgroundImage:
+                "linear-gradient(to bottom, var(--surface), var(--marketing-surface)), linear-gradient(to bottom, var(--border), transparent)",
+            }
+          : null),
+      }}
     >
-      {active && !reduceMotion ? (
+      {active && !reduceMotion && !rounded ? (
         <div
           aria-hidden
           className="landing-feature-card-fade pointer-events-none absolute inset-0 z-0"
@@ -278,10 +298,12 @@ function FeatureCarouselSlide({
       >
         {children}
       </div>
-      <div
-        aria-hidden
-        className={`pointer-events-none absolute inset-0 z-20 ${latticeCellStrokeClassName}`}
-      />
+      {rounded ? null : (
+        <div
+          aria-hidden
+          className={`pointer-events-none absolute inset-0 z-20 ${latticeCellStrokeClassName}`}
+        />
+      )}
     </div>
   )
 }
@@ -291,6 +313,18 @@ type LandingNewFeatureCardsCarouselProps = {
   cardCols: number
   minRows: number
   className?: string
+  /** Accessible name for the sliding region. */
+  ariaLabel?: string
+  prevLabel?: string
+  nextLabel?: string
+  /** One cell between the heading plate and the chevrons. */
+  blockTight?: boolean
+  /** Rounded plate border instead of the lattice stroke. */
+  rounded?: boolean
+  /** `above` sits the chevrons over the track. `below` puts them under it. */
+  chevronPosition?: "above" | "below"
+  /** Left side of the row when chevrons sit below the track. */
+  belowStart?: ReactNode
 }
 
 /**
@@ -302,6 +336,13 @@ export function LandingNewFeatureCardsCarousel({
   cardCols,
   minRows,
   className = "",
+  ariaLabel = "Platform features",
+  prevLabel = "Previous feature",
+  nextLabel = "Next feature",
+  blockTight = true,
+  rounded = false,
+  chevronPosition = "above",
+  belowStart,
 }: LandingNewFeatureCardsCarouselProps) {
   const rootRef = useRef<HTMLDivElement>(null)
   const reduceMotion = useReducedMotion() ?? false
@@ -385,31 +426,36 @@ export function LandingNewFeatureCardsCarousel({
   const canNext = index < items.length - 1
   const goPrev = () => seekToIndex(index - 1)
   const goNext = () => seekToIndex(index + 1)
+  const chevrons = (
+    <FeatureCarouselChevrons
+      onPrev={goPrev}
+      onNext={goNext}
+      canPrev={canPrev}
+      canNext={canNext}
+      prevLabel={prevLabel}
+      nextLabel={nextLabel}
+    />
+  )
+  const controlRowStyle = {
+    height: cellsPx(1),
+    paddingLeft: inset,
+    paddingRight: inset,
+  }
 
   return (
     <div
       ref={rootRef}
-      className={`${landingViewportBleedClassName} ${LATTICE_SPACE.blockTight} ${className}`}
+      className={`${landingViewportBleedClassName} ${blockTight ? LATTICE_SPACE.blockTight : ""} ${className}`}
     >
-      <div
-        className="flex items-center justify-end"
-        style={{
-          height: cellsPx(1),
-          paddingLeft: inset,
-          paddingRight: inset,
-        }}
-      >
-        <FeatureCarouselChevrons
-          onPrev={goPrev}
-          onNext={goNext}
-          canPrev={canPrev}
-          canNext={canNext}
-        />
-      </div>
+      {chevronPosition === "above" ? (
+        <div className="flex items-center justify-end" style={controlRowStyle}>
+          {chevrons}
+        </div>
+      ) : null}
       <div
         className={viewportClassName}
         role="region"
-        aria-label="Platform features"
+        aria-label={ariaLabel}
         style={{
           height,
           paddingLeft: inset,
@@ -428,6 +474,7 @@ export function LandingNewFeatureCardsCarousel({
               key={slideIndex}
               active={slideIndex === index}
               reduceMotion={reduceMotion}
+              rounded={rounded}
               width={width}
               height={height}
             >
@@ -436,6 +483,15 @@ export function LandingNewFeatureCardsCarousel({
           ))}
         </div>
       </div>
+      {chevronPosition === "below" ? (
+        <div
+          className="flex items-center justify-between"
+          style={controlRowStyle}
+        >
+          <div className="min-w-0">{belowStart}</div>
+          {chevrons}
+        </div>
+      ) : null}
     </div>
   )
 }

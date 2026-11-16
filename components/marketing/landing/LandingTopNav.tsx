@@ -9,7 +9,9 @@ import {
   LANDING_MARKETING_CTA_LABEL,
 } from "@/lib/siteNav"
 import { LandingNavWordmark } from "@/components/marketing/landing/LandingNavWordmark"
+import { LandingSiteNav } from "@/components/marketing/landing/LandingSiteNav"
 import { landingHeroPrimaryCtaClassName } from "@/lib/landingHeroTypography"
+import type { SiteNavLink } from "@/lib/siteNav"
 
 function isAbsoluteHttpUrl(href: string): boolean {
   return href.startsWith("http://") || href.startsWith("https://")
@@ -23,6 +25,11 @@ interface LandingTopNavProps {
    * External URLs and `mailto:` use the primary pill; in-app paths use a text link.
    */
   ctaHref?: string
+  /**
+   * Section links beside the CTA (inline from `md`, a "Menu" popover below).
+   * Omit for the wordmark + CTA bar.
+   */
+  links?: readonly SiteNavLink[]
   className?: string
 }
 
@@ -30,6 +37,7 @@ interface LandingTopNavProps {
 export function LandingTopNav({
   ctaLabel = LANDING_MARKETING_CTA_LABEL,
   ctaHref: ctaHrefProp,
+  links,
   className,
 }: LandingTopNavProps) {
   const pathname = usePathname()
@@ -64,6 +72,9 @@ export function LandingTopNav({
           </Link>
         </div>
       </div>
+      {links?.length ? (
+        <LandingSiteNav links={links} ctaLabel={ctaLabel} ctaHref={ctaHref} />
+      ) : (
       <div className="flex shrink-0 items-center gap-x-5 sm:gap-x-6">
         {ctaUsesPrimaryPill ? (
           <a
@@ -96,6 +107,7 @@ export function LandingTopNav({
           </Link>
         )}
       </div>
+      )}
     </nav>
   )
 }
@@ -103,7 +115,7 @@ export function LandingTopNav({
 const topNavTextLinkClassName = [
   "inline-flex shrink-0 items-center self-center",
   "cursor-pointer border-0 bg-transparent p-0",
-  "font-serif text-[17px] font-normal italic leading-none tracking-[-0.02em] text-foreground/90",
+  "font-serif text-[17px] font-normal leading-none tracking-[-0.02em] text-foreground/90",
   "underline-offset-[0.2em] transition-opacity duration-500 ease-out hover:opacity-90 hover:underline",
   "focus-visible:rounded-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-foreground",
 ].join(" ")
