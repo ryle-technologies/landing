@@ -66,8 +66,7 @@ export const CLIENT_SERVICES_DESCRIPTION =
   "Modular financial infrastructure for companies: stablecoins, wallets, cross-border payments and cards, live in weeks. Runs in your cloud. Private by default.";
 
 /** Alt text for the static default share card (`app/opengraph-image.png`). */
-export const DEFAULT_OG_IMAGE_ALT =
-  "Ryle — Digital assets and financial infrastructure for the internet economy";
+export const DEFAULT_OG_IMAGE_ALT = "Ryle — Build and scale digital assets";
 
 /**
  * Shared root metadata merged in [`app/layout.tsx`](app/layout.tsx) with `icons`.
