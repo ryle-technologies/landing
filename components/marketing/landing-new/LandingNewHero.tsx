@@ -32,9 +32,14 @@ const LandingNewLowerSections = dynamic(
     ),
 )
 
-const HERO_TITLE = "Ship your own"
+/**
+ * Newlines are line breaks. Below `sm` each one is its own row. From `sm`
+ * the rows before the last join into "With Ryle Client Services,", and the
+ * last row stays with the rotating word.
+ */
+const HERO_TITLE = "With Ryle\nClient Services,\nship your own"
 
-/** Mobile: line 1 is the prefix; the rotating word sits on line 2. */
+/** Used when the headline is not rotating. Same break as {@link HERO_TITLE}. */
 const HERO_TITLE_TWO_LINE = HERO_TITLE
 
 const HERO_ROTATING_WORDS = [
@@ -53,8 +58,7 @@ const HERO_CTA_LABEL = "Talk to us"
  * Opens the subtitle in the foreground color, the same lead treatment as
  * the homepage paragraph under the h1.
  */
-const HERO_SUBLINE_LEAD =
-  "Ryle Client Services. Digital-asset products for companies."
+const HERO_SUBLINE_LEAD = "Digital-asset products for companies."
 
 const HERO_SUBLINE =
   "Issue assets, move money in seconds, and put payments and cards inside your product."
@@ -107,6 +111,7 @@ export function LandingNewHero() {
           heroVisual={null}
           topBar={false}
           headlinePlate
+          plateFlushTopLeft
           plateClassName="mt-32"
           showCta={false}
           showNetworks={false}

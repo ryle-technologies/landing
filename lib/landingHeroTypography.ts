@@ -8,8 +8,8 @@ export const landingHeroH1ClassName =
 
 /**
  * Home landing h1.
- * From `sm` the line is one row at 82px so the longest rotating line
- * ("Ship your own cross-border.") fits the lattice column after the
+ * From `sm` each row is 82px so the longest line
+ * ("ship your own cross-border.") fits the lattice column after the
  * plate inset. Below `sm`, `LandingHomeHeroTextEffect` may shrink
  * further so the two nowrap lines still fit the column.
  */

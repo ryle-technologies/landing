@@ -62,6 +62,11 @@ type LandingHomeHeroPinContentProps = {
   headlinePlate?: boolean
   /** Copy inset inside the headline plate. Off so type sits on the column edge. */
   plateInset?: boolean
+  /**
+   * Home-hero inset: no top or left padding from `md`. Right and bottom stay
+   * half a cell. Ignored unless `headlinePlate` is set.
+   */
+  plateFlushTopLeft?: boolean
   /** Default pill CTA inside the plate. Off when the new landing draws its own. */
   showCta?: boolean
   /** Supported-networks cluster beside the pill. */
@@ -136,6 +141,7 @@ export function LandingHomeHeroPinContent({
   topBar = true,
   headlinePlate = false,
   plateInset = true,
+  plateFlushTopLeft = false,
   showCta = true,
   showNetworks = true,
   afterPlate,
@@ -164,7 +170,9 @@ export function LandingHomeHeroPinContent({
 
         <Plate
           className={plateClassName}
-          {...(headlinePlate ? { inset: plateInset } : {})}
+          {...(headlinePlate
+            ? { inset: plateInset, flushTopLeft: plateFlushTopLeft }
+            : {})}
         >
           {eyebrow ? (
             <p className="mb-4 w-full whitespace-normal font-sans text-[clamp(17px,3.6vw,28px)] font-normal leading-[1.12] tracking-tighter text-muted transition-colors duration-500 ease-out sm:mb-5 sm:text-balance sm:text-[clamp(20px,2.2vw,30px)]">

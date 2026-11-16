@@ -135,7 +135,7 @@ export type SolutionFamily = {
 export const SOLUTIONS = {
   titleLines: ["What you can build"],
   titleAccent: "with Ryle",
-  sub: "Turn assets into new ways to invest, finance and operate.",
+  sub: "Turn assets into instruments you can invest in, finance with, and operate.",
   families: [
     {
       index: "01",
