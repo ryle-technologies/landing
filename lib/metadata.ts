@@ -55,7 +55,7 @@ export const DEFAULT_SITE_TITLE =
 
 /** Default meta description (≤155 chars for SERP snippets). */
 export const DEFAULT_SITE_DESCRIPTION =
-  "Ryle structures tokenized assets with the institutions that issue them and runs the infrastructure that issues, settles and distributes them.";
+  "Ryle connects institutional finance with decentralized technology. For institutions that issue assets, and companies that build products with them.";
 
 /** `/client-services` title (the product landing that used to be `/`). */
 export const CLIENT_SERVICES_TITLE =
