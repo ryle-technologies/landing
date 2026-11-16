@@ -156,12 +156,23 @@ export function LandingHomeHeroTextEffect({
   const pageVisible = usePageVisible()
   const [wordIndex, setWordIndex] = useState(0)
   const rotatingWord = rotatingWords?.[wordIndex] ?? null
-  const enterDelay = landingHeroPrefixEnterDelayS(title)
+  // Newlines split the prefix. Every row but the last is a lead line: stacked
+  // below `sm`, joined with spaces from `sm`. The last row sits with the
+  // rotating word.
+  const titleParts = title.split("\n")
+  const titleLeadLines = titleParts.length > 1 ? titleParts.slice(0, -1) : []
+  const titleRest = titleParts.length > 1 ? titleParts[titleParts.length - 1] : title
+  const titleLead = titleLeadLines.length > 0 ? titleLeadLines.join(" ") : null
+  const spokenTitle = title.replace(/\n/g, " ")
+  const titleRestDelay = titleLead ? landingHeroPrefixEnterDelayS(titleLead) : 0
+  const leadLineDelay = (index: number) =>
+    landingHeroPrefixEnterDelayS(titleLeadLines.slice(0, index).join(" "))
+  const enterDelay = landingHeroPrefixEnterDelayS(spokenTitle)
   const firstMorphWaitMs = rotatingWords?.[0]
-    ? landingHeroIntroDelays(title, rotatingWords[0]).firstMorph * 1000
+    ? landingHeroIntroDelays(spokenTitle, rotatingWords[0]).firstMorph * 1000
     : HERO_ROTATING_WORD_HOLD_MS
   const fitLines = rotatingWords
-    ? [title, ...rotatingWords.map((word) => `${word}.`)]
+    ? [...titleLeadLines, titleRest, ...rotatingWords.map((word) => `${word}.`)]
     : []
   const { h1Ref, sizerRef, fontPx } = useMobileDisplayFitPx(
     fitLines,
@@ -186,7 +197,7 @@ export function LandingHomeHeroTextEffect({
     return () => window.clearTimeout(id)
   }, [firstMorphWaitMs, pageVisible, reduceMotion, rotatingWords, wordIndex])
 
-  const fullTitle = rotatingWord ? `${title} ${rotatingWord}.` : title
+  const fullTitle = rotatingWord ? `${spokenTitle} ${rotatingWord}.` : spokenTitle
   const accessibleTitle = subtitle ? `${fullTitle} ${subtitle}` : fullTitle
   const fitSizer = rotatingWord ? (
     <span
@@ -270,11 +281,21 @@ export function LandingHomeHeroTextEffect({
       <h1 ref={h1Ref} className={heroH1ClassName}>
         <span className="sr-only">{accessibleTitle}</span>
         <span aria-hidden className="block" style={titleFitStyle}>
-          <span className="block whitespace-nowrap sm:hidden">{title}</span>
+          {titleLeadLines.map((line) => (
+            <span key={line} className="block whitespace-nowrap sm:hidden">
+              {line}
+            </span>
+          ))}
+          <span className="block whitespace-nowrap sm:hidden">{titleRest}</span>
           <span className="block whitespace-nowrap sm:hidden">
             {`${rotatingWord}.`}
           </span>
-          <span className="hidden sm:block">{fullTitle}</span>
+          <span className="hidden sm:block">
+            {titleLead ? <span className="block">{titleLead}</span> : null}
+            <span className="block">
+              {titleRest} {rotatingWord}.
+            </span>
+          </span>
         </span>
         {subtitleLine}
         {fitSizer}
@@ -286,45 +307,78 @@ export function LandingHomeHeroTextEffect({
     <h1 ref={h1Ref} className={heroH1ClassName}>
       <span className="sr-only">{accessibleTitle}</span>
       <span aria-hidden className="block" style={titleFitStyle}>
+        {titleLeadLines.map((line, index) => (
+          <span key={line} className="block whitespace-nowrap sm:hidden">
+            <TextEffect
+              per="word"
+              as="span"
+              preset="blur"
+              className="inline"
+              delay={leadLineDelay(index)}
+              speedReveal={HERO_TEXT_SPEED_REVEAL}
+              speedSegment={HERO_TEXT_SPEED_SEGMENT}
+            >
+              {line}
+            </TextEffect>
+          </span>
+        ))}
         <span className="block whitespace-nowrap sm:hidden">
           <TextEffect
             per="word"
             as="span"
             preset="blur"
             className="inline"
+            delay={titleRestDelay}
             speedReveal={HERO_TEXT_SPEED_REVEAL}
             speedSegment={HERO_TEXT_SPEED_SEGMENT}
           >
-            {title}
+            {titleRest}
           </TextEffect>
         </span>
         <span className="block whitespace-nowrap sm:hidden">
           <LandingHeroRotatingWord
             word={rotatingWord}
-            prefix={title}
+            prefix={spokenTitle}
             enterDelay={enterDelay}
             remeasureKey={fontPx}
           />
           .
         </span>
         <span className="hidden sm:block">
-          <TextEffect
-            per="word"
-            as="span"
-            preset="blur"
-            className="inline"
-            speedReveal={HERO_TEXT_SPEED_REVEAL}
-            speedSegment={HERO_TEXT_SPEED_SEGMENT}
-          >
-            {title}
-          </TextEffect>{" "}
-          <LandingHeroRotatingWord
-            word={rotatingWord}
-            prefix={title}
-            enterDelay={enterDelay}
-            remeasureKey={fontPx}
-          />
-          .
+          {titleLead ? (
+            <span className="block">
+              <TextEffect
+                per="word"
+                as="span"
+                preset="blur"
+                className="inline"
+                speedReveal={HERO_TEXT_SPEED_REVEAL}
+                speedSegment={HERO_TEXT_SPEED_SEGMENT}
+              >
+                {titleLead}
+              </TextEffect>
+            </span>
+          ) : null}
+          <span className="block">
+            <TextEffect
+              per="word"
+              as="span"
+              preset="blur"
+              className="inline"
+              delay={titleRestDelay}
+              speedReveal={HERO_TEXT_SPEED_REVEAL}
+              speedSegment={HERO_TEXT_SPEED_SEGMENT}
+            >
+              {titleRest}
+            </TextEffect>{" "}
+            <LandingHeroRotatingWord
+              word={rotatingWord}
+              prefix={spokenTitle}
+              enterDelay={enterDelay}
+              remeasureKey={fontPx}
+            />
+            .
+          </span>
         </span>
       </span>
       {subtitleLine}
